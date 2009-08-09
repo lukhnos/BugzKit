@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6A0FF641102ED1C7003089B7 /* BKXMLMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0FF640102ED1C7003089B7 /* BKXMLMapper.m */; };
 		6A832D73102EC38200510B1F /* TestBasicFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A832D72102EC38200510B1F /* TestBasicFunctions.m */; };
 		6A832D76102EC43200510B1F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A832D75102EC43200510B1F /* Foundation.framework */; };
 		6A832D78102EC43200510B1F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A832D77102EC43200510B1F /* SystemConfiguration.framework */; };
@@ -17,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6A0FF63F102ED1C7003089B7 /* BKXMLMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKXMLMapper.h; sourceTree = "<group>"; };
+		6A0FF640102ED1C7003089B7 /* BKXMLMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKXMLMapper.m; sourceTree = "<group>"; };
 		6A832D5A102EC33800510B1F /* TestBasicFunctions.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TestBasicFunctions.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A832D5C102EC33800510B1F /* TestBasicFunctions-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestBasicFunctions-Info.plist"; sourceTree = "<group>"; };
 		6A832D71102EC38200510B1F /* TestBasicFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestBasicFunctions.h; sourceTree = "<group>"; };
@@ -96,6 +99,8 @@
 		6A832D97102EC57C00510B1F /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				6A0FF63F102ED1C7003089B7 /* BKXMLMapper.h */,
+				6A0FF640102ED1C7003089B7 /* BKXMLMapper.m */,
 				6A832D98102EC57C00510B1F /* BugzKit.h */,
 				6A832D99102EC57C00510B1F /* BugzKit.m */,
 			);
@@ -177,6 +182,7 @@
 				6A832D9B102EC57C00510B1F /* LFSiteReachability.m in Sources */,
 				6A832D9C102EC57C00510B1F /* NSData+LFHTTPFormExtensions.m in Sources */,
 				6A832D9D102EC57C00510B1F /* BugzKit.m in Sources */,
+				6A0FF641102ED1C7003089B7 /* BKXMLMapper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

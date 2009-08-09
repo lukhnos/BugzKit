@@ -26,6 +26,7 @@
 //
 
 #import "BugzKit.h"
+#import "BKXMLMapper.h"
 
 static NSString *kRequestHTTPMethodKey = @"kRequestHTTPMethodKey";
 static NSString *kRequestURLKey = @"kRequestURLKey";
@@ -125,6 +126,9 @@ static NSString *kRequestDelegateKey = @"kRequestDelegateKey";
 - (void)httpRequestDidComplete:(LFHTTPRequest *)inRequest
 {
 	NSLog(@"%s, response as string: %@", __PRETTY_FUNCTION__, [[[NSString alloc] initWithData:request.receivedData encoding:NSUTF8StringEncoding] autorelease]);
+	
+	NSDictionary *mappedDictionary = [BKXMLMapper dictionaryMappedFromXMLData:request.receivedData];
+	NSLog(@"data: %@", mappedDictionary);
 }
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didFailWithError:(NSString *)error
