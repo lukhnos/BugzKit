@@ -28,7 +28,13 @@
 #import <SenTestingKit/SenTestingKit.h>
 #import "BugzKit.h"
 
-@interface TestBasicFunctions : SenTestCase <BKBugzVersionCheckDelegate, BKBugzLogOnDelegate, BKBugzLogOffDelegate>
+@interface TestBasicFunctions : SenTestCase
+	<
+		BKBugzVersionCheckDelegate,
+		BKBugzLogOnDelegate,
+		BKBugzLogOffDelegate,
+		BKBugzCaseListFetchDelegate
+	>
 {
 	BKBugzRequest *bugzRequest;
 }

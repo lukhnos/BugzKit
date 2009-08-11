@@ -48,6 +48,11 @@
 - (void)bugzRequest:(BKBugzRequest *)inRequest logOffDidFailWithError:(NSError *)inError;
 @end
 
+@protocol BKBugzCaseListFetchDelegate <NSObject>
+- (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList;
+- (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError;
+@end
+
 
 
 @interface BKBugzRequest : NSObject
@@ -66,6 +71,9 @@
 - (void)checkVersionWithDelegate:(id<BKBugzVersionCheckDelegate>)inDelegate;
 - (void)logOnWithUserName:(NSString *)inUserName password:(NSString *)inPassword delegate:(id<BKBugzLogOnDelegate>)inDelegate;
 - (void)logOffWithDelegate:(id<BKBugzLogOffDelegate>)inDelegate;
+
+- (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate;
+- (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList maximumCount:(NSUInteger)inMaximum delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate;
 
 
 @property (retain) NSString *endpointRootString;

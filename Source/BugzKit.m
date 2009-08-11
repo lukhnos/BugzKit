@@ -242,10 +242,44 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)logOffResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
 {
-	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
-	
+	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);	
 }
 
+#pragma mark Fetch Case List
+
+- (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate
+{
+	[self fetchCaseListWithQuery:inQuery columns:inColumnList maximumCount:NSUIntegerMax delegate:inDelegate];
+}
+
+- (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList maximumCount:(NSUInteger)inMaximum delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate
+{
+	NSAssert(self.authToken, @"Must have auth token");
+	
+	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	[params setObject:self.authToken forKey:@"token"];
+	[params setObject:inQuery forKey:@"q"];
+	if ([inColumnList length]) {
+		[params setObject:inColumnList forKey:@"cols"];
+	}
+	
+	if (inMaximum != NSUIntegerMax) {
+		[params setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inMaximum] forKey:@"max"];
+	}
+	
+	NSURL *serviceURL = [self serviceURLWithCommand:@"search" arguments:params];
+	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:serviceURL data:nil handlerPrefix:@"caseListFetch" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
+}
+
+- (void)caseListFetchResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
+}
+
+/*
+ - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList;
+ - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError;
+*/ 
 
 #pragma mark LFHTTPRequest delegates
 

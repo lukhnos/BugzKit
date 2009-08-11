@@ -53,14 +53,11 @@
 
 - (void)setUp
 {	
-	NSLog(@"setUp: %p", bugzRequest);
-	
 	bugzRequest = [[[self class] sharedRequest] retain];
 }
 
 - (void)tearDown
 {
-	NSLog(@"tearDown");
 	[bugzRequest release];
 	bugzRequest = nil;
 }
@@ -116,7 +113,6 @@
 	[bugzRequest logOffWithDelegate:self];
 }
 
-
 - (void)bugzRequestLogOffDidComplete:(BKBugzRequest *)inRequest
 {
 	STAssertTrue(1, @"Must completed logging off");
@@ -126,5 +122,21 @@
 {
 	STFail(@"%@", inError);		
 }
+
+#pragma mark Test Case List Fetch
+
+- (void)testCaseListFetch
+{
+	[bugzRequest fetchCaseListWithQuery:@"project:inbox" columns:@"sTitle" delegate:self];
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList
+{
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError
+{
+}
+
 
 @end
