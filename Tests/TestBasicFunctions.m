@@ -29,6 +29,20 @@
 #import "TestEndpoint.h"
 
 @implementation TestBasicFunctions
++ (BKBugzRequest *)sharedRequest
+{
+	static BKBugzRequest *bugzRequest = nil;
+	
+	if (!bugzRequest) {
+		bugzRequest = [[BKBugzRequest alloc] init];
+		
+		bugzRequest.endpointRootString = kTestEndpoint;
+		bugzRequest.shouldWaitUntilDone = YES;
+	}	
+
+	return bugzRequest;
+}
+
 - (void)dealloc
 {
 	[bugzRequest release];
@@ -39,19 +53,16 @@
 
 - (void)setUp
 {	
-	NSLog(@"setUp");
-
-	if (!bugzRequest) {
-		bugzRequest = [[BKBugzRequest alloc] init];
-		
-		bugzRequest.endpointRootString = kTestEndpoint;
-		bugzRequest.shouldWaitUntilDone = YES;
-	}	
+	NSLog(@"setUp: %p", bugzRequest);
+	
+	bugzRequest = [[[self class] sharedRequest] retain];
 }
 
 - (void)tearDown
 {
 	NSLog(@"tearDown");
+	[bugzRequest release];
+	bugzRequest = nil;
 }
 
 - (void)testTruth
@@ -61,7 +72,7 @@
 
 #pragma mark Version check test
 
-- (void)testVersionCheck
+- (void)test0_VersionCheck
 {
 	[bugzRequest checkVersionWithDelegate:self];
 }
@@ -74,6 +85,46 @@
 - (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidFailWithError:(NSError *)inError
 {
 	STFail(@"%@", inError);
+}
+
+
+#pragma mark Test Logging On and Off
+
+- (void)testA_LogOn
+{
+	[bugzRequest logOnWithUserName:kTestLoginEmail password:kTestLoginPassword delegate:self];
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidCompleteWithToken:(NSString *)inToken
+{
+	STAssertTrue([inToken length], @"Must now have obtained auth token");
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidFailWithAmbiguousNameList:(NSArray *)inNameList
+{
+	STFail(@"Ambiguous login, suggested name list: %@", inNameList);
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidFailWithError:(NSError *)inError
+{
+	STFail(@"%@", inError);	
+}
+
+
+- (void)testZ_LogOff
+{
+	[bugzRequest logOffWithDelegate:self];
+}
+
+
+- (void)bugzRequestLogOffDidComplete:(BKBugzRequest *)inRequest
+{
+	STAssertTrue(1, @"Must completed logging off");
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOffDidFailWithError:(NSError *)inError
+{
+	STFail(@"%@", inError);		
 }
 
 @end

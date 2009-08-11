@@ -38,7 +38,16 @@ static NSString *kRequestExtraInfoKey = @"kRequestExtraInfoKey";
 static NSString *kRequestResponseHandlerKey = @"kRequestResponseHandlerKey";
 static NSString *kRequestFailureHandlerKey = @"kRequestFailureHandlerKey";
 
-
+NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
+{
+	CFStringRef escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)inStr, NULL, CFSTR("&"), kCFStringEncodingUTF8);
+	
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4	
+	return (NSString *)[escaped autorelease];			    
+#else
+	return (NSString *)[NSMakeCollectable(escaped) autorelease];			    
+#endif
+}
 
 @implementation BKBugzRequest
 - (void)dealloc
@@ -117,6 +126,20 @@ static NSString *kRequestFailureHandlerKey = @"kRequestFailureHandlerKey";
     }
 }
 
+- (NSURL *)serviceURLWithCommand:(NSString *)inCommand arguments:(NSDictionary *)inArguments
+{
+	NSMutableArray *params = [NSMutableArray array];
+	[params addObject:[NSString stringWithFormat:@"cmd=%@", inCommand]];
+	
+	for (NSString *key in inArguments) {
+		[params addObject:[NSString stringWithFormat:@"%@=%@", key, OFEscapedURLStringFromNSString([inArguments objectForKey:key])]];
+	}
+	
+	NSString *serviceURLString = [NSString stringWithFormat:@"%@%@", self.serviceEndpointString, [params componentsJoinedByString:@"&"]];
+	NSLog(@"%@", serviceURLString);
+	return [NSURL URLWithString:serviceURLString];	
+}
+
 - (void)pushRequestInfoWithHTTPMethod:(NSString *)inHTTPMethod URL:(NSURL *)inURL data:(NSData *)inData handlerPrefix:(NSString *)inPrefix processDefaultErrorResponse:(BOOL)inProcessError delegate:(id)inDelegate extraInfo:(NSDictionary *)inExtraInfo
 {
     id data = inData ? inData : (id)[NSNull null];
@@ -142,11 +165,87 @@ static NSString *kRequestFailureHandlerKey = @"kRequestFailureHandlerKey";
 	[self runQueue];
 }
 
+#pragma mark Version Check
+
 - (void)checkVersionWithDelegate:(id<BKBugzVersionCheckDelegate>)inDelegate
 {
     NSString *URLString = [endpointRootString stringByAppendingString:@"api.xml"];    
     [self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:[NSURL URLWithString:URLString] data:nil handlerPrefix:@"versionCheck" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
 }
+
+- (void)versionCheckResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
+	
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
+	NSAssert([delegate respondsToSelector:@selector(bugzRequest:versionCheckDidCompleteWithVersion:minorVersion:)], @"Delegate must have handler");
+	
+	NSString *majorVersion = [inResponse textContentForKey:@"version"];
+	NSString *minorVersion = [inResponse textContentForKey:@"minversion"];
+	self.serviceEndpointString = [NSString stringWithFormat:@"%@%@", endpointRootString, [inResponse textContentForKey:@"url"]];
+	
+	NSLog(@"service endpoint is now: %@", self.serviceEndpointString);
+	
+	[delegate bugzRequest:self versionCheckDidCompleteWithVersion:majorVersion minorVersion:minorVersion];
+}
+
+#pragma mark Log On
+
+- (void)logOnWithUserName:(NSString *)inUserName password:(NSString *)inPassword delegate:(id<BKBugzLogOnDelegate>)inDelegate
+{
+	NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:inUserName, @"email",inPassword, @"password", nil];
+	NSURL *serviceURL = [self serviceURLWithCommand:@"logon" arguments:params];	
+	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestPOSTMethod URL:serviceURL data:nil handlerPrefix:@"logOn" processDefaultErrorResponse:NO delegate:inDelegate extraInfo:params];
+}
+
+- (void)logOnResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
+	
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
+	
+	
+	NSDictionary *token = [inResponse objectForKey:@"token"];	
+	if (token) {
+		NSAssert([delegate respondsToSelector:@selector(bugzRequest:logOnDidCompleteWithToken:)], @"Delegate must have handler");
+		
+		self.authToken = token.textContent;
+		[delegate bugzRequest:self logOnDidCompleteWithToken:self.authToken];
+	}
+	else {
+		// TO DO: Handle ambiguous names
+		
+		NSInteger errorCode = BKUnknownError;
+		NSString *errorDomain = BKBugzAPIErrorDomain;
+		NSString *localizedMessage = nil;
+		
+		NSDictionary *errorBlock = [inResponse objectForKey:@"error"];
+		if (errorBlock) {
+			localizedMessage = errorBlock.textContent;
+			errorCode = [[errorBlock objectForKey:@"code"] integerValue];
+		}
+		
+		NSError *error = [NSError errorWithDomain:errorDomain code:errorCode userInfo:(!localizedMessage ? nil : [NSDictionary dictionaryWithObjectsAndKeys:localizedMessage, NSLocalizedDescriptionKey, nil])];
+		[delegate bugzRequest:self logOnDidFailWithError:error];
+	}
+}
+
+
+#pragma mark Log Off
+
+- (void)logOffWithDelegate:(id<BKBugzLogOffDelegate>)inDelegate
+{
+	NSAssert(self.authToken, @"Must have auth token");
+	NSURL *serviceURL = [self serviceURLWithCommand:@"logoff" arguments:[NSDictionary dictionaryWithObjectsAndKeys:self.authToken, @"token", nil]];
+	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestPOSTMethod URL:serviceURL data:nil handlerPrefix:@"logOff" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];	
+}
+
+- (void)logOffResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
+	
+}
+
 
 #pragma mark LFHTTPRequest delegates
 
@@ -177,16 +276,20 @@ static NSString *kRequestFailureHandlerKey = @"kRequestFailureHandlerKey";
 {
 	NSLog(@"%s, error: %@", __PRETTY_FUNCTION__, inError);
 	
-	NSError *error = nil;
-	NSString *domain = nil;
+	NSString *errorDomain = BKBugzConnectionErrorDomain;
 	NSString *localizedMessage = nil;
+	NSInteger errorCode = BKUnknownError;
 	
 	if ([inError isEqualToString:LFHTTPRequestConnectionError]) {
+		errorCode = BKConnecitonLostError;
 	}
 	else if ([inError isEqualToString:LFHTTPRequestTimeoutError]) {
+		errorCode = BKConnecitonTimeoutError;
 	}
 	else {
+		;
 	}
+	NSError *error = [NSError errorWithDomain:errorDomain code:errorCode userInfo:(!localizedMessage ? nil : [NSDictionary dictionaryWithObjectsAndKeys:localizedMessage, NSLocalizedDescriptionKey, nil])];
 		
 	NSDictionary *sessionInfo = inRequest.sessionInfo;
 	id delegate = [sessionInfo objectForKey:kRequestDelegateKey];
@@ -206,23 +309,6 @@ static NSString *kRequestFailureHandlerKey = @"kRequestFailureHandlerKey";
 	request.shouldWaitUntilDone = inValue;
 }
 
-#pragma mark Version Check Handler
-
-- (void)versionCheckResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
-{
-	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
-
-	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
-	NSAssert([delegate respondsToSelector:@selector(bugzRequest:versionCheckDidCompleteWithVersion:minorVersion:)], @"Delegate must have handler");
-	
-	NSString *majorVersion = [inResponse textContentForKey:@"version"];
-	NSString *minorVersion = [inResponse textContentForKey:@"minversion"];
-	self.serviceEndpointString = [NSString stringWithFormat:@"%@%@", endpointRootString, [inResponse textContentForKey:@"url"]];
-	
-	NSLog(@"service endpoint is now: %@", self.serviceEndpointString);
-	
-	[delegate bugzRequest:self versionCheckDidCompleteWithVersion:majorVersion minorVersion:minorVersion];
-}
 
 - (void)setEndpointRootString:(NSString *)inEndpoint
 {
