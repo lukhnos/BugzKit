@@ -132,6 +132,7 @@
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList
 {
+	NSLog(@"Fetched cases: %@", inCaseList);
 }
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError

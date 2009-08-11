@@ -78,6 +78,7 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 		endpointRootString = @"";
 		requestInfoQueue = [[NSMutableArray alloc] init];
 		request = [[LFHTTPRequest alloc] init];
+		request.timeoutInterval = 30.0;
 		request.delegate = self;
 	}
 	
@@ -136,7 +137,6 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 	}
 	
 	NSString *serviceURLString = [NSString stringWithFormat:@"%@%@", self.serviceEndpointString, [params componentsJoinedByString:@"&"]];
-	NSLog(@"%@", serviceURLString);
 	return [NSURL URLWithString:serviceURLString];	
 }
 
@@ -175,16 +175,12 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)versionCheckResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
 {
-	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
-	
 	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
 	NSAssert([delegate respondsToSelector:@selector(bugzRequest:versionCheckDidCompleteWithVersion:minorVersion:)], @"Delegate must have handler");
 	
 	NSString *majorVersion = [inResponse textContentForKey:@"version"];
 	NSString *minorVersion = [inResponse textContentForKey:@"minversion"];
 	self.serviceEndpointString = [NSString stringWithFormat:@"%@%@", endpointRootString, [inResponse textContentForKey:@"url"]];
-	
-	NSLog(@"service endpoint is now: %@", self.serviceEndpointString);
 	
 	[delegate bugzRequest:self versionCheckDidCompleteWithVersion:majorVersion minorVersion:minorVersion];
 }
@@ -200,10 +196,7 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)logOnResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
 {
-	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
-	
-	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
-	
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];	
 	
 	NSDictionary *token = [inResponse objectForKey:@"token"];	
 	if (token) {
@@ -242,7 +235,6 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)logOffResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
 {
-	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);	
 }
 
 #pragma mark Fetch Case List
@@ -273,7 +265,34 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)caseListFetchResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
 {
-	NSLog(@"%s %@ %@", __PRETTY_FUNCTION__, inResponse, inSessionInfo);
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
+	NSAssert([delegate respondsToSelector:@selector(bugzRequest:caseListFetchDidCompleteWithList:)], @"Delegate must have handler");
+	
+	id caseList = [inResponse valueForKeyPath:@"cases.case"];
+	
+	if (![caseList isKindOfClass:[NSArray class]]) {
+		caseList = [NSArray array];
+	}
+	
+	NSMutableArray *resultList = [NSMutableArray array];
+	
+	for (NSDictionary *c in caseList) {
+		NSMutableDictionary *result = [NSMutableDictionary dictionary];
+		
+		for (NSString *k in c) {
+			id v = [c objectForKey:k];
+			if ([v isKindOfClass:[NSDictionary dictionary]] && [[v textContent] length]) {
+				[result setObject:[v textContent]  forKey:k];
+			}
+			else {
+				[result setObject:v forKey:k];
+			}
+		}
+
+		[resultList addObject:result];
+	}
+	
+	[delegate bugzRequest:self caseListFetchDidCompleteWithList:resultList];
 }
 
 /*
@@ -289,8 +308,6 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)httpRequestDidComplete:(LFHTTPRequest *)inRequest
 {
-	NSLog(@"%s, response as string: %@", __PRETTY_FUNCTION__, [[[NSString alloc] initWithData:request.receivedData encoding:NSUTF8StringEncoding] autorelease]);
-	
 	NSDictionary *mappedDictionary = [BKXMLMapper dictionaryMappedFromXMLData:request.receivedData];
 	
 	if ([[inRequest.sessionInfo objectForKey:kRequestProcessErrorKey] boolValue]) {
