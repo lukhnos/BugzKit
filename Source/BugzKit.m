@@ -281,7 +281,7 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 		
 		for (NSString *k in c) {
 			id v = [c objectForKey:k];
-			if ([v isKindOfClass:[NSDictionary dictionary]] && [[v textContent] length]) {
+			if ([v isKindOfClass:[NSDictionary class]] && [[v textContent] length]) {
 				[result setObject:[v textContent]  forKey:k];
 			}
 			else {
