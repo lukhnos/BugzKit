@@ -42,6 +42,8 @@ extern NSString *const BKXMLTextContentKey;
 
 @interface NSDictionary (BKXMLMapperExtension)
 - (NSString *)textContent;
+- (NSString *)textContentForKey:(NSString *)inKey;
+- (NSString *)textContentForKeyPath:(NSString *)inKeyPath;
 
 #if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
 @property (nonatomic, readonly) NSString *textContent;

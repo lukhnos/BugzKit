@@ -34,21 +34,42 @@
 
 @protocol BKBugzVersionCheckDelegate <NSObject>
 - (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidCompleteWithVersion:(NSString *)inMajorVersion minorVersion:(NSString *)inMinorVersion;
-- (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidFail:(NSError *)inError;
+- (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidFailWithError:(NSError *)inError;
 @end
+
+@protocol BKBugzLogOnDelegate <NSObject>
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidCompleteWithToken:(NSString *)inToken;
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidFailWithAmbiguousNameList:(NSArray *)inNameList;
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidFailWithError:(NSError *)inError;
+@end
+
+@protocol BKBugzLogOffDelegate <NSObject>
+- (void)bugzRequestLogOffDidComplete:(BKBugzRequest *)inRequest;
+- (void)bugzRequest:(BKBugzRequest *)inRequest logOffDidFailWithError:(NSError *)inError;
+@end
+
+
 
 @interface BKBugzRequest : NSObject
 {
-    NSString *endpointString;
+    NSString *endpointRootString;
+	
+	// version check and login API change these states
+	NSString *serviceEndpointString;
+	NSString *authToken;	
     
     NSMutableArray *requestInfoQueue;
     LFHTTPRequest *request;   
 }
 
+// + (id)copy;
 - (void)checkVersionWithDelegate:(id<BKBugzVersionCheckDelegate>)inDelegate;
 
 @property (assign) BOOL shouldWaitUntilDone;
-@property (retain) NSString *endpointString;
+
+@property (retain) NSString *endpointRootString;
+@property (retain) NSString *serviceEndpointString;
+@property (retain) NSString *authToken;
 @end
 
 extern NSString *const BKBugzConnectionErrorDomain;

@@ -44,7 +44,7 @@
 	if (!bugzRequest) {
 		bugzRequest = [[BKBugzRequest alloc] init];
 		
-		bugzRequest.endpointString = kTestEndpoint;
+		bugzRequest.endpointRootString = kTestEndpoint;
 		bugzRequest.shouldWaitUntilDone = YES;
 	}	
 }
@@ -68,10 +68,12 @@
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidCompleteWithVersion:(NSString *)inMajorVersion minorVersion:(NSString *)inMinorVersion
 {
+	NSLog(@"Fogbuz API, version: %@.%@", inMajorVersion, inMinorVersion);	
 }
 
-- (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidFail:(NSError *)inError
+- (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidFailWithError:(NSError *)inError
 {
+	STFail(@"%@", inError);
 }
 
 @end

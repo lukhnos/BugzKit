@@ -151,4 +151,15 @@ NSString *const BKXMLTextContentKey = @"_text";
 {
     return [self objectForKey:BKXMLTextContentKey];
 }
+
+- (NSString *)textContentForKey:(NSString *)inKey
+{
+	return [[self objectForKey:inKey] objectForKey:BKXMLTextContentKey];
+}
+
+- (NSString *)textContentForKeyPath:(NSString *)inKeyPath
+{
+	return [[self valueForKeyPath:inKeyPath] objectForKey:BKXMLTextContentKey];
+}
+
 @end
