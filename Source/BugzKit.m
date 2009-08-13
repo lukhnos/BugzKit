@@ -348,10 +348,55 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	[delegate bugzRequest:self caseListFetchDidCompleteWithList:resultList];
 }
 
-/*
- - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList;
- - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError;
-*/ 
+- (void)editCaseWithCommand:(NSString *)inCommand caseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate
+{
+	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	if (inCaseNumber) {
+		[params setObject:[NSString stringWithFormat:@"%ju", (intmax_t)inCaseNumber] forKey:@"ixBug"];
+	}
+	
+	if (inArguments) {
+		[params addEntriesFromDictionary:inArguments];
+	}
+	
+	NSURL *serviceURL = [self serviceURLWithCommand:inCommand arguments:params];
+	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:serviceURL data:nil handlerPrefix:@"caseEdit" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
+}
+
+- (void)newCaseWithArguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate
+{
+	[self editCaseWithCommand:@"new" caseNumber:0 arguments:inArguments delegate:inDelegate];
+}
+
+- (void)editCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate
+{
+	[self editCaseWithCommand:@"edit" caseNumber:inCaseNumber arguments:inArguments delegate:inDelegate];
+}
+
+- (void)assignCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate
+{
+	[self editCaseWithCommand:@"assign" caseNumber:inCaseNumber arguments:inArguments delegate:inDelegate];
+}
+
+- (void)reactivateCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate
+{
+	[self editCaseWithCommand:@"reactivate" caseNumber:inCaseNumber arguments:inArguments delegate:inDelegate];
+}
+
+- (void)reopenCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+{
+	[self editCaseWithCommand:@"reopen" caseNumber:inCaseNumber arguments:inArguments delegate:inDelegate];
+}
+
+- (void)resolveCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+{
+	[self editCaseWithCommand:@"resolve" caseNumber:inCaseNumber arguments:inArguments delegate:inDelegate];
+}
+
+- (void)closeCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+{
+	[self editCaseWithCommand:@"close" caseNumber:inCaseNumber arguments:inArguments delegate:inDelegate];
+}
 
 #pragma mark LFHTTPRequest delegates
 

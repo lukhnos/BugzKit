@@ -53,6 +53,12 @@
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError;
 @end
 
+@protocol BKBugzCaseEditDelegate <NSObject>
+- (void)bugzRequest:(BKBugzRequest *)inRequest caseEditDidCompleteWithArguments:(NSDictionary *)inArgument;
+- (void)bugzRequest:(BKBugzRequest *)inRequest caseEditDidFailWithError:(NSError *)inError;
+@end
+
+
 @interface BKBugzContext : NSObject
 {
     NSString *endpointRootString;
@@ -60,8 +66,6 @@
 	// version check and login API change these states
 	NSString *serviceEndpointString;
 	NSString *authToken;    
-    
-	
 }
 + (BKBugzContext *)defaultContext;
 
@@ -84,6 +88,14 @@
 
 - (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate;
 - (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList maximumCount:(NSUInteger)inMaximum delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate;
+
+- (void)newCaseWithArguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+- (void)editCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+- (void)assignCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+- (void)reactivateCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+- (void)reopenCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+- (void)resolveCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+- (void)closeCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
 
 @property (retain) BKBugzContext *context;
 
