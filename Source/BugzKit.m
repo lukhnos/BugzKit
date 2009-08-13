@@ -283,6 +283,11 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)logOffResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
 {
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];	
+	NSAssert([delegate respondsToSelector:@selector(bugzRequestLogOffDidComplete:)], @"Delegate must have handler");
+	
+	context.authToken = nil;
+	[delegate bugzRequestLogOffDidComplete:self];
 }
 
 #pragma mark Fetch Case List
