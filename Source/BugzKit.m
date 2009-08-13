@@ -38,7 +38,7 @@ static NSString *kRequestExtraInfoKey = @"kRequestExtraInfoKey";
 static NSString *kRequestResponseHandlerKey = @"kRequestResponseHandlerKey";
 static NSString *kRequestFailureHandlerKey = @"kRequestFailureHandlerKey";
 
-NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
+NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 {
 	CFStringRef escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)inStr, NULL, CFSTR("&"), kCFStringEncodingUTF8);
 	
@@ -49,17 +49,55 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 #endif
 }
 
-@implementation BKBugzRequest
+@implementation BKBugzContext
 - (void)dealloc
 {
     [endpointRootString release];
-    endpointRootString = nil;
+    
+    [authToken release];
+    authToken = nil;
+    
+    [super dealloc];
+}
+
++ (BKBugzContext *)defaultContext
+{
+	static BKBugzContext *context = nil;
+	if (!context) {
+		context = [[BKBugzContext alloc] init];
+	}
 	
-	[serviceEndpointString release];
-	serviceEndpointString = nil;
+	return context;
+}
+
+- (void)setEndpointRootString:(NSString *)inEndpoint
+{
+	NSString *tmp = endpointRootString;
 	
-	[authToken release];
-	authToken = nil;
+	if ([inEndpoint hasSuffix:@"@/"]) {
+		endpointRootString = [inEndpoint retain];
+	}
+	else {
+		endpointRootString = [[inEndpoint stringByAppendingString:@"/"] retain];
+	}
+	
+	[tmp autorelease];
+}
+
+- (NSString *)endpointRootString
+{
+	return [[endpointRootString retain] autorelease];
+}
+
+@synthesize serviceEndpointString;
+@synthesize authToken;
+@end
+
+@implementation BKBugzRequest
+- (void)dealloc
+{
+    [context release];
+    context = nil;
     
     [requestInfoQueue release];
     requestInfoQueue = nil;
@@ -72,10 +110,20 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
     [super dealloc];
 }
 
++ (BKBugzRequest *)defaultRequest
+{
+	static BKBugzRequest *request = nil;
+	if (!request) {
+		request = [[BKBugzRequest alloc] init];
+	}
+	
+	return request;
+}
+
 - (id)init
 {
 	if (self = [super init]) {
-		endpointRootString = @"";
+		context = [[BKBugzContext defaultContext] retain];
 		requestInfoQueue = [[NSMutableArray alloc] init];
 		request = [[LFHTTPRequest alloc] init];
 		request.timeoutInterval = 30.0;
@@ -133,10 +181,10 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 	[params addObject:[NSString stringWithFormat:@"cmd=%@", inCommand]];
 	
 	for (NSString *key in inArguments) {
-		[params addObject:[NSString stringWithFormat:@"%@=%@", key, OFEscapedURLStringFromNSString([inArguments objectForKey:key])]];
+		[params addObject:[NSString stringWithFormat:@"%@=%@", key, BKEscapedURLStringFromNSString([inArguments objectForKey:key])]];
 	}
 	
-	NSString *serviceURLString = [NSString stringWithFormat:@"%@%@", self.serviceEndpointString, [params componentsJoinedByString:@"&"]];
+	NSString *serviceURLString = [NSString stringWithFormat:@"%@%@", context.serviceEndpointString, [params componentsJoinedByString:@"&"]];
 	return [NSURL URLWithString:serviceURLString];	
 }
 
@@ -169,7 +217,7 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)checkVersionWithDelegate:(id<BKBugzVersionCheckDelegate>)inDelegate
 {
-    NSString *URLString = [endpointRootString stringByAppendingString:@"api.xml"];    
+    NSString *URLString = [context.endpointRootString stringByAppendingString:@"api.xml"];    
     [self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:[NSURL URLWithString:URLString] data:nil handlerPrefix:@"versionCheck" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
 }
 
@@ -180,7 +228,7 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 	
 	NSString *majorVersion = [inResponse textContentForKey:@"version"];
 	NSString *minorVersion = [inResponse textContentForKey:@"minversion"];
-	self.serviceEndpointString = [NSString stringWithFormat:@"%@%@", endpointRootString, [inResponse textContentForKey:@"url"]];
+	context.serviceEndpointString = [NSString stringWithFormat:@"%@%@", context.endpointRootString, [inResponse textContentForKey:@"url"]];
 	
 	[delegate bugzRequest:self versionCheckDidCompleteWithVersion:majorVersion minorVersion:minorVersion];
 }
@@ -202,8 +250,8 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 	if (token) {
 		NSAssert([delegate respondsToSelector:@selector(bugzRequest:logOnDidCompleteWithToken:)], @"Delegate must have handler");
 		
-		self.authToken = token.textContent;
-		[delegate bugzRequest:self logOnDidCompleteWithToken:self.authToken];
+		context.authToken = token.textContent;
+		[delegate bugzRequest:self logOnDidCompleteWithToken:context.authToken];
 	}
 	else {
 		// TO DO: Handle ambiguous names
@@ -228,8 +276,8 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)logOffWithDelegate:(id<BKBugzLogOffDelegate>)inDelegate
 {
-	NSAssert(self.authToken, @"Must have auth token");
-	NSURL *serviceURL = [self serviceURLWithCommand:@"logoff" arguments:[NSDictionary dictionaryWithObjectsAndKeys:self.authToken, @"token", nil]];
+	NSAssert(context.authToken, @"Must have auth token");
+	NSURL *serviceURL = [self serviceURLWithCommand:@"logoff" arguments:[NSDictionary dictionaryWithObjectsAndKeys:context.authToken, @"token", nil]];
 	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestPOSTMethod URL:serviceURL data:nil handlerPrefix:@"logOff" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];	
 }
 
@@ -246,10 +294,10 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList maximumCount:(NSUInteger)inMaximum delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate
 {
-	NSAssert(self.authToken, @"Must have auth token");
+	NSAssert(context.authToken, @"Must have auth token");
 	
 	NSMutableDictionary *params = [NSMutableDictionary dictionary];
-	[params setObject:self.authToken forKey:@"token"];
+	[params setObject:context.authToken forKey:@"token"];
 	[params setObject:inQuery forKey:@"q"];
 	if ([inColumnList length]) {
 		[params setObject:inColumnList forKey:@"cols"];
@@ -360,29 +408,7 @@ NS_INLINE NSString *OFEscapedURLStringFromNSString(NSString *inStr)
 	request.shouldWaitUntilDone = inValue;
 }
 
-
-- (void)setEndpointRootString:(NSString *)inEndpoint
-{
-	NSString *tmp = endpointRootString;
-	
-	if ([inEndpoint hasSuffix:@"@/"]) {
-		endpointRootString = [inEndpoint retain];
-	}
-	else {
-		endpointRootString = [[inEndpoint stringByAppendingString:@"/"] retain];
-	}
-		
-	[tmp autorelease];
-}
-
-- (NSString *)endpointRootString
-{
-	return [[endpointRootString retain] autorelease];
-}
-
-
-@synthesize serviceEndpointString;
-@synthesize authToken;
+@synthesize context;
 @end
 
 NSString *const BKBugzConnectionErrorDomain = @"BKBugzConnectionErrorDomain";

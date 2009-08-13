@@ -53,21 +53,31 @@
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError;
 @end
 
-
-
-@interface BKBugzRequest : NSObject
+@interface BKBugzContext : NSObject
 {
     NSString *endpointRootString;
 	
 	// version check and login API change these states
 	NSString *serviceEndpointString;
-	NSString *authToken;	
+	NSString *authToken;    
     
+	
+}
++ (BKBugzContext *)defaultContext;
+
+@property (retain) NSString *endpointRootString;
+@property (retain) NSString *serviceEndpointString;
+@property (retain) NSString *authToken;
+@end
+
+@interface BKBugzRequest : NSObject
+{
+	BKBugzContext *context;
     NSMutableArray *requestInfoQueue;
     LFHTTPRequest *request;   
 }
++ (BKBugzRequest *)defaultRequest;
 
-// + (id)copy;
 - (void)checkVersionWithDelegate:(id<BKBugzVersionCheckDelegate>)inDelegate;
 - (void)logOnWithUserName:(NSString *)inUserName password:(NSString *)inPassword delegate:(id<BKBugzLogOnDelegate>)inDelegate;
 - (void)logOffWithDelegate:(id<BKBugzLogOffDelegate>)inDelegate;
@@ -75,10 +85,7 @@
 - (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate;
 - (void)fetchCaseListWithQuery:(NSString *)inQuery columns:(NSString *)inColumnList maximumCount:(NSUInteger)inMaximum delegate:(id<BKBugzCaseListFetchDelegate>)inDelegate;
 
-
-@property (retain) NSString *endpointRootString;
-@property (retain) NSString *serviceEndpointString;
-@property (retain) NSString *authToken;
+@property (retain) BKBugzContext *context;
 
 // for unit testing purpose only
 @property (assign) BOOL shouldWaitUntilDone;
