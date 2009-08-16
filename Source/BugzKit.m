@@ -196,7 +196,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	// assert that we have the <prefix>ResponseHandler, the delegate has the <prefix>DidFail handler:
 	NSString *responseHandler = [NSString stringWithFormat:@"%@ResponseHandler:sessionInfo:", inPrefix];
 	NSString *failureHandler = [NSString stringWithFormat:@"bugzRequest:%@DidFailWithError:", inPrefix];
-	NSAssert1([self respondsToSelector:NSSelectorFromString(responseHandler)], @"API instance must respond to %s", responseHandler);
+	NSAssert1([self respondsToSelector:NSSelectorFromString(responseHandler)], @"API instance must respond to %@", responseHandler);
 	NSAssert1([inDelegate respondsToSelector:NSSelectorFromString(failureHandler)], @"Delegate must respond to %s", failureHandler);
 		
     [requestInfoQueue addObject:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -358,9 +358,13 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	if (inArguments) {
 		[params addEntriesFromDictionary:inArguments];
 	}
+
+	[params setObject:context.authToken forKey:@"token"];
+
+//	[params removeObjectForKey:@"operations"];
 	
 	NSURL *serviceURL = [self serviceURLWithCommand:inCommand arguments:params];
-	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:serviceURL data:nil handlerPrefix:@"caseEdit" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
+	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestPOSTMethod URL:serviceURL data:nil handlerPrefix:@"caseEdit" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
 }
 
 - (void)newCaseWithArguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate
@@ -397,6 +401,15 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 {
 	[self editCaseWithCommand:@"close" caseNumber:inCaseNumber arguments:inArguments delegate:inDelegate];
 }
+
+- (void)caseEditResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
+	NSAssert([delegate respondsToSelector:@selector(bugzRequest:caseEditDidCompleteWithArguments:)], @"Delegate must have handler");
+	
+	[delegate bugzRequest:self caseEditDidCompleteWithArguments:[inSessionInfo objectForKey:kRequestExtraInfoKey]];
+}
+
 
 #pragma mark LFHTTPRequest delegates
 
