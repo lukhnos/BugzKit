@@ -29,37 +29,20 @@
 #import "TestEndpoint.h"
 
 @implementation TestBasicFunctions
-+ (BKBugzRequest *)sharedRequest
-{
-	static BKBugzRequest *bugzRequest = nil;
-	
-	if (!bugzRequest) {
-		bugzRequest = [[BKBugzRequest alloc] init];
-		
-		bugzRequest.endpointRootString = kTestEndpoint;
-		bugzRequest.shouldWaitUntilDone = YES;
-	}	
-
-	return bugzRequest;
-}
-
 - (void)dealloc
 {
-	[bugzRequest release];
-	bugzRequest = nil;
-
 	[super dealloc];
 }
 
 - (void)setUp
 {	
-	bugzRequest = [[[self class] sharedRequest] retain];
+	[BKBugzContext defaultContext].endpointRootString = kTestEndpoint;
+	bugzRequest = [BKBugzRequest defaultRequest];
+	bugzRequest.shouldWaitUntilDone = YES;
 }
 
 - (void)tearDown
 {
-	[bugzRequest release];
-	bugzRequest = nil;
 }
 
 - (void)testTruth
@@ -139,5 +122,21 @@
 {
 }
 
+#pragma mark Test Project List Fetch
+
+- (void)testProjectListFetch
+{
+	[bugzRequest fetchProjectListWithDelegate:self];
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidCompleteWithList:(NSArray *)inProjectList
+{
+	NSLog(@"Fetched projects: %@", inProjectList);
+}
+
+- (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidFailWithError:(NSError *)inError
+{
+	STFail(@"%@", inError);			
+}
 
 @end

@@ -361,8 +361,6 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 
 	[params setObject:context.authToken forKey:@"token"];
 
-//	[params removeObjectForKey:@"operations"];
-	
 	NSURL *serviceURL = [self serviceURLWithCommand:inCommand arguments:params];
 	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestPOSTMethod URL:serviceURL data:nil handlerPrefix:@"caseEdit" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
 }
@@ -411,6 +409,24 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 }
 
 
+- (void)fetchProjectListWithDelegate:(id<BKBugzProjectListFetchDelegate>)inDelegate
+{
+	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	[params setObject:context.authToken forKey:@"token"];
+	
+	NSURL *serviceURL = [self serviceURLWithCommand:@"listProjects" arguments:params];
+	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestPOSTMethod URL:serviceURL data:nil handlerPrefix:@"projectListFetch" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];	
+}
+
+- (void)projectListFetchResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
+	NSAssert([delegate respondsToSelector:@selector(bugzRequest:projectListFetchDidCompleteWithList:)], @"Delegate must have handler");	
+	
+	NSLog(@"rsp: %@", inResponse);
+	[delegate bugzRequest:self projectListFetchDidCompleteWithList:[inResponse objectForKey:@"projects"]];
+}
+
 #pragma mark LFHTTPRequest delegates
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didReceiveStatusCode:(NSUInteger)statusCode URL:(NSURL *)url responseHeader:(CFHTTPMessageRef)header
@@ -419,19 +435,26 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 
 - (void)httpRequestDidComplete:(LFHTTPRequest *)inRequest
 {
+	NSDictionary *sessionInfo = inRequest.sessionInfo;	
 	NSDictionary *mappedDictionary = [BKXMLMapper dictionaryMappedFromXMLData:request.receivedData];
-	
-	if ([[inRequest.sessionInfo objectForKey:kRequestProcessErrorKey] boolValue]) {
-		// handles error code
-	}
-	
 	NSDictionary *response = [mappedDictionary objectForKey:@"response"];
 	
-	if (response) {
-		[self performSelector:NSSelectorFromString([inRequest.sessionInfo objectForKey:kRequestResponseHandlerKey]) withObject:response withObject:inRequest.sessionInfo];
+	if ([[sessionInfo objectForKey:kRequestProcessErrorKey] boolValue]) {
+		NSDictionary *errorDictionary = [response objectForKey:@"error"];
+		if ([errorDictionary count]) {
+			NSString *errorDomain = BKBugzAPIErrorDomain;
+			NSString *localizedMessage = NSLocalizedString(errorDictionary.textContent, nil);
+			NSInteger errorCode = [[errorDictionary objectForKey:@"code"] integerValue];			
+
+			NSError *error = [NSError errorWithDomain:errorDomain code:errorCode userInfo:(!localizedMessage ? nil : [NSDictionary dictionaryWithObjectsAndKeys:localizedMessage, NSLocalizedDescriptionKey, nil])];		
+			id delegate = [sessionInfo objectForKey:kRequestDelegateKey];
+			SEL failureHandlerSel = NSSelectorFromString([sessionInfo objectForKey:kRequestFailureHandlerKey]);
+			[delegate performSelector:failureHandlerSel withObject:self withObject:error];
+			return;					
+		}
 	}
-	else {
-	}
+	
+	[self performSelector:NSSelectorFromString([sessionInfo objectForKey:kRequestResponseHandlerKey]) withObject:response withObject:inRequest.sessionInfo];
 }
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didFailWithError:(NSString *)inError

@@ -33,7 +33,8 @@
 		BKBugzVersionCheckDelegate,
 		BKBugzLogOnDelegate,
 		BKBugzLogOffDelegate,
-		BKBugzCaseListFetchDelegate
+		BKBugzCaseListFetchDelegate,
+		BKBugzProjectListFetchDelegate
 	>
 {
 	BKBugzRequest *bugzRequest;

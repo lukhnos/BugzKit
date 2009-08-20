@@ -58,6 +58,11 @@
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseEditDidFailWithError:(NSError *)inError;
 @end
 
+@protocol BKBugzProjectListFetchDelegate <NSObject>
+- (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidCompleteWithList:(NSArray *)inProjectList;
+- (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidFailWithError:(NSError *)inError;
+@end
+
 
 @interface BKBugzContext : NSObject
 {
@@ -96,6 +101,8 @@
 - (void)reopenCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
 - (void)resolveCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
 - (void)closeCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+
+- (void)fetchProjectListWithDelegate:(id<BKBugzProjectListFetchDelegate>)inDelegate;
 
 @property (retain) BKBugzContext *context;
 
