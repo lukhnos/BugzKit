@@ -316,20 +316,11 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:serviceURL data:nil handlerPrefix:@"caseListFetch" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
 }
 
-- (void)caseListFetchResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+- (NSArray *)_flattenedList:(NSArray *)inList
 {
-	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
-	NSAssert([delegate respondsToSelector:@selector(bugzRequest:caseListFetchDidCompleteWithList:)], @"Delegate must have handler");
-	
-	id caseList = [inResponse valueForKeyPath:@"cases.case"];
-	
-	if (![caseList isKindOfClass:[NSArray class]]) {
-		caseList = [NSArray array];
-	}
-	
 	NSMutableArray *resultList = [NSMutableArray array];
 	
-	for (NSDictionary *c in caseList) {
+	for (NSDictionary *c in inList) {
 		NSMutableDictionary *result = [NSMutableDictionary dictionary];
 		
 		for (NSString *k in c) {
@@ -341,11 +332,25 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 				[result setObject:v forKey:k];
 			}
 		}
-
+		
 		[resultList addObject:result];
-	}
+	}	
 	
-	[delegate bugzRequest:self caseListFetchDidCompleteWithList:resultList];
+	return resultList;
+}
+
+- (void)caseListFetchResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
+	NSAssert([delegate respondsToSelector:@selector(bugzRequest:caseListFetchDidCompleteWithList:)], @"Delegate must have handler");
+	
+	id caseList = [inResponse valueForKeyPath:@"cases.case"];
+	
+	if (![caseList isKindOfClass:[NSArray class]]) {
+		caseList = [NSArray array];
+	}
+		
+	[delegate bugzRequest:self caseListFetchDidCompleteWithList:[self _flattenedList:caseList]];
 }
 
 - (void)editCaseWithCommand:(NSString *)inCommand caseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate
@@ -424,7 +429,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	NSAssert([delegate respondsToSelector:@selector(bugzRequest:projectListFetchDidCompleteWithList:)], @"Delegate must have handler");	
 	
 	NSLog(@"rsp: %@", inResponse);
-	[delegate bugzRequest:self projectListFetchDidCompleteWithList:[inResponse objectForKey:@"projects"]];
+	[delegate bugzRequest:self projectListFetchDidCompleteWithList:[inResponse valueForKeyPath:@"projects.project"]];
 }
 
 #pragma mark LFHTTPRequest delegates
