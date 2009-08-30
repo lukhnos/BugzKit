@@ -28,6 +28,19 @@
 #import "TestBasicFunctions.h"
 #import "TestEndpoint.h"
 
+static NSString *LFPlistString(id plist)
+{
+	NSString *error;
+	NSData *data = [NSPropertyListSerialization dataFromPropertyList:plist format:NSPropertyListXMLFormat_v1_0 errorDescription:&error];
+	
+	if (!data) {
+		return @"(not a valid plist)";
+	}
+	
+	return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+}
+
+
 @implementation TestBasicFunctions
 - (void)dealloc
 {
@@ -110,12 +123,12 @@
 
 - (void)testCaseListFetch
 {
-	[bugzRequest fetchCaseListWithQuery:@"project:inbox" columns:@"sTitle" delegate:self];
+	[bugzRequest fetchCaseListWithQuery:@"project:inbox" columns:@"sTitle,dtOpened" delegate:self];
 }
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList
 {
-	NSLog(@"Fetched cases: %@", inCaseList);
+	NSLog(@"Fetched cases: %@", LFPlistString(inCaseList));
 }
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError
@@ -131,7 +144,7 @@
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidCompleteWithList:(NSArray *)inProjectList
 {
-	NSLog(@"Fetched projects: %@", inProjectList);
+	NSLog(@"Fetched projects: %@", LFPlistString(inProjectList));
 }
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidFailWithError:(NSError *)inError

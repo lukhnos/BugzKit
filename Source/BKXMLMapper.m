@@ -30,6 +30,31 @@
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
 
+@interface NSDate (ISO8601)
++ (NSDate *)dateFromISO8601String:(NSString *)inString;
+@end
+
+@implementation NSDate (ISO8601)
++ (NSDate *)dateFromISO8601String:(NSString *)inString
+{
+	static NSDateFormatter *sISO8601 = nil;
+	
+	if (!sISO8601) {
+		sISO8601 = [[NSDateFormatter alloc] init];
+		[sISO8601 setTimeStyle:NSDateFormatterFullStyle];
+		[sISO8601 setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+	}
+	
+	return [sISO8601 dateFromString:inString];
+}
+@end
+
+@interface BKXMLMapper (Flattener)
++ (NSArray *)flattenedArray:(NSArray *)inArray;
++ (id)flattenedDictionary:(NSDictionary *)inDictionary;
++ (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey;
+@end
+
 @implementation BKXMLMapper
 - (void)dealloc
 {
@@ -59,16 +84,106 @@ NSString *const BKXMLTextContentKey = @"_text";
 	[parser release];
 }
 
-- (NSDictionary *)resultantDictionary
+- (NSMutableDictionary *)resultantDictionary
 {
 	return [[resultantDictionary retain] autorelease];
+}
+
++ (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey
+{
+	if ([inKey length] < 2) {
+		return inValue;
+	}
+	
+	if (![inValue isKindOfClass:[NSString class]]) {
+		return inValue;
+	}
+		
+	UniChar firstChar = [inKey characterAtIndex:0];
+	UniChar secondChar = [inKey characterAtIndex:1];
+	UniChar thirdChar = [inKey length] > 2 ? [inKey characterAtIndex:2] : 0;
+	
+	
+	BOOL secondCharIsUpperCase = (secondChar >= 'A' &&  secondChar <= 'Z');
+	BOOL thirdCharIsUpperCase = (thirdChar >= 'A' && thirdChar <= 'Z');
+	
+	// skip 's'
+	// transform 'f'
+	if (firstChar == 'f' && secondCharIsUpperCase) {
+		return [inKey isEqualToString:@"true"] ? (id)kCFBooleanTrue : (id)kCFBooleanFalse;
+	}
+	
+	// transform 'ix'
+	if (firstChar == 'i' && secondChar == 'x' && thirdCharIsUpperCase) {
+		return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
+	}
+	
+	// transform 'dt'
+	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
+		return [NSDate dateFromISO8601String:inValue];
+	}
+	
+	return inValue;
+}
+
++ (NSArray *)flattenedArray:(NSArray *)inArray
+{
+	NSMutableArray *flattenedArray = [NSMutableArray array];
+	
+	for (id value in inArray) {
+		if ([value isKindOfClass:[NSDictionary class]]) {
+			[flattenedArray addObject:[self flattenedDictionary:value]];
+		}
+		else {
+			[flattenedArray addObject:value];
+		}
+	}
+			
+	return flattenedArray;
+}
+
++ (id)flattenedDictionary:(NSDictionary *)inDictionary
+{
+	if (![inDictionary count]) {
+		return inDictionary;
+	}
+	
+	NSString *textContent = [inDictionary objectForKey:BKXMLTextContentKey];
+	if (textContent && [inDictionary count] == 1) {
+		return textContent;
+	}
+	
+	NSMutableDictionary *flattenedDictionary = [NSMutableDictionary dictionary];
+	
+	for (NSString *key in inDictionary) {
+		id value = [inDictionary objectForKey:key];
+		
+		if ([value isKindOfClass:[NSDictionary class]]) {
+			value = [self flattenedDictionary:value];
+		}
+		else if ([value isKindOfClass:[NSArray class]]) {
+			value = [self flattenedArray:value];
+		}
+		else {
+		}
+		
+		value = [self transformValue:value usingTypeInferredFromKey:key];
+		[flattenedDictionary setObject:value forKey:key];
+	}
+	
+	return flattenedDictionary;
 }
 
 + (NSDictionary *)dictionaryMappedFromXMLData:(NSData *)inData
 {
 	BKXMLMapper *mapper = [[BKXMLMapper alloc] init];
 	[mapper runWithData:inData];
-	NSDictionary *result = [mapper resultantDictionary];
+	
+	// flattens the text contents	
+	
+	
+	NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
+	NSDictionary *result = [self flattenedDictionary:resultantDictionary];
 	[mapper release];
 	return result;
 }

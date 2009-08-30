@@ -226,9 +226,9 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
 	NSAssert([delegate respondsToSelector:@selector(bugzRequest:versionCheckDidCompleteWithVersion:minorVersion:)], @"Delegate must have handler");
 	
-	NSString *majorVersion = [inResponse textContentForKey:@"version"];
-	NSString *minorVersion = [inResponse textContentForKey:@"minversion"];
-	context.serviceEndpointString = [NSString stringWithFormat:@"%@%@", context.endpointRootString, [inResponse textContentForKey:@"url"]];
+	NSString *majorVersion = [inResponse objectForKey:@"version"];
+	NSString *minorVersion = [inResponse objectForKey:@"minversion"];
+	context.serviceEndpointString = [NSString stringWithFormat:@"%@%@", context.endpointRootString, [inResponse objectForKey:@"url"]];
 	
 	[delegate bugzRequest:self versionCheckDidCompleteWithVersion:majorVersion minorVersion:minorVersion];
 }
@@ -246,11 +246,11 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 {
 	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];	
 	
-	NSDictionary *token = [inResponse objectForKey:@"token"];	
+	NSString *token = [inResponse objectForKey:@"token"];	
 	if (token) {
 		NSAssert([delegate respondsToSelector:@selector(bugzRequest:logOnDidCompleteWithToken:)], @"Delegate must have handler");
 		
-		context.authToken = token.textContent;
+		context.authToken = token;
 		[delegate bugzRequest:self logOnDidCompleteWithToken:context.authToken];
 	}
 	else {
@@ -316,29 +316,6 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:serviceURL data:nil handlerPrefix:@"caseListFetch" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];
 }
 
-- (NSArray *)_flattenedList:(NSArray *)inList
-{
-	NSMutableArray *resultList = [NSMutableArray array];
-	
-	for (NSDictionary *c in inList) {
-		NSMutableDictionary *result = [NSMutableDictionary dictionary];
-		
-		for (NSString *k in c) {
-			id v = [c objectForKey:k];
-			if ([v isKindOfClass:[NSDictionary class]] && [[v textContent] length]) {
-				[result setObject:[v textContent]  forKey:k];
-			}
-			else {
-				[result setObject:v forKey:k];
-			}
-		}
-		
-		[resultList addObject:result];
-	}	
-	
-	return resultList;
-}
-
 - (void)caseListFetchResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
 {
 	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
@@ -350,7 +327,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 		caseList = [NSArray array];
 	}
 		
-	[delegate bugzRequest:self caseListFetchDidCompleteWithList:[self _flattenedList:caseList]];
+	[delegate bugzRequest:self caseListFetchDidCompleteWithList:caseList];
 }
 
 - (void)editCaseWithCommand:(NSString *)inCommand caseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate

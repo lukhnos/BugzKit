@@ -29,7 +29,7 @@
 
 extern NSString *const BKXMLTextContentKey;
 
-@interface BKXMLMapper : NSObject
+@interface BKXMLMapper : NSObject <NSXMLParserDelegate>
 {
     NSMutableDictionary *resultantDictionary;
 	
