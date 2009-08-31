@@ -437,6 +437,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	}
 	
 	[self performSelector:NSSelectorFromString([sessionInfo objectForKey:kRequestResponseHandlerKey]) withObject:response withObject:inRequest.sessionInfo];
+	[self runQueue];
 }
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didFailWithError:(NSString *)inError
@@ -462,6 +463,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	id delegate = [sessionInfo objectForKey:kRequestDelegateKey];
 	SEL failureHandlerSel = NSSelectorFromString([sessionInfo objectForKey:kRequestFailureHandlerKey]);
 	[delegate performSelector:failureHandlerSel withObject:self withObject:error];
+	[self runQueue];
 }
 
 #pragma mark Properties
