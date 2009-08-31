@@ -390,6 +390,36 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	[delegate bugzRequest:self caseEditDidCompleteWithArguments:[inSessionInfo objectForKey:kRequestExtraInfoKey]];
 }
 
+- (void)fetchEventListWithCaseNumber:(NSUInteger)inCaseNumber delegate:(id<BKBugzEventListFetchDelegate>)inDelegate
+{
+	NSAssert(context.authToken, @"Must have auth token");
+	
+	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	[params setObject:context.authToken forKey:@"token"];
+	[params setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] forKey:@"q"];
+	[params setObject:@"events" forKey:@"cols"];
+	[params setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)NSUIntegerMax] forKey:@"max"];
+	
+	NSURL *serviceURL = [self serviceURLWithCommand:@"search" arguments:params];
+	[self pushRequestInfoWithHTTPMethod:LFHTTPRequestGETMethod URL:serviceURL data:nil handlerPrefix:@"eventListFetch" processDefaultErrorResponse:YES delegate:inDelegate extraInfo:nil];	
+}
+
+- (void)eventListFetchResponseHandler:(NSDictionary *)inResponse sessionInfo:(NSDictionary *)inSessionInfo
+{
+	id delegate = [inSessionInfo objectForKey:kRequestDelegateKey];
+	NSAssert([delegate respondsToSelector:@selector(bugzRequest:eventListFetchDidCompleteWithList:caseNumber:)], @"Delegate must have handler");
+
+	id caseList = [inResponse valueForKeyPath:@"cases.case"];
+
+	if ([caseList count]) {
+		NSDictionary *mainCase = [caseList objectAtIndex:0];
+		
+		NSArray *eventList = [mainCase valueForKeyPath:@"events.event"];
+		[delegate bugzRequest:self eventListFetchDidCompleteWithList:eventList caseNumber:[[mainCase objectForKey:@"ixBug"] unsignedIntegerValue]];
+	}
+	
+}
+
 
 - (void)fetchProjectListWithDelegate:(id<BKBugzProjectListFetchDelegate>)inDelegate
 {

@@ -207,11 +207,13 @@ NSString *const BKXMLTextContentKey = @"_text";
 				element = newArray;
 			}
 			else {
-				@throw [NSException exceptionWithName:BKXMLMapperExceptionName reason:@"Faulty XML structure" userInfo:nil];
+				// ignore, because we have things like <event ixBugEvent="17" ixBug="5"> and inside a duplicate <ixBugEvent>17</ixBugEvent> 
 			}
 		}
 		
-		[element addObject:mutableAttrDict];
+		if ([element isKindOfClass:[NSMutableArray class]]) {
+			[element addObject:mutableAttrDict];
+		}
 	}
 	else {
 		// plural tag rule: if the parent's tag is plural and the incoming is singular, we'll make it into an array (we only handles the -s case)

@@ -64,6 +64,12 @@
 @end
 
 
+@protocol BKBugzEventListFetchDelegate <NSObject>
+- (void)bugzRequest:(BKBugzRequest *)inRequest eventListFetchDidCompleteWithList:(NSArray *)inEventList caseNumber:(NSUInteger)inCaseNumber;
+- (void)bugzRequest:(BKBugzRequest *)inRequest eventListFetchDidFailWithError:(NSError *)inError;
+@end
+
+
 @interface BKBugzContext : NSObject
 {
     NSString *endpointRootString;
@@ -101,6 +107,8 @@
 - (void)reopenCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
 - (void)resolveCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
 - (void)closeCaseWithCaseNumber:(NSUInteger)inCaseNumber arguments:(NSDictionary *)inArguments delegate:(id<BKBugzCaseEditDelegate>)inDelegate;
+
+- (void)fetchEventListWithCaseNumber:(NSUInteger)inCaseNumber delegate:(id<BKBugzEventListFetchDelegate>)inDelegate;
 
 - (void)fetchProjectListWithDelegate:(id<BKBugzProjectListFetchDelegate>)inDelegate;
 
