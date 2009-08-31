@@ -91,7 +91,9 @@ NSString *const BKXMLTextContentKey = @"_text";
 
 + (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey
 {
-	if ([inKey length] < 2) {
+	// only two exceptions: s (returned directly), dt (date)
+	
+	if ([inKey length] < 2) {		
 		return inValue;
 	}
 	
@@ -105,11 +107,11 @@ NSString *const BKXMLTextContentKey = @"_text";
 	
 	
 	BOOL secondCharIsUpperCase = (secondChar >= 'A' &&  secondChar <= 'Z');
-	BOOL thirdCharIsUpperCase = (thirdChar >= 'A' && thirdChar <= 'Z');
+	BOOL thirdCharIsUpperCase = [inKey isEqualToString:@"dt"] ? YES : (thirdChar >= 'A' && thirdChar <= 'Z');
 	
 	// skip 's'
-	// transform 'f'
-	if (firstChar == 'f' && secondCharIsUpperCase) {
+	// transform 'f' or 'b'
+	if ((firstChar == 'f' || firstChar == 'b') && secondCharIsUpperCase) {
 		return [inKey isEqualToString:@"true"] ? (id)kCFBooleanTrue : (id)kCFBooleanFalse;
 	}
 	
