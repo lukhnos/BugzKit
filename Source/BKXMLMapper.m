@@ -91,25 +91,39 @@ NSString *const BKXMLTextContentKey = @"_text";
 
 + (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey
 {
+	// exceptions: s (returned directly), dt (date), hrs (NSTimeInterval), c (integer)
 	// only two exceptions: s (returned directly), dt (date)
 	
-	if ([inKey length] < 2) {		
+	if ([inKey length] < 2) {
+		if ([inKey isEqualToString:@"c"]) {
+			return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
+		}
+		
+		if ([inKey isEqualToString:@"s"] && [inValue isKindOfClass:[NSDictionary class]] && ![inValue count]) {
+			// s cannot be an empty dictionary--must be a string
+			inValue = @"";
+		}
+		
 		return inValue;
 	}
+			
+	UniChar firstChar = [inKey characterAtIndex:0];
+	UniChar secondChar = [inKey characterAtIndex:1];	
+	UniChar thirdChar = [inKey length] > 2 ? [inKey characterAtIndex:2] : 0;	
+	BOOL secondCharIsUpperCase = (secondChar >= 'A' &&  secondChar <= 'Z');
+	BOOL thirdCharIsUpperCase = [inKey isEqualToString:@"dt"] ? YES : (thirdChar >= 'A' && thirdChar <= 'Z');
+
+	// 's[A-Z][a-z]+ cannot be an empty dictionary
+	if (firstChar == 's' && secondCharIsUpperCase  && [inValue isKindOfClass:[NSDictionary class]] && ![inValue count]) {
+		return @"";
+	}
 	
+	// other than that, returns everything
 	if (![inValue isKindOfClass:[NSString class]]) {
 		return inValue;
 	}
-		
-	UniChar firstChar = [inKey characterAtIndex:0];
-	UniChar secondChar = [inKey characterAtIndex:1];
-	UniChar thirdChar = [inKey length] > 2 ? [inKey characterAtIndex:2] : 0;
 	
 	
-	BOOL secondCharIsUpperCase = (secondChar >= 'A' &&  secondChar <= 'Z');
-	BOOL thirdCharIsUpperCase = [inKey isEqualToString:@"dt"] ? YES : (thirdChar >= 'A' && thirdChar <= 'Z');
-	
-	// skip 's'
 	// transform 'f' or 'b'
 	if ((firstChar == 'f' || firstChar == 'b') && secondCharIsUpperCase) {
 		return [inKey isEqualToString:@"true"] ? (id)kCFBooleanTrue : (id)kCFBooleanFalse;
@@ -123,6 +137,11 @@ NSString *const BKXMLTextContentKey = @"_text";
 	// transform 'dt'
 	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
 		return [NSDate dateFromISO8601String:inValue];
+	}
+	
+	// transform 'hrs'
+	if (firstChar == 'h' && secondChar == 'r' && thirdChar == 's') {
+		return [NSNumber numberWithDouble:[inValue doubleValue]];
 	}
 	
 	return inValue;
