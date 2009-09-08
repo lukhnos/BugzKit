@@ -242,6 +242,23 @@ NSString *const BKXMLTextContentKey = @"_text";
 		if ([currentElementName length] > [elementName length] && [currentElementName hasPrefix:elementName] && [currentElementName hasSuffix:@"s"]) {
 			[currentDictionary setObject:[NSMutableArray arrayWithObject:mutableAttrDict] forKey:elementName];
 		}
+		else if ([currentElementName length] > [elementName length] && [elementName hasSuffix:@"s"] && [currentElementName hasSuffix:@"ses"]) {
+			// status, statuses
+			[currentDictionary setObject:[NSMutableArray arrayWithObject:mutableAttrDict] forKey:elementName];
+		}		
+		else if ([currentElementName length] > [elementName length] && [elementName hasSuffix:@"x"] && [currentElementName hasSuffix:@"xes"]) {
+			// box, boxes
+			[currentDictionary setObject:[NSMutableArray arrayWithObject:mutableAttrDict] forKey:elementName];
+		}		
+		else if ([currentElementName length] > [elementName length] && [elementName hasSuffix:@"y"] && [currentElementName hasSuffix:@"ies"]) {
+			// category, categories
+			// priority, priorities
+			[currentDictionary setObject:[NSMutableArray arrayWithObject:mutableAttrDict] forKey:elementName];
+		}		
+		
+		else if ([currentElementName isEqualToString:@"people"] && [elementName isEqualToString:@"person"]) {
+			[currentDictionary setObject:[NSMutableArray arrayWithObject:mutableAttrDict] forKey:elementName];			
+		}			
 		else {
 			[currentDictionary setObject:mutableAttrDict forKey:elementName];
 		}

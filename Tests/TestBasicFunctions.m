@@ -25,10 +25,10 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
+#import <objc/runtime.h>
 #import "TestBasicFunctions.h"
 #import "TestEndpoint.h"
 #import "BKPrivateUtilities.h"
-
 
 
 @implementation TestBasicFunctions
@@ -187,6 +187,64 @@
 - (void)logOffDidFail:(BKRequest *)inRequest
 {
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);
+}
+
+
+#pragma mark Test list items
+
+- (void)testLists
+{
+	NSArray *lists = [NSArray arrayWithObjects:BKProjectList, BKCategoryList, BKPriorityList, BKPeopleList, BKStatusList, BKFixForList, BKMailboxList, nil];
+	
+	for (NSString *t in lists) {
+		BKListRequest *request = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:t writableItemsOnly:NO] autorelease];
+		request.target = self;
+		request.actionOnSuccess = @selector(listDidComplete:);
+		request.actionOnFailure = @selector(listDidFail:);								  
+		[requestQueue addRequest:request];
+	}
+
+	BKListRequest *projectListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKProjectList writableItemsOnly:NO] autorelease];
+	projectListRequest.target = self;
+	projectListRequest.actionOnSuccess = @selector(projectListDidComplete:);
+	projectListRequest.actionOnFailure = @selector(listDidFail:);								  
+	[requestQueue addRequest:projectListRequest];
+	
+	NSArray *projects = objc_getAssociatedObject(self, @"projects");
+	for (NSDictionary *p in projects) {
+		BKAreaListRequest *request = [[[BKAreaListRequest alloc] initWithAPIContext:[self sharedAPIContext] projectID:[[p objectForKey:@"ixProject"] integerValue] writableItemsOnly:NO] autorelease];
+		request.target = self;
+		request.actionOnSuccess = @selector(areaListDidComplete:);
+		request.actionOnFailure = @selector(listDidFail:);
+		request.userInfo = p;
+		[requestQueue addRequest:request];
+	}
+	
+	objc_setAssociatedObject(self, @"projects", nil, OBJC_ASSOCIATION_RETAIN);	
+}
+
+- (void)listDidComplete:(BKListRequest *)inRequest
+{
+	STAssertTrue([inRequest.processedResponse isKindOfClass:[NSArray class]], @"Processed response must be some kind of array");	
+	NSLog(@"request type: %@, returned array count: %d", inRequest.listType, [inRequest.processedResponse count]);
+}
+
+- (void)projectListDidComplete:(BKListRequest *)inRequest
+{
+	[self listDidComplete:inRequest];	
+	objc_setAssociatedObject(self, @"projects", inRequest.processedResponse, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (void)areaListDidComplete:(BKAreaListRequest *)inRequest
+{
+	STAssertTrue([inRequest.processedResponse isKindOfClass:[NSArray class]], @"Processed response must be some kind of array");		
+	NSArray *areaNames = [inRequest.processedResponse valueForKeyPath:@"sArea"];	
+	NSLog(@"Project %@, areas: %@", [inRequest.userInfo objectForKey:@"sProject"], [areaNames componentsJoinedByString:@","]);
+}
+
+- (void)listDidFail:(BKListRequest *)inRequest
+{
+	STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
 }
 
 

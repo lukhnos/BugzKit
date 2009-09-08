@@ -131,6 +131,11 @@
 	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
 
 	NSError *responseError = [self errorFromXMLMappedResponse:innerResponse];
+	
+	if (!responseError) {
+		responseError = [self validateResponse:innerResponse];
+	}
+	
 	if (responseError) {
 		BKRetainAssign(error, responseError);
 		BKRetainAssign(processedResponse, nil);
@@ -182,7 +187,17 @@
 	NSDictionary *dict = [self preparedParameterDict];
 	NSMutableArray *params = [NSMutableArray array];
 	for (NSString *key in dict) {
-		[params addObject:[NSString stringWithFormat:@"%@=%@", key, BKEscapedURLStringFromNSString([dict objectForKey:key])]];
+		id value = [dict objectForKey:key];
+		
+		if ([value isKindOfClass:[NSNumber class]]) {
+			value = [NSString stringWithFormat:@"%ju", (uintmax_t)[value unsignedIntegerValue]];
+		}
+		else if ([value isKindOfClass:[NSDate class]]) {
+			NSAssert(0, @"NSDate mapping not yet completed");
+		}
+		
+		
+		[params addObject:[NSString stringWithFormat:@"%@=%@", key, BKEscapedURLStringFromNSString(value)]];
 	}
 	
 	return [params count] ? [params componentsJoinedByString:@"&"] : nil;
@@ -204,6 +219,11 @@
 
 - (void)postprocessError:(NSError *)inError
 {
+}
+
+- (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse
+{
+	return nil;
 }
 
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse

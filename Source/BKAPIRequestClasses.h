@@ -37,3 +37,29 @@
 @interface BKLogOffRequest : BKRequest
 @end
 
+extern NSString *const BKProjectList;
+extern NSString *const BKAreaList;
+extern NSString *const BKCategoryList;
+extern NSString *const BKPriorityList;
+extern NSString *const BKPeopleList;
+extern NSString *const BKStatusList;
+extern NSString *const BKFixForList;
+extern NSString *const BKMailboxList;
+
+@interface BKListRequest : BKRequest
+{
+	NSString *listType;
+}
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables;
+
+@property (readonly) NSString *listType;
+@end
+
+@interface BKAreaListRequest : BKListRequest
+{
+	NSUInteger projectID;	
+}
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables;
+
+@property NSUInteger projectID;
+@end
