@@ -106,8 +106,9 @@
 		BKRetainAssign(error, responseError);
 		[target performSelector:actionOnFailure withObject:self];
 	}
-	
-	[self dispatchSuccessfulResponse];
+
+    [self postprocessResponse];
+    [target performSelector:actionOnSuccess withObject:[self extractedResponse]];   
 }
 
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError
@@ -156,8 +157,12 @@
 	return nil;
 }
 
-- (void)dispatchSuccessfulResponse
+- (void)postprocessResponse
+{    
+}
+
+- (id)extractedResponse
 {
-	[target performSelector:actionOnSuccess withObject:response];
+    return response;
 }
 @end

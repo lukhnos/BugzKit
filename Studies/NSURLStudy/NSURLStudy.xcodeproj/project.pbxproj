@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6A1667A410562BF000EA9C34 /* NSURLStudy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = NSURLStudy; path = build/Debug/NSURLStudy; sourceTree = "<group>"; };
+		6A1667A410562BF000EA9C34 /* NSURLStudy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NSURLStudy; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A1667AA10562BF700EA9C34 /* NSURLStudy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSURLStudy.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 

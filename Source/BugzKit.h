@@ -27,6 +27,11 @@
 
 #import "LFWebAPIKit.h"
 
+#import "BKAPIContext.h"
+#import "BKError.h"
+#import "BKRequest.h"
+#import "BKRequestQueue.h"
+
 @class BKBugzRequest;
 
 @protocol BKBugzBaseDelegate <NSObject>
@@ -117,12 +122,3 @@
 // for unit testing purpose only
 @property (assign) BOOL shouldWaitUntilDone;
 @end
-
-extern NSString *const BKBugzConnectionErrorDomain;
-extern NSString *const BKBugzAPIErrorDomain;
-
-typedef enum {
-	BKUnknownError = -1,
-	BKConnecitonLostError = -2,
-	BKConnecitonTimeoutError = -3
-} BKErrorCode;

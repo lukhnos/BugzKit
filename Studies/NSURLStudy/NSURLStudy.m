@@ -11,7 +11,12 @@ int main()
 	NSLog(@"a: %@", [a absoluteString]);
 	NSLog(@"b: %@, relative part: %@", [b absoluteString], [b relativePath]);
 	NSLog(@"c: %@, relative part: %@, query: %@", [c absoluteString], [c relativePath], [c query]);
-	
+
+	NSURL *d = [NSURL URLWithString:@"/example.php?" relativeToURL:a];
+	NSURL *e = [NSURL URLWithString:@"?a=b" relativeToURL:b];
+
+	NSLog(@"d: %@, relative part: %@", [b absoluteString], [b relativePath]);
+	NSLog(@"e: %@, relative part: %@, query: %@", [c absoluteString], [c relativePath], [c query]);
 	
 	return 0;
 }
