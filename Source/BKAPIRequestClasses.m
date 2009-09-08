@@ -166,6 +166,11 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 	return result;
 }
 
+- (NSArray *)fetchedList
+{
+	return [processedResponse isKindOfClass:[NSArray class]] ? processedResponse : nil;
+}
+
 @synthesize listType;
 @end
 

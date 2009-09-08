@@ -53,6 +53,7 @@ extern NSString *const BKMailboxList;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables;
 
 @property (readonly) NSString *listType;
+@property (readonly) NSArray *fetchedList;
 @end
 
 @interface BKAreaListRequest : BKListRequest

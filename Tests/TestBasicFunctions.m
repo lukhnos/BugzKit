@@ -232,13 +232,13 @@
 - (void)projectListDidComplete:(BKListRequest *)inRequest
 {
 	[self listDidComplete:inRequest];	
-	objc_setAssociatedObject(self, @"projects", inRequest.processedResponse, OBJC_ASSOCIATION_RETAIN);
+	objc_setAssociatedObject(self, @"projects", inRequest.fetchedList, OBJC_ASSOCIATION_RETAIN);
 }
 
 - (void)areaListDidComplete:(BKAreaListRequest *)inRequest
 {
 	STAssertTrue([inRequest.processedResponse isKindOfClass:[NSArray class]], @"Processed response must be some kind of array");		
-	NSArray *areaNames = [inRequest.processedResponse valueForKeyPath:@"sArea"];	
+	NSArray *areaNames = [inRequest.fetchedList valueForKeyPath:@"sArea"];	
 	NSLog(@"Project %@, areas: %@", [inRequest.userInfo objectForKey:@"sProject"], [areaNames componentsJoinedByString:@","]);
 }
 
