@@ -81,4 +81,25 @@ extern NSString *const BKMailboxList;
 @property (readonly) NSString *query;
 @end
 
+extern NSString *const BKNewCaseAction;
+extern NSString *const BKEditCaseAction;
+extern NSString *const BKAssignCaseAction;
+extern NSString *const BKReactiateCaseAction;
+extern NSString *const BKReopenCaseAction;
+extern NSString *const BKResolveCaseAction;
+extern NSString *const BKCloseCaseAction;
+extern NSString *const BKEmailCaseAction;
+extern NSString *const BKReplyCaseAction;
+extern NSString *const BKForwardCaseAction;
+
+@interface BKEditCaseRequest : BKRequest
+{
+	NSDictionary *parameters;
+}
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters;
+
+@property (readonly) NSDictionary *editedCase;
+@property (readonly) NSString *editAction;
+@property (readonly) NSDictionary *parameters;
+@end
 

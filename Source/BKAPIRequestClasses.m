@@ -270,3 +270,61 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 }
 @end
 
+NSString *const BKNewCaseAction = @"new";
+NSString *const BKEditCaseAction = @"edit";
+NSString *const BKAssignCaseAction = @"assign";
+NSString *const BKReactiateCaseAction = @"reactivate";
+NSString *const BKReopenCaseAction = @"reopen";
+NSString *const BKResolveCaseAction = @"resolve";
+NSString *const BKCloseCaseAction = @"close";
+NSString *const BKEmailCaseAction = @"email";
+NSString *const BKReplyCaseAction = @"reply";
+NSString *const BKForwardCaseAction = @"forward";
+
+@implementation BKEditCaseRequest
+- (void)dealloc
+{
+	[parameters release];
+	[super dealloc];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		NSMutableDictionary *d = [NSMutableDictionary dictionary];
+		
+		[d setObject:inAPIContext.authToken forKey:@"token"];
+		[d setObject:inAction forKey:@"cmd"];
+		
+		if (inParameters) {
+			[d addEntriesFromDictionary:inParameters];
+		}
+		
+		requestParameterDict = [d retain];
+	}
+	
+	return self;	
+}
+
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
+{
+	id result = [inXMLMappedResponse valueForKeyPath:@"case"];
+	if (!result) {
+		result = [NSDictionary dictionary];
+	}
+	
+	return result;
+}
+
+- (NSString *)editAction
+{
+	return [requestParameterDict objectForKey:@"cmd"];
+}
+
+- (NSDictionary *)editedCase
+{
+	return processedResponse;
+}
+
+@synthesize parameters;
+@end

@@ -332,7 +332,7 @@ static NSString *kTestingCurrentFilterName = @"kTestingCurrentFilterName";
 
 #pragma mark Test case query
 
-- (void)testCaseQuery
+- (void)_testCaseQuery
 {
 	BKCaseQueryRequest *query = [[[BKCaseQueryRequest alloc] initWithAPIContext:[self sharedAPIContext] query:nil columns:[NSArray arrayWithObjects:@"sTitle", nil]] autorelease];
 	query.target = self;
@@ -350,6 +350,51 @@ static NSString *kTestingCurrentFilterName = @"kTestingCurrentFilterName";
 {
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);		
 }
+
+#pragma mark Test create new caseQueryDidFail
+
+static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
+
+- (void)testCaseEdit_New
+{
+	NSDictionary *newCaseParams = [NSDictionary dictionaryWithObjectsAndKeys:
+								   @"inbox", @"sProject",
+								   @"test create new BugzKit case", @"sTitle",
+								   nil];
+	
+	BKEditCaseRequest *edit = [[[BKEditCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] editAction:BKNewCaseAction parameters:newCaseParams] autorelease];
+	edit.target = self;
+	edit.actionOnFailure = @selector(caseEditDidFail:);
+	edit.actionOnSuccess = @selector(caseEditDidComplete:);
+	[requestQueue addRequest:edit];
+	
+	NSDictionary *caseInfo = objc_getAssociatedObject(self, kCurrentCaseInfo);
+	
+	NSMutableDictionary *changeTitle = [NSMutableDictionary dictionaryWithDictionary:caseInfo];
+	[changeTitle setObject:@"Set to new title for BugzKit test" forKey:@"sTitle"];
+	edit = [[[BKEditCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] editAction:BKEditCaseAction parameters:changeTitle] autorelease];
+	edit.target = self;
+	edit.actionOnFailure = @selector(caseEditDidFail:);
+	edit.actionOnSuccess = @selector(caseEditDidComplete:);
+	[requestQueue addRequest:edit];	
+}
+
+- (void)caseEditDidComplete:(BKEditCaseRequest *)inRequest
+{
+	NSLog(@"request: %@", inRequest);
+	NSLog(@"raw response: %@", inRequest.rawResponseString);
+	NSLog(@"mapped dict: %@", inRequest.rawXMLMappedResponse);							
+	
+	NSLog(@"edited case: %@", inRequest.editedCase);
+	
+	objc_setAssociatedObject(self, kCurrentCaseInfo, inRequest.editedCase, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (void)caseEditDidFail:(BKEditCaseRequest *)inRequest
+{
+	STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
+}
+
 
 /*
 #pragma mark Version check test
