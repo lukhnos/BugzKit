@@ -58,12 +58,9 @@ extern NSString *const BKMailboxList;
 @end
 
 @interface BKAreaListRequest : BKListRequest
-{
-	NSUInteger projectID;	
-}
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables;
 
-@property NSUInteger projectID;
+@property (readonly) NSUInteger projectID;
 @end
 
 @interface BKSetCurrentFilterRequest : BKRequest
@@ -74,4 +71,14 @@ extern NSString *const BKMailboxList;
 
 @property (readonly) NSString *filterName;
 @end
+
+
+@interface BKCaseQueryRequest : BKRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames;
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum;
+
+@property (readonly) NSArray *fetchedCases;
+@property (readonly) NSString *query;
+@end
+
 

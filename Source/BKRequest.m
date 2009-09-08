@@ -200,10 +200,7 @@
 	for (NSString *key in dict) {
 		id value = [dict objectForKey:key];
 		
-		if (!value) {
-			value = @"";
-		}
-		else if (value == [NSNull null]) {
+		if (value == [NSNull null]) {
 			value = @"";
 		}
 		else if ([value isKindOfClass:[NSNumber class]]) {

@@ -195,7 +195,7 @@
 
 static NSString *kProjects = @"kProjects";
 
-- (void)testLists
+- (void)_testLists
 {
 	NSArray *lists = [NSArray arrayWithObjects:BKFilterList, BKProjectList, BKCategoryList, BKPriorityList, BKPeopleList, BKStatusList, BKFixForList, BKMailboxList, nil];
 	
@@ -330,6 +330,26 @@ static NSString *kTestingCurrentFilterName = @"kTestingCurrentFilterName";
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
 }
 
+#pragma mark Test case query
+
+- (void)testCaseQuery
+{
+	BKCaseQueryRequest *query = [[[BKCaseQueryRequest alloc] initWithAPIContext:[self sharedAPIContext] query:nil columns:[NSArray arrayWithObjects:@"sTitle", nil]] autorelease];
+	query.target = self;
+	query.actionOnFailure = @selector(caseQueryDidFail:);
+	query.actionOnSuccess = @selector(caseQueryDidComplete:);
+	[requestQueue addRequest:query];
+}
+
+- (void)caseQueryDidComplete:(BKCaseQueryRequest *)inRequest
+{
+	NSLog(@"query string: %@, fetched case titles: %@", inRequest.query, [inRequest.fetchedCases valueForKeyPath:@"sTitle"]);
+}
+
+- (void)caseQueryDidFail:(BKCaseQueryRequest *)inRequest
+{
+	STFail(@"request: %@, error: %@", inRequest, inRequest.error);		
+}
 
 /*
 #pragma mark Version check test

@@ -182,13 +182,15 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 {
 	if (self = [super initWithAPIContext:inAPIContext list:BKAreaList writableItemsOnly:inListOnlyWritables]) {
 		[(NSMutableDictionary *)requestParameterDict setObject:[NSNumber numberWithUnsignedInteger:inProjectID] forKey:@"ixProject"];
-		projectID = inProjectID;
 	}
 	
 	return self;
 }
 
-@synthesize projectID;
+- (NSUInteger)projectID
+{
+	return (NSUInteger)[[requestParameterDict objectForKey:@"ixProject"] integerValue];
+}
 @end
 
 
@@ -214,3 +216,57 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 
 @synthesize filterName;
 @end
+
+@implementation BKCaseQueryRequest : BKRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		NSMutableDictionary *d = [NSMutableDictionary dictionary];
+		
+		[d setObject:inAPIContext.authToken forKey:@"token"];
+		[d setObject:@"search" forKey:@"cmd"];
+		
+		if (inQuery) {
+			[d setObject:inQuery forKey:@"q"];
+		}
+		
+		if ([inColumnNames count]) {
+			[d setObject:[inColumnNames componentsJoinedByString:@","] forKey:@"cols"];
+		}
+		
+		if (inMaximum && inMaximum != NSUIntegerMax) {
+			[d setObject:[NSString stringWithFormat:@"%jd", (uintmax_t)inMaximum] forKey:@"max"];
+		}			 
+		
+		requestParameterDict = [d retain];
+	}
+	
+	return self;
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames
+{
+	return [self initWithAPIContext:inAPIContext query:inQuery columns:inColumnNames maximum:NSUIntegerMax];
+}
+
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
+{
+	id result = [inXMLMappedResponse valueForKeyPath:@"cases.case"];
+	if (!result) {
+		result = [NSArray array];
+	}
+	
+	return result;
+}
+
+- (NSArray *)fetchedCases
+{
+	return processedResponse;
+}
+
+- (NSString *)query
+{
+	return [requestParameterDict objectForKey:@"q"];
+}
+@end
+
