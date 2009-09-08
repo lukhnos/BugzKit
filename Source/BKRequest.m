@@ -59,6 +59,13 @@
 	return self;
 }
 
+- (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure
+{
+	target = inTarget;
+	actionOnFailure = inActionOnFailure;
+	actionOnSuccess = inActionOnSuccess;
+}
+
 - (NSString *)HTTPRequestContentType
 {
 	return LFHTTPRequestWWWFormURLEncodedContentType;

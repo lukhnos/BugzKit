@@ -10,7 +10,7 @@
 #import "BKPrivateUtilities.h"
 #import "BKRequest+ProtectedMethods.h"
 
-@implementation BKVersionCheckRequest
+@implementation BKCheckVersionRequest
 - (NSURL *)requestURL
 {
     return [NSURL URLWithString:@"api.xml" relativeToURL:APIContext.serviceRoot];
@@ -270,6 +270,29 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 }
 @end
 
+
+@implementation BKQueryEventRequest : BKQueryCaseRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber
+{
+	if (self = [super initWithAPIContext:inAPIContext query:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] columns:[NSArray arrayWithObject:@"events"]]) {
+	}
+	
+	return self;
+}
+
+- (NSArray *)fetchedEvents
+{
+	NSArray *cases = [self fetchedCases];
+	
+	if ([cases count]) {
+		return [[cases objectAtIndex:0] valueForKeyPath:@"events.event"];
+	}
+	
+	return [NSArray array];
+}
+@end
+
+
 NSString *const BKNewCaseAction = @"new";
 NSString *const BKEditCaseAction = @"edit";
 NSString *const BKAssignCaseAction = @"assign";
@@ -288,13 +311,17 @@ NSString *const BKForwardCaseAction = @"forward";
 	[super dealloc];
 }
 
-- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters
 {
 	if (self = [super initWithAPIContext:inAPIContext]) {
 		NSMutableDictionary *d = [NSMutableDictionary dictionary];
 		
 		[d setObject:inAPIContext.authToken forKey:@"token"];
 		[d setObject:inAction forKey:@"cmd"];
+		
+		if (inCaseNumber) {
+			[d setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] forKey:@"ixBug"];
+		}
 		
 		if (inParameters) {
 			[d addEntriesFromDictionary:inParameters];
@@ -304,6 +331,11 @@ NSString *const BKForwardCaseAction = @"forward";
 	}
 	
 	return self;	
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters
+{
+	return [self initWithAPIContext:inAPIContext editAction:inAction caseNumber:0 parameters:inParameters];
 }
 
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse

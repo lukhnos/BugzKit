@@ -42,6 +42,7 @@
     NSDate *creationDate;
 }
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext;
+- (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure;
 
 @property (assign) id target;
 @property (assign) SEL actionOnSuccess;

@@ -27,7 +27,7 @@
 
 #import "BKRequest.h"
 
-@interface BKVersionCheckRequest : BKRequest
+@interface BKCheckVersionRequest : BKRequest
 @end
 
 @interface BKLogOnRequest : BKRequest
@@ -81,6 +81,14 @@ extern NSString *const BKMailboxList;
 @property (readonly) NSString *query;
 @end
 
+@interface BKQueryEventRequest : BKQueryCaseRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber;
+
+@property (readonly) NSArray *fetchedEvents;
+@end
+
+
+
 extern NSString *const BKNewCaseAction;
 extern NSString *const BKEditCaseAction;
 extern NSString *const BKAssignCaseAction;
@@ -97,6 +105,7 @@ extern NSString *const BKForwardCaseAction;
 	NSDictionary *parameters;
 }
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters;
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters;
 
 @property (readonly) NSDictionary *editedCase;
 @property (readonly) NSString *editAction;
