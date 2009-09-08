@@ -56,6 +56,7 @@
 
 - (void)addRequest:(BKRequest *)inRequest
 {
+	[inRequest recycleIfUsedBefore];
     [queue addObject:inRequest];
 	[self runQueue];
 }

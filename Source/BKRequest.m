@@ -122,6 +122,17 @@
 @end
 
 @implementation BKRequest (ProtectedMethods)
+- (void)recycleIfUsedBefore
+{
+	if (rawResponseData) {	
+		BKRetainAssign(rawResponseData, nil);
+		BKRetainAssign(rawXMLMappedResponse, nil);
+		BKRetainAssign(processedResponse, nil);
+		BKRetainAssign(error, nil);
+		BKRetainAssign(creationDate, [NSDate date]);
+	}
+}
+
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData
 {
 	BKRetainAssign(rawResponseData, inData);
@@ -189,13 +200,19 @@
 	for (NSString *key in dict) {
 		id value = [dict objectForKey:key];
 		
-		if ([value isKindOfClass:[NSNumber class]]) {
+		if (!value) {
+			value = @"";
+		}
+		else if (value == [NSNull null]) {
+			value = @"";
+		}
+		else if ([value isKindOfClass:[NSNumber class]]) {
 			value = [NSString stringWithFormat:@"%ju", (uintmax_t)[value unsignedIntegerValue]];
 		}
 		else if ([value isKindOfClass:[NSDate class]]) {
+			// TO DO: See assert
 			NSAssert(0, @"NSDate mapping not yet completed");
 		}
-		
 		
 		[params addObject:[NSString stringWithFormat:@"%@=%@", key, BKEscapedURLStringFromNSString(value)]];
 	}

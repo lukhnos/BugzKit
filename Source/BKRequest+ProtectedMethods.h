@@ -29,6 +29,8 @@
 #import "BKRequestQueue.h"
 
 @interface BKRequest (ProtectedMethods)
+- (void)recycleIfUsedBefore;
+
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData;
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError;
 

@@ -66,6 +66,7 @@
 
 - (void)tearDown
 {
+	objc_removeAssociatedObjects(self);
 	[requestQueue release];
 }
 
@@ -132,8 +133,8 @@
 	NSString *wrongPassword = @"zzzzzzzz";
 	BKLogOnRequest *request = [[[BKLogOnRequest alloc] initWithAPIContext:[self sharedAPIContext] accountName:kTestLoginEmail password:wrongPassword] autorelease];
 	request.target = self;
-	request.actionOnSuccess = @selector(logOnExpectedNotToComplete:);
 	request.actionOnFailure = @selector(logOnExpectedToFail:);
+	request.actionOnSuccess = @selector(logOnExpectedNotToComplete:);
 	[requestQueue addRequest:request];							   
 }
 
@@ -155,8 +156,8 @@
 	// you ain't going to use this as password are you?
 	BKLogOnRequest *request = [[[BKLogOnRequest alloc] initWithAPIContext:[self sharedAPIContext] accountName:kTestLoginEmail password:kTestLoginPassword] autorelease];
 	request.target = self;
-	request.actionOnSuccess = @selector(logOnDidComplete:);
 	request.actionOnFailure = @selector(logOnDidFail:);
+	request.actionOnSuccess = @selector(logOnDidComplete:);
 	[requestQueue addRequest:request];							   
 }
 
@@ -174,8 +175,8 @@
 {
 	BKLogOffRequest *request = [[[BKLogOffRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
 	request.target = self;
-	request.actionOnSuccess = @selector(logOffDidComplete:);
 	request.actionOnFailure = @selector(logOffDidFail:);
+	request.actionOnSuccess = @selector(logOffDidComplete:);
 	[requestQueue addRequest:request];	
 }
 
@@ -192,35 +193,37 @@
 
 #pragma mark Test list items
 
+static NSString *kProjects = @"kProjects";
+
 - (void)testLists
 {
-	NSArray *lists = [NSArray arrayWithObjects:BKProjectList, BKCategoryList, BKPriorityList, BKPeopleList, BKStatusList, BKFixForList, BKMailboxList, nil];
+	NSArray *lists = [NSArray arrayWithObjects:BKFilterList, BKProjectList, BKCategoryList, BKPriorityList, BKPeopleList, BKStatusList, BKFixForList, BKMailboxList, nil];
 	
 	for (NSString *t in lists) {
 		BKListRequest *request = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:t writableItemsOnly:NO] autorelease];
 		request.target = self;
-		request.actionOnSuccess = @selector(listDidComplete:);
 		request.actionOnFailure = @selector(listDidFail:);								  
+		request.actionOnSuccess = @selector(listDidComplete:);
 		[requestQueue addRequest:request];
 	}
+	
+	return;
 
 	BKListRequest *projectListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKProjectList writableItemsOnly:NO] autorelease];
 	projectListRequest.target = self;
-	projectListRequest.actionOnSuccess = @selector(projectListDidComplete:);
 	projectListRequest.actionOnFailure = @selector(listDidFail:);								  
+	projectListRequest.actionOnSuccess = @selector(projectListDidComplete:);
 	[requestQueue addRequest:projectListRequest];
 	
-	NSArray *projects = objc_getAssociatedObject(self, @"projects");
+	NSArray *projects = objc_getAssociatedObject(self, kProjects);
 	for (NSDictionary *p in projects) {
 		BKAreaListRequest *request = [[[BKAreaListRequest alloc] initWithAPIContext:[self sharedAPIContext] projectID:[[p objectForKey:@"ixProject"] integerValue] writableItemsOnly:NO] autorelease];
 		request.target = self;
-		request.actionOnSuccess = @selector(areaListDidComplete:);
 		request.actionOnFailure = @selector(listDidFail:);
+		request.actionOnSuccess = @selector(areaListDidComplete:);
 		request.userInfo = p;
 		[requestQueue addRequest:request];
 	}
-	
-	objc_setAssociatedObject(self, @"projects", nil, OBJC_ASSOCIATION_RETAIN);	
 }
 
 - (void)listDidComplete:(BKListRequest *)inRequest
@@ -232,7 +235,7 @@
 - (void)projectListDidComplete:(BKListRequest *)inRequest
 {
 	[self listDidComplete:inRequest];	
-	objc_setAssociatedObject(self, @"projects", inRequest.fetchedList, OBJC_ASSOCIATION_RETAIN);
+	objc_setAssociatedObject(self, kProjects, inRequest.fetchedList, OBJC_ASSOCIATION_RETAIN);
 }
 
 - (void)areaListDidComplete:(BKAreaListRequest *)inRequest
@@ -247,6 +250,85 @@
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
 }
 
+#pragma mark Test setting current filter
+
+static NSString *kFilterList = @"kFilterList";
+static NSString *kSavedCurrentFilterName = @"kSavedCurrentFilterName";
+
+static NSString *kTestingCurrentFilterName = @"kTestingCurrentFilterName";
+
+- (void)testSettingCurrentFilter
+{
+	BKListRequest *filterListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKFilterList writableItemsOnly:NO] autorelease];
+	filterListRequest.target = self;
+	filterListRequest.actionOnFailure = @selector(currentFilterSettingFail:);								  
+	filterListRequest.actionOnSuccess = @selector(getCurrentFilter:);
+	[requestQueue addRequest:filterListRequest];	
+	
+	filterListRequest.actionOnSuccess = @selector(checkCurrentFilterActuallySet:);	
+	NSArray *filterList = objc_getAssociatedObject(self, kFilterList);
+	for (NSDictionary *f in filterList) {
+		NSString *filterName = [f objectForKey:@"sFilter"];
+		objc_setAssociatedObject(self, kTestingCurrentFilterName, filterName, OBJC_ASSOCIATION_RETAIN);
+		
+		BKSetCurrentFilterRequest *setRequest = [[[BKSetCurrentFilterRequest alloc] initWithAPIContext:[self sharedAPIContext] filterName:filterName] autorelease];
+		setRequest.target = self;
+		setRequest.actionOnFailure = @selector(currentFilterSettingFail:);
+		setRequest.actionOnSuccess = @selector(setCurrentFilterDidComplete:);
+		
+		[requestQueue addRequest:setRequest];
+		[requestQueue addRequest:filterListRequest];
+	}	
+
+	objc_setAssociatedObject(self, kTestingCurrentFilterName, objc_getAssociatedObject(self, kSavedCurrentFilterName), OBJC_ASSOCIATION_RETAIN);
+	BKSetCurrentFilterRequest *setRequest = [[[BKSetCurrentFilterRequest alloc] initWithAPIContext:[self sharedAPIContext] filterName:objc_getAssociatedObject(self, kSavedCurrentFilterName)] autorelease];
+	setRequest.target = self;
+	setRequest.actionOnFailure = @selector(currentFilterSettingFail:);
+	setRequest.actionOnSuccess = @selector(setCurrentFilterDidComplete:);	
+	[requestQueue addRequest:setRequest];
+
+	[requestQueue addRequest:filterListRequest];
+}
+
+- (NSString *)currentFilterNameFromList:(NSArray *)inList
+{
+	for (NSDictionary *f in inList) {
+		if ([[f objectForKey:@"status"] isEqualToString:@"current"]) {
+			return [f objectForKey:@"sFilter"];
+		}
+	}
+	
+	return nil;
+}
+
+- (void)getCurrentFilter:(BKListRequest *)inRequest
+{
+	NSString *fn = [self currentFilterNameFromList:inRequest.fetchedList];	
+	objc_setAssociatedObject(self, kFilterList, inRequest.fetchedList, OBJC_ASSOCIATION_RETAIN);
+	objc_setAssociatedObject(self, kSavedCurrentFilterName, fn, OBJC_ASSOCIATION_RETAIN);
+	
+	NSLog(@"Current filter: %@", fn);
+}
+
+- (void)setCurrentFilterDidComplete:(BKSetCurrentFilterRequest *)inRequest
+{
+	NSLog(@"Current filter now set to: %@", inRequest.filterName);
+}
+
+- (void)checkCurrentFilterActuallySet:(BKListRequest *)inRequest
+{
+	NSString *fn = [self currentFilterNameFromList:inRequest.fetchedList];
+	if (fn) {		
+		STAssertEqualObjects([self currentFilterNameFromList:inRequest.fetchedList], objc_getAssociatedObject(self, kTestingCurrentFilterName), @"Current filter should be set to the desired one");
+	}
+	
+	NSLog(@"We want filter set to: %@, actual filter name: %@", objc_getAssociatedObject(self, kTestingCurrentFilterName), fn);
+}
+
+- (void)currentFilterSettingFail:(BKListRequest *)inRequest
+{
+	STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
+}
 
 
 /*

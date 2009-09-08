@@ -7,6 +7,7 @@
 #import "BKAPIRequestClasses.h"
 #import "BKAPIContext+ProtectedMethods.h"
 #import "BKError.h"
+#import "BKPrivateUtilities.h"
 #import "BKRequest+ProtectedMethods.h"
 
 @implementation BKVersionCheckRequest
@@ -28,7 +29,7 @@
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext accountName:(NSString *)inAccountName password:(NSString *)inPassword
 {
 	if (self = [super initWithAPIContext:inAPIContext]) {
-		requestParameterDict = [[NSDictionary dictionaryWithObjectsAndKeys:@"logon", @"cmd", inAccountName, @"email", inPassword, @"password", nil] retain];
+		requestParameterDict = [[NSDictionary dictionaryWithObjectsAndKeys:@"logon", @"cmd", BKNotNil(inAccountName), @"email", BKNotNil(inPassword), @"password", nil] retain];
 	}
 	
 	return self;
@@ -65,6 +66,7 @@
 }
 @end
 
+NSString *const BKFilterList = @"BKFilterList";
 NSString *const BKProjectList = @"BKProjectList";
 NSString *const BKAreaList = @"BKAreaList";
 NSString *const BKCategoryList = @"BKCategoryList";
@@ -95,6 +97,7 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 		parameterDictionary = [[NSMutableDictionary dictionary] retain];
 		
 		#define POPULATE(dict, key, cmd, kvPath, lvk) do { [(NSMutableDictionary *)dict setObject:[NSDictionary dictionaryWithObjectsAndKeys:cmd, kListCommandKey, kvPath, kListResultValueKeyPathKey, lvk, kFirstLevelValueKey, nil] forKey:key]; } while(0);
+		POPULATE(parameterDictionary, BKFilterList, @"listFilters", @"filters.filter", @"filters");
 		POPULATE(parameterDictionary, BKProjectList, @"listProjects", @"projects.project", @"projects");
 		POPULATE(parameterDictionary, BKAreaList, @"listAreas", @"areas.area", @"areas");
 		POPULATE(parameterDictionary, BKCategoryList, @"listCategories", @"categories.category", @"categories");
@@ -186,4 +189,28 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 }
 
 @synthesize projectID;
+@end
+
+
+@implementation BKSetCurrentFilterRequest
+- (void)dealloc
+{
+	[filterName release];
+	[super dealloc];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		filterName = [inFilterName copy];
+		
+		// TO DO: Check if API keeps the name
+		// TO DO: Ask if there's a way to set the sFilter to none
+		requestParameterDict = [[NSDictionary dictionaryWithObjectsAndKeys:@"setCurrentFilter", @"cmd", inAPIContext.authToken, @"token", ([inFilterName length] ? inFilterName : @"inbox"), @"sFilter", nil] retain];
+	}
+	
+	return self;	
+}
+
+@synthesize filterName;
 @end

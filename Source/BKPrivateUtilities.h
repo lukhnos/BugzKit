@@ -29,6 +29,10 @@
 #define BKReleaseClean(foo)	        do { id tmp = foo; foo = nil; [tmp release]; } while(0)
 #define BKAutoreleasedCopy(foo)     ([[foo copy] autorelease])
 
+
+#define BKNotNil(x)		(x ? (id)x : (id)[NSNull null])
+#define BKNotNSNull(x)	(x == [NSNull null] ? nil : x)
+
 NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 {
 	CFStringRef escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)inStr, NULL, CFSTR("&"), kCFStringEncodingUTF8);

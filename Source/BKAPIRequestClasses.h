@@ -37,6 +37,7 @@
 @interface BKLogOffRequest : BKRequest
 @end
 
+extern NSString *const BKFilterList;
 extern NSString *const BKProjectList;
 extern NSString *const BKAreaList;
 extern NSString *const BKCategoryList;
@@ -64,3 +65,13 @@ extern NSString *const BKMailboxList;
 
 @property NSUInteger projectID;
 @end
+
+@interface BKSetCurrentFilterRequest : BKRequest
+{
+	NSString *filterName;
+}
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName;
+
+@property (readonly) NSString *filterName;
+@end
+
