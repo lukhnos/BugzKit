@@ -195,7 +195,7 @@
 
 static NSString *kProjects = @"kProjects";
 
-- (void)_testLists
+- (void)testLists
 {
 	NSArray *lists = [NSArray arrayWithObjects:BKFilterList, BKProjectList, BKCategoryList, BKPriorityList, BKPeopleList, BKStatusList, BKFixForList, BKMailboxList, nil];
 	
@@ -332,7 +332,7 @@ static NSString *kTestingCurrentFilterName = @"kTestingCurrentFilterName";
 
 #pragma mark Test case query
 
-- (void)_testCaseQuery
+- (void)testCaseQuery
 {
 	BKCaseQueryRequest *query = [[[BKCaseQueryRequest alloc] initWithAPIContext:[self sharedAPIContext] query:nil columns:[NSArray arrayWithObjects:@"sTitle", nil]] autorelease];
 	query.target = self;
@@ -377,16 +377,46 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 	edit.actionOnFailure = @selector(caseEditDidFail:);
 	edit.actionOnSuccess = @selector(caseEditDidComplete:);
 	[requestQueue addRequest:edit];	
+	
+	caseInfo = objc_getAssociatedObject(self, kCurrentCaseInfo);
+	edit = [[[BKEditCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] editAction:BKResolveCaseAction parameters:changeTitle] autorelease];
+	edit.target = self;
+	edit.actionOnFailure = @selector(caseEditDidFail:);
+	edit.actionOnSuccess = @selector(caseEditDidComplete:);
+	[requestQueue addRequest:edit];	
+
+	caseInfo = objc_getAssociatedObject(self, kCurrentCaseInfo);
+	edit = [[[BKEditCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] editAction:BKCloseCaseAction parameters:changeTitle] autorelease];
+	edit.target = self;
+	edit.actionOnFailure = @selector(caseEditDidFail:);
+	edit.actionOnSuccess = @selector(caseEditDidComplete:);
+	[requestQueue addRequest:edit];		
+
+	caseInfo = objc_getAssociatedObject(self, kCurrentCaseInfo);
+	edit = [[[BKEditCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] editAction:BKReopenCaseAction parameters:changeTitle] autorelease];
+	edit.target = self;
+	edit.actionOnFailure = @selector(caseEditDidFail:);
+	edit.actionOnSuccess = @selector(caseEditDidComplete:);
+	[requestQueue addRequest:edit];		
+
+	caseInfo = objc_getAssociatedObject(self, kCurrentCaseInfo);
+	edit = [[[BKEditCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] editAction:BKResolveCaseAction parameters:changeTitle] autorelease];
+	edit.target = self;
+	edit.actionOnFailure = @selector(caseEditDidFail:);
+	edit.actionOnSuccess = @selector(caseEditDidComplete:);
+	[requestQueue addRequest:edit];		
+
+	caseInfo = objc_getAssociatedObject(self, kCurrentCaseInfo);
+	edit = [[[BKEditCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] editAction:BKCloseCaseAction parameters:changeTitle] autorelease];
+	edit.target = self;
+	edit.actionOnFailure = @selector(caseEditDidFail:);
+	edit.actionOnSuccess = @selector(caseEditDidComplete:);
+	[requestQueue addRequest:edit];			
 }
 
 - (void)caseEditDidComplete:(BKEditCaseRequest *)inRequest
 {
-	NSLog(@"request: %@", inRequest);
-	NSLog(@"raw response: %@", inRequest.rawResponseString);
-	NSLog(@"mapped dict: %@", inRequest.rawXMLMappedResponse);							
-	
-	NSLog(@"edited case: %@", inRequest.editedCase);
-	
+	NSLog(@"edited case number: %@ (allowed operations: %@)", [inRequest.editedCase objectForKey:@"ixBug"], [inRequest.editedCase objectForKey:@"operations"]);	
 	objc_setAssociatedObject(self, kCurrentCaseInfo, inRequest.editedCase, OBJC_ASSOCIATION_RETAIN);
 }
 
@@ -394,98 +424,4 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 {
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
 }
-
-
-/*
-#pragma mark Version check test
-
-- (void)test0_VersionCheck
-{
-	[bugzRequest checkVersionWithDelegate:self];
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidCompleteWithVersion:(NSString *)inMajorVersion minorVersion:(NSString *)inMinorVersion
-{
-	NSLog(@"Fogbuz API, version: %@.%@", inMajorVersion, inMinorVersion);	
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest versionCheckDidFailWithError:(NSError *)inError
-{
-	STFail(@"%@", inError);
-}
-
-
-#pragma mark Test Logging On and Off
-
-- (void)testA_LogOn
-{
-	[bugzRequest logOnWithUserName:kTestLoginEmail password:kTestLoginPassword delegate:self];
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidCompleteWithToken:(NSString *)inToken
-{
-	STAssertTrue([inToken length], @"Must now have obtained auth token");
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidFailWithAmbiguousNameList:(NSArray *)inNameList
-{
-	STFail(@"Ambiguous login, suggested name list: %@", inNameList);
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest logOnDidFailWithError:(NSError *)inError
-{
-	STFail(@"%@", inError);	
-}
-
-
-- (void)testZ_LogOff
-{
-	[bugzRequest logOffWithDelegate:self];
-}
-
-- (void)bugzRequestLogOffDidComplete:(BKBugzRequest *)inRequest
-{
-	STAssertTrue(1, @"Must completed logging off");
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest logOffDidFailWithError:(NSError *)inError
-{
-	STFail(@"%@", inError);		
-}
-
-#pragma mark Test Case List Fetch
-
-- (void)testCaseListFetch
-{
-	[bugzRequest fetchCaseListWithQuery:@"project:inbox" columns:@"sTitle,dtOpened" delegate:self];
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList
-{
-	NSLog(@"Fetched cases: %@", BKPlistString(inCaseList));
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError
-{
-}
-
-#pragma mark Test Project List Fetch
-
-- (void)testProjectListFetch
-{
-	[bugzRequest fetchProjectListWithDelegate:self];
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidCompleteWithList:(NSArray *)inProjectList
-{
-	NSLog(@"Fetched projects: %@", BKPlistString(inProjectList));
-}
-
-- (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidFailWithError:(NSError *)inError
-{
-	STFail(@"%@", inError);			
-}
-*/
 @end
-
-
