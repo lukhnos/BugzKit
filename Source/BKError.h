@@ -32,7 +32,8 @@ extern NSString *const BKBugzAPIErrorDomain;
 
 typedef enum {
 	BKConnecitonLostError = -1,
-	BKConnecitonTimeoutError = -2,
+	BKConnectionTimeoutError = -2,
+	BKConnectionServerHTTPError = -3,	// e.g. 404
 	
 	BKAPIMalformedResponseError = -100,
 	BKUnknownError = -9999

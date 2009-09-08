@@ -6,6 +6,7 @@
 
 #import "BKAPIRequestClasses.h"
 #import "BKAPIContext+ProtectedMethods.h"
+#import "BKRequest+ProtectedMethods.h"
 
 @implementation BKVersionCheckRequest
 - (NSURL *)requestURL
@@ -13,8 +14,9 @@
     return [NSURL URLWithString:@"api.xml" relativeToURL:APIContext.serviceRoot];
 }
 
-- (void)postprocessResponse
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
 {
-    [APIContext setEndpoint:[response objectForKey:@"url"]]
+    [APIContext setEndpoint:[NSURL URLWithString:[inXMLMappedResponse objectForKey:@"url"] relativeToURL:APIContext.serviceRoot]];
+	return [super postprocessResponse:inXMLMappedResponse];
 }
 @end

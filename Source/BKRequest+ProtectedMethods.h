@@ -34,7 +34,8 @@
 
 - (NSDictionary *)preparedParameterDict;
 - (NSString *)preparedParameterString;
-- (NSError *)errorFromXMLMappedResponse;
-- (void)postprocessResponse;
-- (id)extractedResponse;
+- (NSError *)errorFromXMLMappedResponse:(NSDictionary *)inXMLMappedResponse;
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse;
 @end
+
+extern NSString *const BKHTTPRequestServerError;

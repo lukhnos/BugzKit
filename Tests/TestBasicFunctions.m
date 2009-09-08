@@ -27,21 +27,21 @@
 
 #import "TestBasicFunctions.h"
 #import "TestEndpoint.h"
+#import "BKPrivateUtilities.h"
 
-static NSString *LFPlistString(id plist)
-{
-	NSString *error;
-	NSData *data = [NSPropertyListSerialization dataFromPropertyList:plist format:NSPropertyListXMLFormat_v1_0 errorDescription:&error];
-	
-	if (!data) {
-		return @"(not a valid plist)";
-	}
-	
-	return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
-}
 
 
 @implementation TestBasicFunctions
++ (BKAPIContext *)sharedAPIContext
+{
+	static BKAPIContext *sharedInstance = nil;
+	if (!sharedInstance) {
+		sharedInstance = [[BKAPIContext alloc] init];
+	}
+	
+	return sharedInstance;
+}
+
 - (void)dealloc
 {
 	[super dealloc];
@@ -52,10 +52,16 @@ static NSString *LFPlistString(id plist)
 	[BKBugzContext defaultContext].endpointRootString = kTestEndpoint;
 	bugzRequest = [BKBugzRequest defaultRequest];
 	bugzRequest.shouldWaitUntilDone = YES;
+	
+	
+	[[self class] sharedAPIContext].serviceRoot = [NSURL URLWithString:kTestEndpoint];
+	requestQueue = [[BKRequestQueue alloc] init];
+	requestQueue.shouldWaitUntilDone = YES;
 }
 
 - (void)tearDown
 {
+	[requestQueue release];
 }
 
 - (void)testTruth
@@ -63,6 +69,48 @@ static NSString *LFPlistString(id plist)
 	STAssertTrue(YES, @"Truth");
 }
 
+- (void)test00_VersionCheckWithFaultyEndpoint
+{
+	[[self class] sharedAPIContext].serviceRoot = [NSURL URLWithString:@"http://example.org"];
+	
+	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[[self class] sharedAPIContext]] autorelease];
+	request.target = self;
+	request.actionOnSuccess = @selector(versionCheckExpectedNotToComplete:);
+	request.actionOnFailure = @selector(versionCheckExpectedToFail:);
+	[requestQueue addRequest:request];	
+}
+
+- (void)versionCheckExpectedNotToComplete:(BKRequest *)inRequest
+{
+	STFail(@"This request should not complete: %@, context: %@", inRequest, [[self class] sharedAPIContext]);
+}
+
+- (void)versionCheckExpectedToFail:(BKRequest *)inRequest
+{
+	STAssertNotNil(inRequest.error, @"Must have an error");
+}
+
+- (void)test01_VersionCheck
+{
+	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[[self class] sharedAPIContext]] autorelease];
+	request.target = self;
+	request.actionOnSuccess = @selector(versionCheckDidComplete:);
+	request.actionOnFailure = @selector(commonAPIFailureHandler:);
+	[requestQueue addRequest:request];
+}
+
+- (void)versionCheckDidComplete:(BKRequest *)inRequest
+{
+	STAssertNotNil([[self class] sharedAPIContext].endpoint, @"After check, endpoint must not be nil");
+}
+
+- (void)commonAPIFailureHandler:(BKRequest *)inRequest
+{
+	STFail(@"request: %@, error: %@", inRequest, inRequest.error);
+	NSLog(@"%s (request %p), error: %@", __PRETTY_FUNCTION__, inRequest, inRequest.error);
+}
+
+/*
 #pragma mark Version check test
 
 - (void)test0_VersionCheck
@@ -128,7 +176,7 @@ static NSString *LFPlistString(id plist)
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidCompleteWithList:(NSArray *)inCaseList
 {
-	NSLog(@"Fetched cases: %@", LFPlistString(inCaseList));
+	NSLog(@"Fetched cases: %@", BKPlistString(inCaseList));
 }
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest caseListFetchDidFailWithError:(NSError *)inError
@@ -144,12 +192,12 @@ static NSString *LFPlistString(id plist)
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidCompleteWithList:(NSArray *)inProjectList
 {
-	NSLog(@"Fetched projects: %@", LFPlistString(inProjectList));
+	NSLog(@"Fetched projects: %@", BKPlistString(inProjectList));
 }
 
 - (void)bugzRequest:(BKBugzRequest *)inRequest projectListFetchDidFailWithError:(NSError *)inError
 {
 	STFail(@"%@", inError);			
 }
-
+*/
 @end

@@ -35,7 +35,8 @@
     id userInfo;
     BKAPIContext *APIContext;
     NSDictionary *requestParameterDict;
-    id response;
+	NSDictionary *rawXMLMappedResponse;
+    id processedResponse;
     NSError *error;
     NSDate *creationDate;
 }
@@ -51,7 +52,8 @@
 @property (readonly) NSDictionary *requestParameterDict;
 @property (readonly) NSURL *requestURL;
 @property (readonly) NSData *requestData;
-@property (readonly) id response;
+@property (readonly) NSDictionary *rawXMLMappedResponse;
+@property (readonly) id processedResponse;
 @property (readonly) NSError *error;
 @property (readonly) NSDate *creationDate;
 @end

@@ -37,6 +37,12 @@
     [authToken release];
     [super dealloc];
 }
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@: %p> {serviceRoot: %@, endpoint: %@, authToken: %@}", [self class], self, BKQuotedString([serviceRoot absoluteString]), BKQuotedString([endpoint absoluteString]), BKQuotedString(authToken)];
+}
+
 @synthesize serviceRoot;
 @synthesize authToken;
 @synthesize endpoint;

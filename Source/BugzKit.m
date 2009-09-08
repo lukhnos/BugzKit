@@ -482,7 +482,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 		errorCode = BKConnecitonLostError;
 	}
 	else if ([inError isEqualToString:LFHTTPRequestTimeoutError]) {
-		errorCode = BKConnecitonTimeoutError;
+		errorCode = BKConnectionTimeoutError;
 	}
 	else {
 		;

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6A0FF641102ED1C7003089B7 /* BKXMLMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A0FF640102ED1C7003089B7 /* BKXMLMapper.m */; };
 		6A1667FC105630E900EA9C34 /* BKError.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A1667FB105630E900EA9C34 /* BKError.m */; };
+		6A1668BF105638F500EA9C34 /* BKAPIRequestClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A1668BE105638F500EA9C34 /* BKAPIRequestClasses.m */; };
 		6A832D73102EC38200510B1F /* TestBasicFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A832D72102EC38200510B1F /* TestBasicFunctions.m */; };
 		6A832D76102EC43200510B1F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A832D75102EC43200510B1F /* Foundation.framework */; };
 		6A832D78102EC43200510B1F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A832D77102EC43200510B1F /* SystemConfiguration.framework */; };
@@ -25,6 +26,8 @@
 		6A0FF63F102ED1C7003089B7 /* BKXMLMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKXMLMapper.h; sourceTree = "<group>"; };
 		6A0FF640102ED1C7003089B7 /* BKXMLMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKXMLMapper.m; sourceTree = "<group>"; };
 		6A1667FB105630E900EA9C34 /* BKError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKError.m; sourceTree = "<group>"; };
+		6A1668BD105638F500EA9C34 /* BKAPIRequestClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKAPIRequestClasses.h; sourceTree = "<group>"; };
+		6A1668BE105638F500EA9C34 /* BKAPIRequestClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKAPIRequestClasses.m; sourceTree = "<group>"; };
 		6A832D5A102EC33800510B1F /* TestBasicFunctions.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TestBasicFunctions.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A832D5C102EC33800510B1F /* TestBasicFunctions-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestBasicFunctions-Info.plist"; sourceTree = "<group>"; };
 		6A832D71102EC38200510B1F /* TestBasicFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestBasicFunctions.h; sourceTree = "<group>"; };
@@ -114,6 +117,8 @@
 		6A832D97102EC57C00510B1F /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				6A1668BD105638F500EA9C34 /* BKAPIRequestClasses.h */,
+				6A1668BE105638F500EA9C34 /* BKAPIRequestClasses.m */,
 				6ADE9B981055477900788DA1 /* BKAPIContext.h */,
 				6ADE9B991055477900788DA1 /* BKAPIContext.m */,
 				6ADE9B9A1055477900788DA1 /* BKAPIContext+ProtectedMethods.h */,
@@ -213,6 +218,7 @@
 				6ADE9BA31055477900788DA1 /* BKRequest.m in Sources */,
 				6ADE9BA41055477900788DA1 /* BKRequestQueue.m in Sources */,
 				6A1667FC105630E900EA9C34 /* BKError.m in Sources */,
+				6A1668BF105638F500EA9C34 /* BKAPIRequestClasses.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

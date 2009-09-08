@@ -28,6 +28,7 @@
 #import "LFWebAPIKit.h"
 
 #import "BKAPIContext.h"
+#import "BKAPIRequestClasses.h"
 #import "BKError.h"
 #import "BKRequest.h"
 #import "BKRequestQueue.h"

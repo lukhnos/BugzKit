@@ -25,7 +25,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#define BKRetainAssign(foo, bar)    do { id tmp = foo; foo = [bar retain]; [tmp release]; } while(0)
+#define BKRetainAssign(foo, bar)    do { id tmp = foo; foo = [(id)bar retain]; [tmp release]; } while(0)
 #define BKReleaseClean(foo)	        do { id tmp = foo; foo = nil; [tmp release]; } while(0)
 #define BKAutoreleasedCopy(foo)     ([[foo copy] autorelease])
 
@@ -38,4 +38,29 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 #else
 	return (NSString *)[NSMakeCollectable(escaped) autorelease];			    
 #endif
+}
+
+NS_INLINE NSString *BKPlistString(id plist)
+{
+	NSString *error;
+	NSData *data = [NSPropertyListSerialization dataFromPropertyList:plist format:NSPropertyListXMLFormat_v1_0 errorDescription:&error];
+	
+	if (!data) {
+		return @"(not a valid plist)";
+	}
+	
+	return [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+}
+
+NS_INLINE NSString *BKQuotedString(id s)
+{
+	if (s) {
+		if ([s isKindOfClass:[NSURL class]]) {
+			return [NSString stringWithFormat:@"\"%@\"", [s absoluteString]];
+		}
+		
+		return [NSString stringWithFormat:@"\"%@\"", [s description]];
+	}
+	
+	return nil;
 }

@@ -57,6 +57,7 @@
 - (void)addRequest:(BKRequest *)inRequest
 {
     [queue addObject:inRequest];
+	[self runQueue];
 }
 
 - (void)setShouldWaitUntilDone:(BOOL)inShouldWait
@@ -126,7 +127,7 @@
 {
 	if (statusCode != 200) {
 		[inRequest cancelWithoutDelegateMessage];
-		[self httpRequest:inRequest didFailWithError:LFHTTPRequestConnectionError];
+		[self httpRequest:inRequest didFailWithError:BKHTTPRequestServerError];
 	}
 }
 

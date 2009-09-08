@@ -41,7 +41,8 @@
     [userInfo release];
     [APIContext release];
     [requestParameterDict release];
-    [response release];
+    [rawXMLMappedResponse release];
+	[processedResponse release];
     [error release];
     [creationDate release];
     [super dealloc];
@@ -70,7 +71,9 @@
 - (NSURL *)requestURL
 {
 	if ([self.HTTPRequestMethod isEqualToString:LFHTTPRequestGETMethod]) {
-		return [NSURL URLWithString:[@"?" stringByAppendingString:[self preparedParameterString]] relativeToURL:APIContext.endpoint];
+		NSString *paramsString = [self preparedParameterString];
+
+		return [paramsString length] ? [NSURL URLWithString:[@"?" stringByAppendingString:paramsString] relativeToURL:APIContext.endpoint] : APIContext.endpoint;
 	}
 		
 	return APIContext.endpoint;
@@ -85,13 +88,28 @@
 	return nil;
 }
 
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@: %p> {created: %@, target: %p, actionOnSuccess: %s, actionOnFailure: %s, userInfo: %@, APIContext: %p, req params: %@}",
+			[self class],
+			self,
+			creationDate,
+			target,
+			actionOnSuccess,
+			actionOnFailure,
+			userInfo,
+			APIContext,
+			requestParameterDict];			
+}
+
 @synthesize target;
 @synthesize actionOnSuccess;
 @synthesize actionOnFailure;
 @synthesize userInfo;
 @synthesize APIContext;
 @synthesize requestParameterDict;
-@synthesize response;
+@synthesize rawXMLMappedResponse;
+@synthesize processedResponse;
 @synthesize error;
 @synthesize creationDate;
 @end
@@ -99,16 +117,28 @@
 @implementation BKRequest (ProtectedMethods)
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData
 {
-	BKRetainAssign(response, [[BKXMLMapper dictionaryMappedFromXMLData:inData] objectForKey:@"response"]);
+	BKRetainAssign(rawXMLMappedResponse, [BKXMLMapper dictionaryMappedFromXMLData:inData]);
 	
-	NSError *responseError = [self errorFromXMLMappedResponse];
+	NSError *responseError = [self errorFromXMLMappedResponse:rawXMLMappedResponse];
 	if (responseError) {
 		BKRetainAssign(error, responseError);
-		[target performSelector:actionOnFailure withObject:self];
+		BKRetainAssign(processedResponse, nil);
+		if (actionOnFailure) {
+			[target performSelector:actionOnFailure withObject:self];
+		}
+		return;
 	}
-
-    [self postprocessResponse];
-    [target performSelector:actionOnSuccess withObject:[self extractedResponse]];   
+							  
+	// TO DO: Determine if we should handle, e.g. empty response, etc.
+	
+	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
+	
+	BKRetainAssign(error, nil);
+	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
+	
+	if (actionOnSuccess) {
+		[target performSelector:actionOnSuccess withObject:self];   
+	}
 }
 
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError
@@ -119,12 +149,17 @@
 		errorCode = BKConnecitonLostError;
 	}
 	else if ([inHTTPRequestError isEqualToString:LFHTTPRequestTimeoutError]) {
-		errorCode = BKConnecitonTimeoutError;
+		errorCode = BKConnectionTimeoutError;
+	}
+	else if ([inHTTPRequestError isEqualToString:BKHTTPRequestServerError]) {
+		errorCode = BKConnectionServerHTTPError;
 	}
 
 	BKRetainAssign(error, [NSError errorWithDomain:BKBugzConnectionErrorDomain code:errorCode userInfo:nil]);	
 	
-	[target performSelector:actionOnFailure withObject:self];
+	if (actionOnFailure) {
+		[target performSelector:actionOnFailure withObject:self];
+	}
 }
 
 - (NSDictionary *)preparedParameterDict
@@ -140,12 +175,12 @@
 		[params addObject:[NSString stringWithFormat:@"%@=%@", key, BKEscapedURLStringFromNSString([dict objectForKey:key])]];
 	}
 	
-	return [params componentsJoinedByString:@"&"];	
+	return [params count] ? [params componentsJoinedByString:@"&"] : nil;
 }
 
-- (NSError *)errorFromXMLMappedResponse
+- (NSError *)errorFromXMLMappedResponse:(NSDictionary *)inXMLMappedResponse
 {
-	NSDictionary *errorDictionary = [response objectForKey:@"error"];
+	NSDictionary *errorDictionary = [inXMLMappedResponse objectForKey:@"error"];
 	if ([errorDictionary count]) {
 		NSString *errorDomain = BKBugzAPIErrorDomain;
 		NSString *localizedMessage = NSLocalizedString(errorDictionary.textContent, nil);
@@ -157,12 +192,11 @@
 	return nil;
 }
 
-- (void)postprocessResponse
-{    
-}
 
-- (id)extractedResponse
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
 {
-    return response;
+	return inXMLMappedResponse;
 }
 @end
+
+NSString *const BKHTTPRequestServerError = @"BKHTTPRequestServerError";
