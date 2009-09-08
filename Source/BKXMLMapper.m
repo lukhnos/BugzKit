@@ -134,6 +134,11 @@ NSString *const BKXMLTextContentKey = @"_text";
 		return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
 	}
 	
+	// transform 'i'
+	if (firstChar == 'i' && secondCharIsUpperCase) {
+		return [NSNumber numberWithInteger:[inValue integerValue]];
+	}
+	
 	// transform 'dt'
 	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
 		return [NSDate dateFromISO8601String:inValue];
