@@ -54,11 +54,6 @@
 
 - (void)setUp
 {	
-	[BKBugzContext defaultContext].endpointRootString = kTestEndpoint;
-	bugzRequest = [BKBugzRequest defaultRequest];
-	bugzRequest.shouldWaitUntilDone = YES;
-	
-	
 	[self sharedAPIContext].serviceRoot = [NSURL URLWithString:kTestEndpoint];
 	requestQueue = [[BKRequestQueue alloc] init];
 	requestQueue.shouldWaitUntilDone = YES;

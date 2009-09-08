@@ -16,7 +16,6 @@
 		6A832D9A102EC57C00510B1F /* LFHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A832D91102EC57C00510B1F /* LFHTTPRequest.m */; };
 		6A832D9B102EC57C00510B1F /* LFSiteReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A832D93102EC57C00510B1F /* LFSiteReachability.m */; };
 		6A832D9C102EC57C00510B1F /* NSData+LFHTTPFormExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A832D96102EC57C00510B1F /* NSData+LFHTTPFormExtensions.m */; };
-		6A832D9D102EC57C00510B1F /* BugzKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A832D99102EC57C00510B1F /* BugzKit.m */; };
 		6ADE9BA21055477900788DA1 /* BKAPIContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE9B991055477900788DA1 /* BKAPIContext.m */; };
 		6ADE9BA31055477900788DA1 /* BKRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE9B9E1055477900788DA1 /* BKRequest.m */; };
 		6ADE9BA41055477900788DA1 /* BKRequestQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADE9BA11055477900788DA1 /* BKRequestQueue.m */; };
@@ -43,7 +42,6 @@
 		6A832D95102EC57C00510B1F /* NSData+LFHTTPFormExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+LFHTTPFormExtensions.h"; sourceTree = "<group>"; };
 		6A832D96102EC57C00510B1F /* NSData+LFHTTPFormExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+LFHTTPFormExtensions.m"; sourceTree = "<group>"; };
 		6A832D98102EC57C00510B1F /* BugzKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugzKit.h; sourceTree = "<group>"; };
-		6A832D99102EC57C00510B1F /* BugzKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugzKit.m; sourceTree = "<group>"; };
 		6ADE9B981055477900788DA1 /* BKAPIContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKAPIContext.h; sourceTree = "<group>"; };
 		6ADE9B991055477900788DA1 /* BKAPIContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKAPIContext.m; sourceTree = "<group>"; };
 		6ADE9B9A1055477900788DA1 /* BKAPIContext+ProtectedMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "BKAPIContext+ProtectedMethods.h"; sourceTree = "<group>"; };
@@ -133,7 +131,6 @@
 				6A0FF63F102ED1C7003089B7 /* BKXMLMapper.h */,
 				6A0FF640102ED1C7003089B7 /* BKXMLMapper.m */,
 				6A832D98102EC57C00510B1F /* BugzKit.h */,
-				6A832D99102EC57C00510B1F /* BugzKit.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -212,7 +209,6 @@
 				6A832D9A102EC57C00510B1F /* LFHTTPRequest.m in Sources */,
 				6A832D9B102EC57C00510B1F /* LFSiteReachability.m in Sources */,
 				6A832D9C102EC57C00510B1F /* NSData+LFHTTPFormExtensions.m in Sources */,
-				6A832D9D102EC57C00510B1F /* BugzKit.m in Sources */,
 				6A0FF641102ED1C7003089B7 /* BKXMLMapper.m in Sources */,
 				6ADE9BA21055477900788DA1 /* BKAPIContext.m in Sources */,
 				6ADE9BA31055477900788DA1 /* BKRequest.m in Sources */,
