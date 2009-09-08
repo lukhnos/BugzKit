@@ -1,5 +1,5 @@
 //
-// BKRequest.h
+// BKError.m
 //
 // Copyright (c) 2009 Lukhnos D. Liu (http://lukhnos.org)
 //
@@ -25,33 +25,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BKAPIContext.h"
+#import "BKError.h"
 
-@interface BKRequest : NSObject
-{
-    id target;
-    SEL actionOnSuccess;
-    SEL actionOnFailure;
-    id userInfo;
-    BKAPIContext *APIContext;
-    NSDictionary *requestParameterDict;
-    id response;
-    NSError *error;
-    NSDate *creationDate;
-}
-- (id)initWithAPIContext:(BKAPIContext *)inAPIContext;
-
-@property (assign) id target;
-@property (assign) SEL actionOnSuccess;
-@property (assign) SEL actionOnFailure;
-@property (retain) id userInfo;
-@property (readonly) NSString *HTTPRequestMethod;
-@property (readonly) NSString *HTTPRequestContentType;
-@property (readonly) BKAPIContext *APIContext;
-@property (readonly) NSDictionary *requestParameterDict;
-@property (readonly) NSURL *requestURL;
-@property (readonly) NSData *requestData;
-@property (readonly) id response;
-@property (readonly) NSError *error;
-@property (readonly) NSDate *creationDate;
-@end
+NSString *const BKBugzConnectionErrorDomain = @"BKBugzConnectionErrorDomain";
+NSString *const BKBugzAPIErrorDomain = @"BKBugzAPIErrorDomain";

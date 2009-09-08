@@ -510,6 +510,3 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 
 @synthesize context;
 @end
-
-NSString *const BKBugzConnectionErrorDomain = @"BKBugzConnectionErrorDomain";
-NSString *const BKBugzAPIErrorDomain = @"BKBugzAPIErrorDomain";

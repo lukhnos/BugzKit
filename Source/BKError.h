@@ -25,3 +25,15 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
+#import <Foundation/Foundation.h>
+
+extern NSString *const BKBugzConnectionErrorDomain;
+extern NSString *const BKBugzAPIErrorDomain;
+
+typedef enum {
+	BKConnecitonLostError = -1,
+	BKConnecitonTimeoutError = -2,
+	
+	BKAPIMalformedResponseError = -100,
+	BKUnknownError = -9999
+} BKErrorCode;

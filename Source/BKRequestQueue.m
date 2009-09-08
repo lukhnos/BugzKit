@@ -84,8 +84,9 @@
         return;
     }
 
-    BKRequest *nextRequest = [queue objectAtIndex:0];    
+    BKRequest *nextRequest = [queue objectAtIndex:0];
 	HTTPRequest.sessionInfo = nextRequest;
+	HTTPRequest.contentType = nextRequest.HTTPRequestContentType;
 
 	// we must remove in advance in this mode, otherwise if any exception is raised, the object never gets removed
 	if (HTTPRequest.shouldWaitUntilDone) {

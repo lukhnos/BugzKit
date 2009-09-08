@@ -31,4 +31,9 @@
 @interface BKRequest (ProtectedMethods)
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData;
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError;
+
+- (NSDictionary *)preparedParameterDict;
+- (NSString *)preparedParameterString;
+- (NSError *)errorFromXMLMappedResponse;
+- (void)dispatchSuccessfulResponse;
 @end

@@ -1,0 +1,178 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6A1667AB10562BF700EA9C34 /* NSURLStudy.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A1667AA10562BF700EA9C34 /* NSURLStudy.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		6A1667A410562BF000EA9C34 /* NSURLStudy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = NSURLStudy; path = build/Debug/NSURLStudy; sourceTree = "<group>"; };
+		6A1667AA10562BF700EA9C34 /* NSURLStudy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSURLStudy.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6A1667A210562BF000EA9C34 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6A16679710562BE800EA9C34 = {
+			isa = PBXGroup;
+			children = (
+				6A1667AA10562BF700EA9C34 /* NSURLStudy.m */,
+				6A1667A510562BF000EA9C34 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6A1667A510562BF000EA9C34 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6A1667A410562BF000EA9C34 /* NSURLStudy */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A1667A310562BF000EA9C34 /* NSURLStudy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A1667A910562BF100EA9C34 /* Build configuration list for PBXNativeTarget "NSURLStudy" */;
+			buildPhases = (
+				6A1667A110562BF000EA9C34 /* Sources */,
+				6A1667A210562BF000EA9C34 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NSURLStudy;
+			productName = NSURLStudy;
+			productReference = 6A1667A410562BF000EA9C34 /* NSURLStudy */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6A16679910562BE800EA9C34 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 6A16679C10562BE800EA9C34 /* Build configuration list for PBXProject "NSURLStudy" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = 6A16679710562BE800EA9C34;
+			productRefGroup = 6A1667A510562BF000EA9C34 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A1667A310562BF000EA9C34 /* NSURLStudy */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A1667A110562BF000EA9C34 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A1667AB10562BF700EA9C34 /* NSURLStudy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6A16679A10562BE800EA9C34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		6A16679B10562BE800EA9C34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		6A1667A710562BF100EA9C34 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = NSURLStudy;
+			};
+			name = Debug;
+		};
+		6A1667A810562BF100EA9C34 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = NSURLStudy;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6A16679C10562BE800EA9C34 /* Build configuration list for PBXProject "NSURLStudy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A16679A10562BE800EA9C34 /* Debug */,
+				6A16679B10562BE800EA9C34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6A1667A910562BF100EA9C34 /* Build configuration list for PBXNativeTarget "NSURLStudy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A1667A710562BF100EA9C34 /* Debug */,
+				6A1667A810562BF100EA9C34 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6A16679910562BE800EA9C34 /* Project object */;
+}

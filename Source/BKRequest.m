@@ -27,8 +27,10 @@
 
 #import "BKRequest.h"
 #import "BKRequest+ProtectedMethods.h"
+#import "BKError.h"
 #import "BKPrivateUtilities.h"
-
+#import "BKXMLMapper.h"
+#import "LFWebAPIKit.h"
 
 @implementation BKRequest
 - (void)dealloc
@@ -37,7 +39,6 @@
     actionOnSuccess = NULL;
     actionOnFailure = NULL;
     [userInfo release];
-    [HTTPRequestMethod release];
     [APIContext release];
     [requestParameterDict release];
     [response release];
@@ -46,21 +47,48 @@
     [super dealloc];
 }
 
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext
+{
+	if (self = [super init]) {
+		APIContext = [inAPIContext retain];
+		creationDate = [[NSDate date] retain];
+	}
+	
+	return self;
+}
+
+- (NSString *)HTTPRequestContentType
+{
+	return LFHTTPRequestWWWFormURLEncodedContentType;
+}
+
+- (NSString *)HTTPRequestMethod
+{
+	return LFHTTPRequestGETMethod;
+}
+
 - (NSURL *)requestURL
 {
-    
+	if ([self.HTTPRequestMethod isEqualToString:LFHTTPRequestGETMethod]) {
+		return [NSURL URLWithString:[@"?" stringByAppendingString:[self preparedParameterString]] relativeToURL:APIContext.endpoint];
+	}
+		
+	return APIContext.endpoint;
 }
 
 - (NSData *)requestData
 {
-    
+    if ([self.HTTPRequestMethod isEqualToString:LFHTTPRequestPOSTMethod]) {
+		return [[self preparedParameterString] dataUsingEncoding:NSUTF8StringEncoding];
+	}
+	
+	return nil;
 }
 
 @synthesize target;
 @synthesize actionOnSuccess;
 @synthesize actionOnFailure;
 @synthesize userInfo;
-@synthesize HTTPRequestMethod;
 @synthesize APIContext;
 @synthesize requestParameterDict;
 @synthesize response;
@@ -71,11 +99,65 @@
 @implementation BKRequest (ProtectedMethods)
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData
 {
-    
+	BKRetainAssign(response, [[BKXMLMapper dictionaryMappedFromXMLData:inData] objectForKey:@"response"]);
+	
+	NSError *responseError = [self errorFromXMLMappedResponse];
+	if (responseError) {
+		BKRetainAssign(error, responseError);
+		[target performSelector:actionOnFailure withObject:self];
+	}
+	
+	[self dispatchSuccessfulResponse];
 }
 
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError
 {
-    
+	NSInteger errorCode = BKUnknownError;
+	
+	if ([inHTTPRequestError isEqualToString:LFHTTPRequestConnectionError]) {
+		errorCode = BKConnecitonLostError;
+	}
+	else if ([inHTTPRequestError isEqualToString:LFHTTPRequestTimeoutError]) {
+		errorCode = BKConnecitonTimeoutError;
+	}
+
+	BKRetainAssign(error, [NSError errorWithDomain:BKBugzConnectionErrorDomain code:errorCode userInfo:nil]);	
+	
+	[target performSelector:actionOnFailure withObject:self];
+}
+
+- (NSDictionary *)preparedParameterDict
+{
+	return requestParameterDict;
+}
+
+- (NSString *)preparedParameterString
+{
+	NSDictionary *dict = [self preparedParameterDict];
+	NSMutableArray *params = [NSMutableArray array];
+	for (NSString *key in dict) {
+		[params addObject:[NSString stringWithFormat:@"%@=%@", key, BKEscapedURLStringFromNSString([dict objectForKey:key])]];
+	}
+	
+	return [params componentsJoinedByString:@"&"];	
+}
+
+- (NSError *)errorFromXMLMappedResponse
+{
+	NSDictionary *errorDictionary = [response objectForKey:@"error"];
+	if ([errorDictionary count]) {
+		NSString *errorDomain = BKBugzAPIErrorDomain;
+		NSString *localizedMessage = NSLocalizedString(errorDictionary.textContent, nil);
+		NSInteger errorCode = [[errorDictionary objectForKey:@"code"] integerValue];			
+		
+		return [NSError errorWithDomain:errorDomain code:errorCode userInfo:(!localizedMessage ? nil : [NSDictionary dictionaryWithObjectsAndKeys:localizedMessage, NSLocalizedDescriptionKey, nil])];		
+	}
+	
+	return nil;
+}
+
+- (void)dispatchSuccessfulResponse
+{
+	[target performSelector:actionOnSuccess withObject:response];
 }
 @end
