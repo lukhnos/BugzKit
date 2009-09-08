@@ -73,7 +73,7 @@ extern NSString *const BKMailboxList;
 @end
 
 
-@interface BKCaseQueryRequest : BKRequest
+@interface BKQueryCaseRequest : BKRequest
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum;
 

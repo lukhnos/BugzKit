@@ -334,19 +334,19 @@ static NSString *kTestingCurrentFilterName = @"kTestingCurrentFilterName";
 
 - (void)testCaseQuery
 {
-	BKCaseQueryRequest *query = [[[BKCaseQueryRequest alloc] initWithAPIContext:[self sharedAPIContext] query:nil columns:[NSArray arrayWithObjects:@"sTitle", nil]] autorelease];
+	BKQueryCaseRequest *query = [[[BKQueryCaseRequest alloc] initWithAPIContext:[self sharedAPIContext] query:nil columns:[NSArray arrayWithObjects:@"sTitle", nil]] autorelease];
 	query.target = self;
 	query.actionOnFailure = @selector(caseQueryDidFail:);
 	query.actionOnSuccess = @selector(caseQueryDidComplete:);
 	[requestQueue addRequest:query];
 }
 
-- (void)caseQueryDidComplete:(BKCaseQueryRequest *)inRequest
+- (void)caseQueryDidComplete:(BKQueryCaseRequest *)inRequest
 {
 	NSLog(@"query string: %@, fetched case titles: %@", inRequest.query, [inRequest.fetchedCases valueForKeyPath:@"sTitle"]);
 }
 
-- (void)caseQueryDidFail:(BKCaseQueryRequest *)inRequest
+- (void)caseQueryDidFail:(BKQueryCaseRequest *)inRequest
 {
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);		
 }

@@ -217,7 +217,7 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 @synthesize filterName;
 @end
 
-@implementation BKCaseQueryRequest : BKRequest
+@implementation BKQueryCaseRequest : BKRequest
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum
 {
 	if (self = [super initWithAPIContext:inAPIContext]) {
