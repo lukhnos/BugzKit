@@ -150,7 +150,7 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 - (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse
 {
 	if (![inXMLMappedResponse objectForKey:[[self class] firstLevelValueKey:listType]]) {
-		return [NSError errorWithDomain:BKBugzAPIErrorDomain code:BKAPIMalformedResponseError userInfo:nil];
+		return [NSError errorWithDomain:BKAPIErrorDomain code:BKAPIMalformedResponseError userInfo:nil];
 	}
 	
 	return [super validateResponse:inXMLMappedResponse];

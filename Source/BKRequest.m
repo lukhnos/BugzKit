@@ -170,7 +170,7 @@
 		errorCode = BKConnectionServerHTTPError;
 	}
 
-	BKRetainAssign(error, [NSError errorWithDomain:BKBugzConnectionErrorDomain code:errorCode userInfo:nil]);	
+	BKRetainAssign(error, [NSError errorWithDomain:BKConnectionErrorDomain code:errorCode userInfo:nil]);	
 	
 	if (actionOnFailure) {
 		[target performSelector:actionOnFailure withObject:self];
@@ -207,7 +207,7 @@
 {
 	NSDictionary *errorDictionary = [inXMLMappedResponse objectForKey:@"error"];
 	if ([errorDictionary count]) {
-		NSString *errorDomain = BKBugzAPIErrorDomain;
+		NSString *errorDomain = BKAPIErrorDomain;
 		NSString *localizedMessage = NSLocalizedString(errorDictionary.textContent, nil);
 		NSInteger errorCode = [[errorDictionary objectForKey:@"code"] integerValue];			
 		

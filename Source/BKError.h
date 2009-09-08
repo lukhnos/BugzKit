@@ -27,8 +27,8 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString *const BKBugzConnectionErrorDomain;
-extern NSString *const BKBugzAPIErrorDomain;
+extern NSString *const BKConnectionErrorDomain;
+extern NSString *const BKAPIErrorDomain;
 
 typedef enum {
 	BKConnecitonLostError = -1,

@@ -27,5 +27,5 @@
 
 #import "BKError.h"
 
-NSString *const BKBugzConnectionErrorDomain = @"BKBugzConnectionErrorDomain";
-NSString *const BKBugzAPIErrorDomain = @"BKBugzAPIErrorDomain";
+NSString *const BKConnectionErrorDomain = @"BKBugzConnectionErrorDomain";
+NSString *const BKAPIErrorDomain = @"BKBugzAPIErrorDomain";

@@ -257,7 +257,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 		// TO DO: Handle ambiguous names
 		
 		NSInteger errorCode = BKUnknownError;
-		NSString *errorDomain = BKBugzAPIErrorDomain;
+		NSString *errorDomain = BKAPIErrorDomain;
 		NSString *localizedMessage = nil;
 		
 		NSDictionary *errorBlock = [inResponse objectForKey:@"error"];
@@ -454,7 +454,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 	if ([[sessionInfo objectForKey:kRequestProcessErrorKey] boolValue]) {
 		NSDictionary *errorDictionary = [response objectForKey:@"error"];
 		if ([errorDictionary count]) {
-			NSString *errorDomain = BKBugzAPIErrorDomain;
+			NSString *errorDomain = BKAPIErrorDomain;
 			NSString *localizedMessage = NSLocalizedString(errorDictionary.textContent, nil);
 			NSInteger errorCode = [[errorDictionary objectForKey:@"code"] integerValue];			
 
@@ -474,7 +474,7 @@ NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 {
 	NSLog(@"%s, error: %@", __PRETTY_FUNCTION__, inError);
 	
-	NSString *errorDomain = BKBugzConnectionErrorDomain;
+	NSString *errorDomain = BKConnectionErrorDomain;
 	NSString *localizedMessage = nil;
 	NSInteger errorCode = BKUnknownError;
 	
