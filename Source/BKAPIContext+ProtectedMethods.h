@@ -28,6 +28,8 @@
 #import "BKAPIContext.h"
 
 @interface BKAPIContext (ProtectedMethods)
-- (void)setAuthToken:(NSString *)inAuthToken;
+- (void)setMajorVersion:(NSUInteger)inVersion;
+- (void)setMinorVersion:(NSUInteger)inVersion;
 - (void)setEndpoint:(NSURL *)inEndpoint;
+- (void)setAuthToken:(NSString *)inAuthToken;
 @end

@@ -40,15 +40,27 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@: %p> {serviceRoot: %@, endpoint: %@, authToken: %@}", [self class], self, BKQuotedString([serviceRoot absoluteString]), BKQuotedString([endpoint absoluteString]), BKQuotedString(authToken)];
+	return [NSString stringWithFormat:@"<%@: %p> {serviceRoot: %@, API version: %@, endpoint: %@, authToken: %@}", [self class], self, BKQuotedString([serviceRoot absoluteString]), [NSString stringWithFormat:@"%jd.%jd", (uintmax_t)majorVersion, (uintmax_t)minorVersion], BKQuotedString([endpoint absoluteString]), BKQuotedString(authToken)];
 }
 
 @synthesize serviceRoot;
-@synthesize authToken;
+@synthesize majorVersion;
+@synthesize minorVersion;
 @synthesize endpoint;
+@synthesize authToken;
 @end
 
 @implementation BKAPIContext (ProtectedMethods)
+- (void)setMajorVersion:(NSUInteger)inVersion
+{
+	majorVersion = inVersion;
+}
+
+- (void)setMinorVersion:(NSUInteger)inVersion
+{
+	minorVersion = inVersion;
+}
+
 - (void)setAuthToken:(NSString *)inAuthToken
 {
     BKRetainAssign(authToken, inAuthToken);

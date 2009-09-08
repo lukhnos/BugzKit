@@ -102,6 +102,8 @@
 - (void)versionCheckDidComplete:(BKRequest *)inRequest
 {
 	STAssertNotNil([[self class] sharedAPIContext].endpoint, @"After check, endpoint must not be nil");
+	
+	NSLog(@"context: %@", [[self class] sharedAPIContext]);
 }
 
 - (void)commonAPIFailureHandler:(BKRequest *)inRequest

@@ -29,12 +29,17 @@
 
 @interface BKAPIContext : NSObject
 {
-    NSURL *serviceRoot;    
+    NSURL *serviceRoot; 
+	
+	NSUInteger majorVersion;
+	NSUInteger minorVersion;
     NSURL *endpoint;
-	NSString *authToken;    
+	NSString *authToken;
 }
 @property (retain) NSURL *serviceRoot;
 
-@property (readonly) NSString *authToken;
+@property (readonly) NSUInteger majorVersion;
+@property (readonly) NSUInteger minorVersion;
 @property (readonly) NSURL *endpoint;
+@property (readonly) NSString *authToken;
 @end

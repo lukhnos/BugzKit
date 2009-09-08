@@ -17,6 +17,8 @@
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
 {
     [APIContext setEndpoint:[NSURL URLWithString:[inXMLMappedResponse objectForKey:@"url"] relativeToURL:APIContext.serviceRoot]];
+	[APIContext setMajorVersion:[[inXMLMappedResponse objectForKey:@"version"] integerValue]];
+	[APIContext setMinorVersion:[[inXMLMappedResponse objectForKey:@"minversion"] integerValue]];
 	return [super postprocessResponse:inXMLMappedResponse];
 }
 @end
