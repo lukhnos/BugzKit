@@ -35,6 +35,7 @@
     id userInfo;
     BKAPIContext *APIContext;
     NSDictionary *requestParameterDict;
+	NSData *rawResponseData;
 	NSDictionary *rawXMLMappedResponse;
     id processedResponse;
     NSError *error;
@@ -49,6 +50,8 @@
 @property (readonly) NSString *HTTPRequestMethod;
 @property (readonly) NSString *HTTPRequestContentType;
 @property (readonly) BKAPIContext *APIContext;
+@property (readonly) NSData *rawResponseData;
+@property (readonly) NSString *rawResponseString;
 @property (readonly) NSDictionary *requestParameterDict;
 @property (readonly) NSURL *requestURL;
 @property (readonly) NSData *requestData;

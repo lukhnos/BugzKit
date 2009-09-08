@@ -29,3 +29,11 @@
 
 @interface BKVersionCheckRequest : BKRequest
 @end
+
+@interface BKLogOnRequest : BKRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext accountName:(NSString *)inAccountName password:(NSString *)inPassword;
+@end
+
+@interface BKLogOffRequest : BKRequest
+@end
+

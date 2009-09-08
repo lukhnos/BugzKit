@@ -41,6 +41,7 @@
     [userInfo release];
     [APIContext release];
     [requestParameterDict release];
+	[rawResponseData release];
     [rawXMLMappedResponse release];
 	[processedResponse release];
     [error release];
@@ -102,12 +103,18 @@
 			requestParameterDict];			
 }
 
+- (NSString *)rawResponseString
+{
+	return [[[NSString alloc] initWithData:rawResponseData encoding:NSUTF8StringEncoding] autorelease];
+}
+
 @synthesize target;
 @synthesize actionOnSuccess;
 @synthesize actionOnFailure;
 @synthesize userInfo;
 @synthesize APIContext;
 @synthesize requestParameterDict;
+@synthesize rawResponseData;
 @synthesize rawXMLMappedResponse;
 @synthesize processedResponse;
 @synthesize error;
@@ -117,22 +124,25 @@
 @implementation BKRequest (ProtectedMethods)
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData
 {
+	BKRetainAssign(rawResponseData, inData);
 	BKRetainAssign(rawXMLMappedResponse, [BKXMLMapper dictionaryMappedFromXMLData:inData]);
-	
-	NSError *responseError = [self errorFromXMLMappedResponse:rawXMLMappedResponse];
+
+	// TO DO: Determine if we should handle, e.g. empty response, etc.
+	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
+
+	NSError *responseError = [self errorFromXMLMappedResponse:innerResponse];
 	if (responseError) {
 		BKRetainAssign(error, responseError);
 		BKRetainAssign(processedResponse, nil);
+		
+		[self postprocessError:responseError];
+		
 		if (actionOnFailure) {
 			[target performSelector:actionOnFailure withObject:self];
 		}
 		return;
 	}
-							  
-	// TO DO: Determine if we should handle, e.g. empty response, etc.
-	
-	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
-	
+
 	BKRetainAssign(error, nil);
 	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
 	
@@ -192,6 +202,9 @@
 	return nil;
 }
 
+- (void)postprocessError:(NSError *)inError
+{
+}
 
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
 {

@@ -42,6 +42,11 @@
 	return sharedInstance;
 }
 
+- (BKAPIContext *)sharedAPIContext
+{
+	return [[self class] sharedAPIContext];
+}
+
 - (void)dealloc
 {
 	[super dealloc];
@@ -54,7 +59,7 @@
 	bugzRequest.shouldWaitUntilDone = YES;
 	
 	
-	[[self class] sharedAPIContext].serviceRoot = [NSURL URLWithString:kTestEndpoint];
+	[self sharedAPIContext].serviceRoot = [NSURL URLWithString:kTestEndpoint];
 	requestQueue = [[BKRequestQueue alloc] init];
 	requestQueue.shouldWaitUntilDone = YES;
 }
@@ -64,16 +69,22 @@
 	[requestQueue release];
 }
 
+
+#pragma mark Test truth
+
 - (void)testTruth
 {
 	STAssertTrue(YES, @"Truth");
+
 }
+
+#pragma mark Test failed version check
 
 - (void)test00_VersionCheckWithFaultyEndpoint
 {
-	[[self class] sharedAPIContext].serviceRoot = [NSURL URLWithString:@"http://example.org"];
+	[self sharedAPIContext].serviceRoot = [NSURL URLWithString:@"http://example.org"];
 	
-	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[[self class] sharedAPIContext]] autorelease];
+	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
 	request.target = self;
 	request.actionOnSuccess = @selector(versionCheckExpectedNotToComplete:);
 	request.actionOnFailure = @selector(versionCheckExpectedToFail:);
@@ -82,7 +93,7 @@
 
 - (void)versionCheckExpectedNotToComplete:(BKRequest *)inRequest
 {
-	STFail(@"This request should not complete: %@, context: %@", inRequest, [[self class] sharedAPIContext]);
+	STFail(@"This request should not complete: %@, context: %@", inRequest, [self sharedAPIContext]);
 }
 
 - (void)versionCheckExpectedToFail:(BKRequest *)inRequest
@@ -90,9 +101,12 @@
 	STAssertNotNil(inRequest.error, @"Must have an error");
 }
 
+
+#pragma mark Test version check
+
 - (void)test01_VersionCheck
 {
-	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[[self class] sharedAPIContext]] autorelease];
+	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
 	request.target = self;
 	request.actionOnSuccess = @selector(versionCheckDidComplete:);
 	request.actionOnFailure = @selector(commonAPIFailureHandler:);
@@ -101,16 +115,81 @@
 
 - (void)versionCheckDidComplete:(BKRequest *)inRequest
 {
-	STAssertNotNil([[self class] sharedAPIContext].endpoint, @"After check, endpoint must not be nil");
-	
-	NSLog(@"context: %@", [[self class] sharedAPIContext]);
+	STAssertNotNil([self sharedAPIContext].endpoint, @"After check, endpoint must not be nil");
 }
 
 - (void)commonAPIFailureHandler:(BKRequest *)inRequest
 {
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);
-	NSLog(@"%s (request %p), error: %@", __PRETTY_FUNCTION__, inRequest, inRequest.error);
 }
+
+
+#pragma mark Test failed logon
+
+- (void)test02_LogOnWithWrongPassword
+{
+	// you ain't going to use this as password are you?
+	NSString *wrongPassword = @"zzzzzzzz";
+	BKLogOnRequest *request = [[[BKLogOnRequest alloc] initWithAPIContext:[self sharedAPIContext] accountName:kTestLoginEmail password:wrongPassword] autorelease];
+	request.target = self;
+	request.actionOnSuccess = @selector(logOnExpectedNotToComplete:);
+	request.actionOnFailure = @selector(logOnExpectedToFail:);
+	[requestQueue addRequest:request];							   
+}
+
+- (void)logOnExpectedNotToComplete:(BKRequest *)inRequest
+{
+	STAssertNil([self sharedAPIContext].authToken, @"Logon should fail");
+}
+
+- (void)logOnExpectedToFail:(BKRequest *)inRequest
+{
+	STAssertEquals([inRequest.error code], 1, @"Should be an invalid username/password error");
+	STAssertNil([self sharedAPIContext].authToken, @"Logon failure should zero out authToken");
+}
+
+#pragma mark Test successful logoff
+
+- (void)test03_LogOnWithCorrectPassword
+{
+	// you ain't going to use this as password are you?
+	BKLogOnRequest *request = [[[BKLogOnRequest alloc] initWithAPIContext:[self sharedAPIContext] accountName:kTestLoginEmail password:kTestLoginPassword] autorelease];
+	request.target = self;
+	request.actionOnSuccess = @selector(logOnDidComplete:);
+	request.actionOnFailure = @selector(logOnDidFail:);
+	[requestQueue addRequest:request];							   
+}
+
+- (void)logOnDidComplete:(BKRequest *)inRequest
+{
+	STAssertNotNil([self sharedAPIContext].authToken, @"Logon should return an authToken");
+}
+
+- (void)logOnDidFail:(BKRequest *)inRequest
+{
+	STFail(@"request: %@, error: %@", inRequest, inRequest.error);
+}
+
+- (void)testZZ_LogOff
+{
+	BKLogOffRequest *request = [[[BKLogOffRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
+	request.target = self;
+	request.actionOnSuccess = @selector(logOffDidComplete:);
+	request.actionOnFailure = @selector(logOffDidFail:);
+	[requestQueue addRequest:request];	
+}
+
+- (void)logOffDidComplete:(BKRequest *)inRequest
+{
+	STAssertNil([self sharedAPIContext].authToken, @"authToken should be zeroed out after logoff");
+}
+
+- (void)logOffDidFail:(BKRequest *)inRequest
+{
+	STFail(@"request: %@, error: %@", inRequest, inRequest.error);
+}
+
+
 
 /*
 #pragma mark Version check test
@@ -203,3 +282,5 @@
 }
 */
 @end
+
+

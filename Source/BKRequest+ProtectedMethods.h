@@ -35,6 +35,7 @@
 - (NSDictionary *)preparedParameterDict;
 - (NSString *)preparedParameterString;
 - (NSError *)errorFromXMLMappedResponse:(NSDictionary *)inXMLMappedResponse;
+- (void)postprocessError:(NSError *)inError;
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse;
 @end
 
