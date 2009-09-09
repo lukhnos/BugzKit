@@ -27,11 +27,17 @@
 
 #import "BKAPIContext.h"
 
+@class BKRequest;
+
 @interface BKRequest : NSObject
 {
     id target;
     SEL actionOnSuccess;
     SEL actionOnFailure;
+	
+	void (^blockOnSuccess)(BKRequest *);
+	void (^blockOnFailure)(BKRequest *);
+	
     id userInfo;
     BKAPIContext *APIContext;
     NSDictionary *requestParameterDict;
@@ -47,6 +53,8 @@
 @property (assign) id target;
 @property (assign) SEL actionOnSuccess;
 @property (assign) SEL actionOnFailure;
+@property (copy) void (^blockOnSuccess)(BKRequest *);
+@property (copy) void (^blockOnFailure)(BKRequest *);
 @property (retain) id userInfo;
 @property (readonly) NSString *HTTPRequestMethod;
 @property (readonly) NSString *HTTPRequestContentType;

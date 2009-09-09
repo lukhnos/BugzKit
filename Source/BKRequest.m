@@ -38,6 +38,8 @@
     target = nil;
     actionOnSuccess = NULL;
     actionOnFailure = NULL;
+	[blockOnSuccess release];
+	[blockOnFailure release];
     [userInfo release];
     [APIContext release];
     [requestParameterDict release];
@@ -118,6 +120,8 @@
 @synthesize target;
 @synthesize actionOnSuccess;
 @synthesize actionOnFailure;
+@synthesize blockOnSuccess;
+@synthesize blockOnFailure;
 @synthesize userInfo;
 @synthesize APIContext;
 @synthesize requestParameterDict;
@@ -160,7 +164,10 @@
 		
 		[self postprocessError:responseError];
 		
-		if (actionOnFailure) {
+		if (blockOnFailure) {
+			blockOnFailure(self);
+		}
+		else if (actionOnFailure) {
 			[target performSelector:actionOnFailure withObject:self];
 		}
 		return;
@@ -169,7 +176,10 @@
 	BKRetainAssign(error, nil);
 	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
 	
-	if (actionOnSuccess) {
+	if (blockOnSuccess) {
+		blockOnSuccess(self);
+	}
+	else if (actionOnSuccess) {
 		[target performSelector:actionOnSuccess withObject:self];   
 	}
 }
@@ -190,7 +200,10 @@
 
 	BKRetainAssign(error, [NSError errorWithDomain:BKConnectionErrorDomain code:errorCode userInfo:nil]);	
 	
-	if (actionOnFailure) {
+	if (blockOnFailure) {
+		blockOnFailure(self);
+	}
+	else if (actionOnFailure) {
 		[target performSelector:actionOnFailure withObject:self];
 	}
 }
