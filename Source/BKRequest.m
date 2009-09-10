@@ -120,8 +120,10 @@
 @synthesize target;
 @synthesize actionOnSuccess;
 @synthesize actionOnFailure;
+@synthesize blockBeforeRequestStart;
 @synthesize blockOnSuccess;
 @synthesize blockOnFailure;
+@synthesize blockAfterRequestEnd;
 @synthesize userInfo;
 @synthesize APIContext;
 @synthesize requestParameterDict;
@@ -141,6 +143,20 @@
 		BKRetainAssign(processedResponse, nil);
 		BKRetainAssign(error, nil);
 		BKRetainAssign(creationDate, [NSDate date]);
+	}
+}
+
+- (void)requestQueueWillBeginRequest:(BKRequestQueue *)inQueue
+{
+	if (blockBeforeRequestStart) {
+		blockBeforeRequestStart(self);
+	}
+}
+
+- (void)requestQueueRequestDidFinish:(BKRequestQueue *)inQueue
+{
+	if (blockAfterRequestEnd) {
+		blockAfterRequestEnd(self);
 	}
 }
 

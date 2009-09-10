@@ -35,8 +35,10 @@
     SEL actionOnSuccess;
     SEL actionOnFailure;
 	
+	void (^blockBeforeRequestStart)(BKRequest *);
 	void (^blockOnSuccess)(BKRequest *);
 	void (^blockOnFailure)(BKRequest *);
+	void (^blockAfterRequestEnd)(BKRequest *);
 	
     id userInfo;
     BKAPIContext *APIContext;
@@ -53,8 +55,11 @@
 @property (assign) id target;
 @property (assign) SEL actionOnSuccess;
 @property (assign) SEL actionOnFailure;
+
+@property (copy) void (^blockBeforeRequestStart)(BKRequest *);
 @property (copy) void (^blockOnSuccess)(BKRequest *);
 @property (copy) void (^blockOnFailure)(BKRequest *);
+@property (copy) void (^blockAfterRequestEnd)(BKRequest *);
 @property (retain) id userInfo;
 @property (readonly) NSString *HTTPRequestMethod;
 @property (readonly) NSString *HTTPRequestContentType;

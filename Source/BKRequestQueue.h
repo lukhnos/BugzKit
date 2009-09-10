@@ -35,12 +35,15 @@
     LFHTTPRequest *HTTPRequest;
     BOOL paused;
 }
-- (void)addRequest:(BKRequest *)inRequest;
 
-// - (void)cancelAllRequests;
-// - (void)cancelRequestsOfDelegate:(id)inDelegate;
-// - (void)cancelRequestsCreatedSinceDate:(NSDate *)inSinceDate;   // includes the date
-// - (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate;
+- (void)addRequest:(BKRequest *)inRequest;
+- (void)addRequest:(BKRequest *)inRequest deferred:(BOOL)inDeferred;
+
+//- (void)cancelAllRequests;
+//- (void)cancelRequestsOfDelegate:(id)inDelegate;
+//- (void)cancelRequestsCreatedSinceDate:(NSDate *)inSinceDate;   // includes the date
+//- (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate;
+//- (void)cancelRequestsWithBlock:(BOOL (^)())
 
 @property (assign) BOOL paused;
 @property (assign) BOOL shouldWaitUntilDone;

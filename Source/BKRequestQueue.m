@@ -56,9 +56,17 @@
 
 - (void)addRequest:(BKRequest *)inRequest
 {
+	[self addRequest:inRequest deferred:NO];
+}
+
+- (void)addRequest:(BKRequest *)inRequest deferred:(BOOL)inDeferred
+{
 	[inRequest recycleIfUsedBefore];
     [queue addObject:inRequest];
-	[self runQueue];
+	
+	if (!inDeferred) {
+		[self runQueue];
+	}
 }
 
 - (void)setShouldWaitUntilDone:(BOOL)inShouldWait
@@ -95,6 +103,7 @@
 		[queue removeObjectAtIndex:0];
 	}
 	
+	[nextRequest requestQueueWillBeginRequest:self];
     NSAssert1([HTTPRequest performMethod:nextRequest.HTTPRequestMethod onURL:nextRequest.requestURL withData:nextRequest.requestData], @"HTTP request must be made, or is the BKRequest object bad: %@", nextRequest);
 	
 	if (!HTTPRequest.shouldWaitUntilDone) {
@@ -135,12 +144,14 @@
 - (void)httpRequestDidComplete:(LFHTTPRequest *)inRequest
 {
     [(BKRequest *)inRequest.sessionInfo requestQueue:self didCompleteWithData:inRequest.receivedData];
+	[(BKRequest *)inRequest.sessionInfo requestQueueRequestDidFinish:self];
     [self runQueue];
 }
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didFailWithError:(NSString *)inError
 {
     [(BKRequest *)inRequest.sessionInfo requestQueue:self didFailWithError:inError];
+	[(BKRequest *)inRequest.sessionInfo requestQueueRequestDidFinish:self];
     [self runQueue];
 }
 

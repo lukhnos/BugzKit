@@ -80,7 +80,7 @@
 {
 	[self sharedAPIContext].serviceRoot = [NSURL URLWithString:@"http://example.org"];
 	
-	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
+	BKCheckVersionRequest *request = [[[BKCheckVersionRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
 	request.target = self;
 	request.actionOnSuccess = @selector(versionCheckExpectedNotToComplete:);
 	request.actionOnFailure = @selector(versionCheckExpectedToFail:);
@@ -102,7 +102,7 @@
 
 - (void)test01_VersionCheck
 {
-	BKVersionCheckRequest *request = [[[BKVersionCheckRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
+	BKCheckVersionRequest *request = [[[BKCheckVersionRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
 	request.target = self;
 	request.actionOnSuccess = @selector(versionCheckDidComplete:);
 	request.actionOnFailure = @selector(commonAPIFailureHandler:);
