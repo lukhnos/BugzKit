@@ -39,12 +39,15 @@
 - (void)addRequest:(BKRequest *)inRequest;
 - (void)addRequest:(BKRequest *)inRequest deferred:(BOOL)inDeferred;
 
-//- (void)cancelAllRequests;
-//- (void)cancelRequestsOfDelegate:(id)inDelegate;
-//- (void)cancelRequestsCreatedSinceDate:(NSDate *)inSinceDate;   // includes the date
-//- (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate;
-//- (void)cancelRequestsWithBlock:(BOOL (^)())
+- (NSArray *)queuedRequestsWithPredicate:(NSPredicate *)inPredicate;
+
+- (void)cancelAllRequests;
+- (void)cancelRequest:(BKRequest *)inRequest;
+- (void)cancelRequestsOfTarget:(id)inTarget;
+- (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate;
+- (void)cancelRequestsWithBlock:(BOOL (^)(BKRequest *))inFilter;
 
 @property (assign) BOOL paused;
 @property (assign) BOOL shouldWaitUntilDone;
+@property (readonly) BOOL isRunning;
 @end

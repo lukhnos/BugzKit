@@ -69,6 +69,19 @@
 	}
 }
 
+- (NSArray *)queuedRequestsWithPredicate:(NSPredicate *)inPredicate
+{
+	NSMutableArray *result = [NSMutableArray array];
+	
+	for (BKRequest *r in queue) {
+		if ([inPredicate evaluateWithObject:r]) {
+			[result addObject:r];
+		}
+	}
+	
+	return result;
+}
+
 - (void)setShouldWaitUntilDone:(BOOL)inShouldWait
 {
     HTTPRequest.shouldWaitUntilDone = inShouldWait;
@@ -130,6 +143,54 @@
         [self runQueue];
     }    
 }
+
+- (BOOL)isRunning
+{
+	return [HTTPRequest isRunning];
+}
+
+- (void)cancelAllRequests
+{
+	[self cancelRequestsWithBlock:^(BKRequest *r) { return YES; }];
+}
+
+- (void)cancelRequest:(BKRequest *)inRequest
+{
+	[self cancelRequestsWithBlock:^(BKRequest *r) { return (BOOL)(inRequest == r); }];
+}
+
+- (void)cancelRequestsOfTarget:(id)inTarget
+{
+	[self cancelRequestsWithBlock:^(BKRequest *r) { return (BOOL)(inTarget == r.target); }];	
+}
+
+- (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate
+{
+	[self cancelRequestsWithBlock:^(BKRequest *r) { return [inPredicate evaluateWithObject:r]; }];
+}
+
+- (void)cancelRequestsWithBlock:(BOOL (^)(BKRequest *))inFilter
+{
+	if ([HTTPRequest isRunning]) {
+		if (inFilter((BKRequest *)HTTPRequest.sessionInfo)) {
+			[HTTPRequest cancelWithoutDelegateMessage];
+			[[HTTPRequest.sessionInfo retain] autorelease];
+			HTTPRequest.sessionInfo = nil;
+		}
+	}
+
+	NSMutableArray *newQueue = [NSMutableArray array];
+	for (BKRequest *request in newQueue) {
+		if (inFilter(request)) {
+			[newQueue addObject:request];
+		}
+	}
+	
+	[queue removeAllObjects];
+	[queue addObjectsFromArray:newQueue];
+	[self runQueue];
+}
+
 
 #pragma mark LFHTTPRequest delegate methods
 
