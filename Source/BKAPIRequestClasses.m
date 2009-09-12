@@ -214,6 +214,11 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 	return self;	
 }
 
+- (NSString *)HTTPRequestMethod
+{
+	return LFHTTPRequestPOSTMethod;
+}
+
 @synthesize filterName;
 @end
 
@@ -356,6 +361,11 @@ NSString *const BKForwardCaseAction = @"forward";
 - (NSDictionary *)editedCase
 {
 	return processedResponse;
+}
+
+- (NSString *)HTTPRequestMethod
+{
+	return LFHTTPRequestGETMethod;
 }
 
 @synthesize parameters;

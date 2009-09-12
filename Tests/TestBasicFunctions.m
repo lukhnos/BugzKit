@@ -187,7 +187,7 @@
 
 
 #pragma mark Test list items
-/*
+
 static NSString *kProjects = @"kProjects";
 
 - (void)testLists
@@ -420,8 +420,6 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
 }
 
-*/
-
 - (void)testDeferredRequest
 {
 	BKListRequest *filterListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKFilterList writableItemsOnly:NO] autorelease];
@@ -459,14 +457,14 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 	
 
 	NSArray *a = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithFormat:@"creationDate < %@", date]];
-	NSArray *b = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithFormat:@"creationDate > %@", date]];
+	NSArray *b = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithFormat:@"creationDate > %@", date]];	
 	
-	NSLog(@"a: %@", a);
+	[requestQueue cancelAllRequests];
+	NSArray *c = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithValue:YES]];
+
 	STAssertTrue([a count] == 2, @"A must be 2");
-	
-	NSLog(@"b: %@", b);
 	STAssertTrue([b count] == 3, @"B must be 3");
-	
+	STAssertTrue([c count] == 0, @"C must be 0");	
 }
 
 
