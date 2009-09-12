@@ -29,11 +29,21 @@
 #import "BKRequest.h"
 #import "LFWebAPIKit.h"
 
+@class BKRequestQueue;
+
+@protocol BKRequestQueueCachePolicy <NSObject>
+- (void)requestQueue:(BKRequestQueue *)inRequestQueue storeData:(NSData *)inData ofRequest:(BKRequest *)inRequest;
+- (NSData *)requestQueue:(BKRequestQueue *)inRequestQueue cachedDataOfRequest:(BKRequest *)inRequest;
+@end
+
+
 @interface BKRequestQueue : NSObject
 {
     NSMutableArray *queue;
     LFHTTPRequest *HTTPRequest;
     BOOL paused;
+	
+	id<BKRequestQueueCachePolicy> cachePolicy;
 }
 
 - (void)addRequest:(BKRequest *)inRequest;
@@ -50,4 +60,5 @@
 @property (assign) BOOL paused;
 @property (assign) BOOL shouldWaitUntilDone;
 @property (readonly) BOOL isRunning;
+@property (retain) id<BKRequestQueueCachePolicy> cachePolicy;
 @end

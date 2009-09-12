@@ -38,8 +38,11 @@
 {
     HTTPRequest.delegate = nil;
     [HTTPRequest cancelWithoutDelegateMessage];
+	
     [queue release];
     [HTTPRequest release];
+	[cachePolicy release];
+	
     [super dealloc];
 }
 
@@ -117,7 +120,18 @@
 	}
 	
 	[nextRequest requestQueueWillBeginRequest:self];
-    NSAssert1([HTTPRequest performMethod:nextRequest.HTTPRequestMethod onURL:nextRequest.requestURL withData:nextRequest.requestData], @"HTTP request must be made, or is the BKRequest object bad: %@", nextRequest);
+	
+	NSData *cachedData = nil;
+	if (cachedData = [cachePolicy requestQueue:self cachedDataOfRequest:nextRequest]) {
+		[nextRequest requestQueue:self didCompleteWithData:cachedData];
+		[nextRequest requestQueueRequestDidFinish:self];
+		[self runQueue];		
+	}
+	else {	
+		BOOL __unused requestResult;
+		requestResult = [HTTPRequest performMethod:nextRequest.HTTPRequestMethod onURL:nextRequest.requestURL withData:nextRequest.requestData];	
+		NSAssert1(requestResult, @"HTTP request must be made, or is the BKRequest object bad: %@", nextRequest);
+	}
 	
 	if (!HTTPRequest.shouldWaitUntilDone) {
 		[queue removeObjectAtIndex:0];
@@ -204,17 +218,27 @@
 
 - (void)httpRequestDidComplete:(LFHTTPRequest *)inRequest
 {
-    [(BKRequest *)inRequest.sessionInfo requestQueue:self didCompleteWithData:inRequest.receivedData];
-	[(BKRequest *)inRequest.sessionInfo requestQueueRequestDidFinish:self];
+	BKRequest *request = inRequest.sessionInfo;
+	NSData *receivedData = inRequest.receivedData;
+	
+	[cachePolicy requestQueue:self storeData:receivedData ofRequest:request];
+	
+    [request requestQueue:self didCompleteWithData:receivedData];
+	[request requestQueueRequestDidFinish:self];
     [self runQueue];
 }
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didFailWithError:(NSString *)inError
 {
-    [(BKRequest *)inRequest.sessionInfo requestQueue:self didFailWithError:inError];
-	[(BKRequest *)inRequest.sessionInfo requestQueueRequestDidFinish:self];
+	BKRequest *request = inRequest.sessionInfo;
+	
+	[cachePolicy requestQueue:self storeData:nil ofRequest:request];
+	
+    [request requestQueue:self didFailWithError:inError];
+	[request requestQueueRequestDidFinish:self];
     [self runQueue];
 }
 
+@synthesize cachePolicy;
 @synthesize paused;
 @end
