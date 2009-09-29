@@ -43,6 +43,20 @@
 	return [NSString stringWithFormat:@"<%@: %p> {serviceRoot: %@, API version: %@, endpoint: %@, authToken: %@}", [self class], self, BKQuotedString([serviceRoot absoluteString]), [NSString stringWithFormat:@"%jd.%jd", (uintmax_t)majorVersion, (uintmax_t)minorVersion], BKQuotedString([endpoint absoluteString]), BKQuotedString(authToken)];
 }
 
+- (NSURL *)serviceRoot
+{
+	return [[serviceRoot copy] autorelease];
+}
+
+- (void)setServiceRoot:(NSURL *)inRoot
+{
+	BKRetainAssign(serviceRoot, inRoot);
+	majorVersion = 0;
+	minorVersion = 0;
+	BKReleaseClean(endpoint);
+	BKReleaseClean(authToken);
+}
+
 @synthesize serviceRoot;
 @synthesize majorVersion;
 @synthesize minorVersion;
