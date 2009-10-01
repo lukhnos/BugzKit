@@ -51,6 +51,11 @@
     [super dealloc];
 }
 
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext
+{
+	return [[[[self class] alloc] initWithAPIContext:inAPIContext] autorelease];
+}
+
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext
 {
 	if (self = [super init]) {

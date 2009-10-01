@@ -49,6 +49,7 @@
     NSError *error;
     NSDate *creationDate;
 }
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext;
 - (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure;
 

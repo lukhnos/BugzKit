@@ -31,6 +31,7 @@
 @end
 
 @interface BKLogOnRequest : BKRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext accountName:(NSString *)inAccountName password:(NSString *)inPassword;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext accountName:(NSString *)inAccountName password:(NSString *)inPassword;
 @end
 
@@ -51,6 +52,7 @@ extern NSString *const BKMailboxList;
 {
 	NSString *listType;
 }
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables;
 
 @property (readonly) NSString *listType;
@@ -58,6 +60,7 @@ extern NSString *const BKMailboxList;
 @end
 
 @interface BKAreaListRequest : BKListRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables;
 
 @property (readonly) NSUInteger projectID;
@@ -67,6 +70,7 @@ extern NSString *const BKMailboxList;
 {
 	NSString *filterName;
 }
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName;
 
 @property (readonly) NSString *filterName;
@@ -74,6 +78,8 @@ extern NSString *const BKMailboxList;
 
 
 @interface BKQueryCaseRequest : BKRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames;
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum;
 
@@ -82,6 +88,7 @@ extern NSString *const BKMailboxList;
 @end
 
 @interface BKQueryEventRequest : BKQueryCaseRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber;
 
 @property (readonly) NSArray *fetchedEvents;

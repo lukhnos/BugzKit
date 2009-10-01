@@ -26,6 +26,11 @@
 @end
 
 @implementation BKLogOnRequest : BKRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext accountName:(NSString *)inAccountName password:(NSString *)inPassword
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext accountName:inAccountName password:inPassword] autorelease];
+}
+
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext accountName:(NSString *)inAccountName password:(NSString *)inPassword
 {
 	if (self = [super initWithAPIContext:inAPIContext]) {
@@ -133,6 +138,11 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 	[super dealloc];
 }
 
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext list:inListType writableItemsOnly:inListOnlyWritables] autorelease];
+}
+
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables
 {
 	if (self = [super initWithAPIContext:inAPIContext]) {
@@ -178,6 +188,11 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 @end
 
 @implementation BKAreaListRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext projectID:inProjectID writableItemsOnly:inListOnlyWritables] autorelease];
+}
+
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables
 {
 	if (self = [super initWithAPIContext:inAPIContext list:BKAreaList writableItemsOnly:inListOnlyWritables]) {
@@ -199,6 +214,11 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 {
 	[filterName release];
 	[super dealloc];
+}
+
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext filterName:inFilterName] autorelease];
 }
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName
@@ -223,6 +243,16 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 @end
 
 @implementation BKQueryCaseRequest : BKRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext query:inQuery columns:inColumnNames maximum:NSUIntegerMax] autorelease];
+}
+
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext query:inQuery columns:inColumnNames maximum:inMaximum] autorelease];
+}
+
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext query:(NSString *)inQuery columns:(NSArray *)inColumnNames maximum:(NSUInteger)inMaximum
 {
 	if (self = [super initWithAPIContext:inAPIContext]) {
@@ -277,6 +307,11 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 
 
 @implementation BKQueryEventRequest : BKQueryCaseRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext caseNumber:inCaseNumber] autorelease];
+}
+
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber
 {
 	if (self = [super initWithAPIContext:inAPIContext query:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] columns:[NSArray arrayWithObject:@"events"]]) {
