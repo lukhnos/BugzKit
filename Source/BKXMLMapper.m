@@ -126,7 +126,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 	
 	// transform 'f' or 'b'
 	if ((firstChar == 'f' || firstChar == 'b') && secondCharIsUpperCase) {
-		return [inKey isEqualToString:@"true"] ? (id)kCFBooleanTrue : (id)kCFBooleanFalse;
+		return [inValue isEqualToString:@"true"] ? (id)kCFBooleanTrue : (id)kCFBooleanFalse;
 	}
 	
 	// transform 'ix'
