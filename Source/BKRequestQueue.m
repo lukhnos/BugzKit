@@ -194,8 +194,8 @@
 	}
 
 	NSMutableArray *newQueue = [NSMutableArray array];
-	for (BKRequest *request in newQueue) {
-		if (inFilter(request)) {
+	for (BKRequest *request in queue) {
+		if (!inFilter(request)) {
 			[newQueue addObject:request];
 		}
 	}
