@@ -134,8 +134,8 @@ NSString *const BKXMLTextContentKey = @"_text";
 		return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
 	}
 	
-	// transform 'i'
-	if (firstChar == 'i' && secondCharIsUpperCase) {
+	// transform 'i' or 'n' or 'c'
+	if ((firstChar == 'i' || firstChar == 'n' || firstChar == 'c') && secondCharIsUpperCase) {
 		return [NSNumber numberWithInteger:[inValue integerValue]];
 	}
 	

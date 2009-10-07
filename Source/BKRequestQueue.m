@@ -144,6 +144,7 @@
         [self _runQueue];
     }
     else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runQueue) object:nil];
         [self performSelector:@selector(_runQueue) withObject:nil afterDelay:0.0];
     }
 }
