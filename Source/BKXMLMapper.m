@@ -141,6 +141,8 @@ NSString *const BKXMLTextContentKey = @"_text";
 	
 	// transform 'dt'
 	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
+		
+		NSAssert([inValue isKindOfClass:[NSString class]], @"must be string");
 		return [NSDate dateFromISO8601String:inValue];
 	}
 	
@@ -185,7 +187,12 @@ NSString *const BKXMLTextContentKey = @"_text";
 		id value = [inDictionary objectForKey:key];
 		
 		if ([value isKindOfClass:[NSDictionary class]]) {
-			value = [self flattenedDictionary:value];
+			if ([value count]) {			
+				value = [self flattenedDictionary:value];
+			}
+			else {
+				value = nil;
+			}
 		}
 		else if ([value isKindOfClass:[NSArray class]]) {
 			value = [self flattenedArray:value];
@@ -193,8 +200,10 @@ NSString *const BKXMLTextContentKey = @"_text";
 		else {
 		}
 		
-		value = [self transformValue:value usingTypeInferredFromKey:key];
-		[flattenedDictionary setObject:value forKey:key];
+		if (value) {
+			value = [self transformValue:value usingTypeInferredFromKey:key];
+			[flattenedDictionary setObject:value forKey:key];
+		}
 	}
 	
 	return flattenedDictionary;
