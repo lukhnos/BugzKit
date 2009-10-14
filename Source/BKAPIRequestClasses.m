@@ -345,12 +345,6 @@ NSString *const BKReplyCaseAction = @"reply";
 NSString *const BKForwardCaseAction = @"forward";
 
 @implementation BKEditCaseRequest
-- (void)dealloc
-{
-	[parameters release];
-	[super dealloc];
-}
-
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters
 {
 	if (self = [super initWithAPIContext:inAPIContext]) {
@@ -400,8 +394,7 @@ NSString *const BKForwardCaseAction = @"forward";
 
 - (NSString *)HTTPRequestMethod
 {
-	return LFHTTPRequestGETMethod;
+	return LFHTTPRequestPOSTMethod;
 }
 
-@synthesize parameters;
 @end

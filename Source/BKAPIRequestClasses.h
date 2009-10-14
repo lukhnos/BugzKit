@@ -113,9 +113,22 @@ extern NSString *const BKForwardCaseAction;
 }
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters;
-
 @property (readonly) NSDictionary *editedCase;
 @property (readonly) NSString *editAction;
-@property (readonly) NSDictionary *parameters;
 @end
+/*
 
+@interface BKMailRequest : BKEditCaseRequest
+{
+	NSString *tempFilename;
+	NSArray *attachmentURLs;
+	NSUInteger attachmentsFromBugEventID;
+	NSString *subject;
+	NSString *from;
+	NSString *to;
+	NSString *CC;
+	NSString *BCC;
+}
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
+@end
+ */
