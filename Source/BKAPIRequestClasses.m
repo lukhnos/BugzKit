@@ -494,6 +494,8 @@ NSString *const BKForwardCaseAction = @"forward";
 		writeLength = strlen(UTF8String);
 		actualWrittenLength = [outputStream write:(uint8_t *)UTF8String maxLength:writeLength];
 		NSAssert(actualWrittenLength == writeLength, @"Must write fileHeader");
+		
+		fileIndex++;
 	}
 	
     
