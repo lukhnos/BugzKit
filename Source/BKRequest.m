@@ -94,6 +94,16 @@
 	return APIContext.endpoint;
 }
 
+- (NSUInteger)requestInputStreamSize
+{
+	return 0;
+}
+
+- (NSInputStream *)requestInputStream
+{
+	return nil;
+}
+
 - (NSData *)requestData
 {
     if ([self.HTTPRequestMethod isEqualToString:LFHTTPRequestPOSTMethod]) {

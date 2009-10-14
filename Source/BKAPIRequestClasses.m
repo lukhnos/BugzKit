@@ -396,5 +396,197 @@ NSString *const BKForwardCaseAction = @"forward";
 {
 	return LFHTTPRequestPOSTMethod;
 }
+@end
 
+@implementation BKMailRequest
+- (void)cleanUpTempFile
+{
+	if (![tempFilename length]) {
+		return;
+	}
+	
+	BOOL isDir = NO;
+	if ([[NSFileManager defaultManager] fileExistsAtPath:tempFilename isDirectory:&isDir]) {
+		
+		NSError *ourError = NULL;
+		BOOL __unused removeResult = [[NSFileManager defaultManager] removeItemAtPath:tempFilename error:&ourError];
+		NSAssert2(removeResult, @"Must remove the temp file at: %@, error: %@", tempFilename, ourError);
+	}
+}
+
+- (NSString *)generateUUID
+{
+	CFUUIDRef uuid = CFUUIDCreate(NULL);
+	CFStringRef uuidStr = CFUUIDCreateString(NULL, uuid);
+	CFRelease(uuid);
+	return [NSMakeCollectable(uuidStr) autorelease];
+}
+
+- (void)prepareTempFile
+{
+	if ([tempFilename length]) {
+		return;
+	}
+	
+	NSString *bundleID = [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+	NSString *filenameRoot = [NSTemporaryDirectory() stringByAppendingFormat:@"%@.%@.data-XXXXXX", NSStringFromClass([self class]), bundleID];
+	
+	const char *filenameUTF8 = [filenameRoot UTF8String];
+	char *writableFilename = (char *)calloc(1, strlen(filenameUTF8) + 1);
+	strncpy(writableFilename, filenameUTF8, strlen(filenameUTF8));
+	
+	mktemp(writableFilename);
+	tempFilename = [[NSString alloc] initWithUTF8String:writableFilename];
+
+    // build the multipart form
+    NSMutableString *multipartBegin = [NSMutableString string];
+    NSMutableString *multipartEnd = [NSMutableString string];
+    
+	for (NSString *key in requestParameterDict) {
+		NSString *value = [requestParameterDict objectForKey:key];
+		[multipartBegin appendFormat:@"--%@\r\nContent-Disposition: form-data; name=\"%@\"\r\n\r\n%@\r\n", multipartSeparator, key, value];
+	}
+	
+	
+    // add filename, if nil, generate a UUID
+	
+    [multipartEnd appendFormat:@"--%@--", multipartSeparator];
+    
+    
+    // create the write stream
+    NSOutputStream *outputStream = [NSOutputStream outputStreamToFileAtPath:tempFilename append:NO];
+    [outputStream open];
+    
+    const char *UTF8String;
+    size_t writeLength;
+    UTF8String = [multipartBegin UTF8String];
+    writeLength = strlen(UTF8String);
+	
+	size_t __unused actualWrittenLength;
+	actualWrittenLength = [outputStream write:(uint8_t *)UTF8String maxLength:writeLength];
+    NSAssert(actualWrittenLength == writeLength, @"Must write multipartBegin");
+	
+	NSUInteger fileIndex = 1;
+	for (NSURL *u in attachmentURLs) {
+		// TO DO: Speed this part up (measure performance first)
+		NSData *d = [NSData dataWithContentsOfURL:u];
+		
+		// TO DO: Ensure the correctness
+		NSString *lastPathComponent = [u lastPathComponent];
+
+		NSMutableString *fileHeader = [NSMutableString string];
+	
+		[fileHeader appendFormat:@"--%@\r\nContent-Disposition: form-data; name=\"File%ju\"; filename=\"%@\"\r\n", multipartSeparator, (uintmax_t)fileIndex, lastPathComponent];
+		[fileHeader appendFormat:@"Content-Type: %@\r\n\r\n", @"application/octet-stream"];
+		
+
+		UTF8String = [fileHeader UTF8String];
+		writeLength = strlen(UTF8String);
+		actualWrittenLength = [outputStream write:(uint8_t *)UTF8String maxLength:writeLength];
+		NSAssert(actualWrittenLength == writeLength, @"Must write fileHeader");
+		
+		actualWrittenLength = [outputStream write:[d bytes] maxLength:[d length]];
+		NSAssert(actualWrittenLength == [d length], @"Must write binary data");
+		
+		NSString *fileEnd = @"\r\n";
+
+		UTF8String = [fileEnd UTF8String];
+		writeLength = strlen(UTF8String);
+		actualWrittenLength = [outputStream write:(uint8_t *)UTF8String maxLength:writeLength];
+		NSAssert(actualWrittenLength == writeLength, @"Must write fileHeader");
+	}
+	
+    
+    UTF8String = [multipartEnd UTF8String];
+    writeLength = strlen(UTF8String);
+	actualWrittenLength = [outputStream write:(uint8_t *)UTF8String maxLength:writeLength];
+    NSAssert(actualWrittenLength == writeLength, @"Must write multipartEnd");
+    [outputStream close];
+}
+
+- (void)dealloc
+{
+	[self cleanUpTempFile];
+	[multipartSeparator release];
+	[tempFilename release];
+	[attachmentURLs release];
+	[super dealloc];
+}
+
+- (void)finalize
+{
+	[self cleanUpTempFile];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID
+{
+	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	if ([inSubject length]) {
+		[params setObject:inSubject forKey:@"sSubject"];
+	}
+	
+	if ([inText length]) {
+		[params setObject:inText forKey:@"sEvent"];
+	}
+	
+	if ([inFrom length]) {
+		[params setObject:inFrom forKey:@"sFrom"];
+	}
+	
+	if ([inTo length]) {
+		[params setObject:inTo forKey:@"sTo"];
+	}
+
+	if ([inCC length]) {
+		[params setObject:inCC forKey:@"sCC"];
+	}
+
+	if ([inBCC length]) {
+		[params setObject:inBCC forKey:@"sBCC"];
+	}
+	
+	if (inEventID) {
+		[params setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inEventID] forKey:@"ixBugEventAttachment"];
+	}
+	
+	if ([inURLs count]) {
+		[params setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)[inURLs count]] forKey:@"nFileCount"];
+	}
+		 
+	if (self = [super initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:params]) {
+		if ([inURLs count]) {
+			attachmentURLs = [[NSArray alloc] initWithArray:inURLs];
+		}
+		
+		multipartSeparator = [[self generateUUID] retain];
+	}
+	
+	return self;
+}
+
+
+#pragma mark Overwritten BKRequest methods
+- (NSString *)HTTPRequestContentType
+{
+	return [NSString stringWithFormat:@"multipart/form-data; boundary=%@", multipartSeparator];
+}
+
+- (NSUInteger)requestInputStreamSize
+{
+	[self prepareTempFile];	
+	NSError *fileError = NULL;
+	NSDictionary *info = [[NSFileManager defaultManager] attributesOfItemAtPath:tempFilename error:&fileError];	
+	return [[info objectForKey:NSFileSize] unsignedIntegerValue];
+}
+
+- (NSInputStream *)requestInputStream
+{
+	[self prepareTempFile];
+	return [NSInputStream inputStreamWithFileAtPath:tempFilename];
+}
+
+- (NSData *)requestData
+{
+	return nil;
+}
 @end

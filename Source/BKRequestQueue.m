@@ -129,7 +129,15 @@
 	}
 	else {	
 		BOOL __unused requestResult;
-		requestResult = [HTTPRequest performMethod:nextRequest.HTTPRequestMethod onURL:nextRequest.requestURL withData:nextRequest.requestData];	
+		
+		NSInputStream *requestInputStream = nextRequest.requestInputStream;		
+		if (requestInputStream) {
+			requestResult = [HTTPRequest performMethod:nextRequest.HTTPRequestMethod onURL:nextRequest.requestURL withInputStream:requestInputStream knownContentSize:nextRequest.requestInputStreamSize];
+		}
+		else {
+			requestResult = [HTTPRequest performMethod:nextRequest.HTTPRequestMethod onURL:nextRequest.requestURL withData:nextRequest.requestData];	
+		}
+		
 		NSAssert1(requestResult, @"HTTP request must be made, or is the BKRequest object bad: %@", nextRequest);
 	}
 	
