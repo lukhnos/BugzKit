@@ -42,6 +42,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 	if (!sISO8601) {
 		sISO8601 = [[NSDateFormatter alloc] init];
 		[sISO8601 setTimeStyle:NSDateFormatterFullStyle];
+		[sISO8601 setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
 		[sISO8601 setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
 	}
 	
