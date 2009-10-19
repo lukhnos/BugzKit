@@ -345,60 +345,6 @@ NSString *const BKReplyCaseAction = @"reply";
 NSString *const BKForwardCaseAction = @"forward";
 
 @implementation BKEditCaseRequest
-- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters
-{
-	if (self = [super initWithAPIContext:inAPIContext]) {
-		NSMutableDictionary *d = [NSMutableDictionary dictionary];
-		
-		[d setObject:inAPIContext.authToken forKey:@"token"];
-		[d setObject:inAction forKey:@"cmd"];
-		
-		if (inCaseNumber) {
-			[d setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] forKey:@"ixBug"];
-		}
-		
-		if (inParameters) {
-			[d addEntriesFromDictionary:inParameters];
-		}
-		
-		requestParameterDict = [d retain];
-	}
-	
-	return self;	
-}
-
-- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters
-{
-	return [self initWithAPIContext:inAPIContext editAction:inAction caseNumber:0 parameters:inParameters];
-}
-
-- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
-{
-	id result = [inXMLMappedResponse valueForKeyPath:@"case"];
-	if (!result) {
-		result = [NSDictionary dictionary];
-	}
-	
-	return result;
-}
-
-- (NSString *)editAction
-{
-	return [requestParameterDict objectForKey:@"cmd"];
-}
-
-- (NSDictionary *)editedCase
-{
-	return processedResponse;
-}
-
-- (NSString *)HTTPRequestMethod
-{
-	return LFHTTPRequestPOSTMethod;
-}
-@end
-
-@implementation BKMailRequest
 - (void)cleanUpTempFile
 {
 	if (![tempFilename length]) {
@@ -437,7 +383,7 @@ NSString *const BKForwardCaseAction = @"forward";
 	
 	mktemp(writableFilename);
 	tempFilename = [[NSString alloc] initWithUTF8String:writableFilename];
-
+	
     // build the multipart form
     NSMutableString *multipartBegin = [NSMutableString string];
     NSMutableString *multipartEnd = [NSMutableString string];
@@ -473,13 +419,13 @@ NSString *const BKForwardCaseAction = @"forward";
 		
 		// TO DO: Ensure the correctness
 		NSString *lastPathComponent = [u lastPathComponent];
-
+		
 		NSMutableString *fileHeader = [NSMutableString string];
-	
+		
 		[fileHeader appendFormat:@"--%@\r\nContent-Disposition: form-data; name=\"File%ju\"; filename=\"%@\"\r\n", multipartSeparator, (uintmax_t)fileIndex, lastPathComponent];
 		[fileHeader appendFormat:@"Content-Type: %@\r\n\r\n", @"application/octet-stream"];
 		
-
+		
 		UTF8String = [fileHeader UTF8String];
 		writeLength = strlen(UTF8String);
 		actualWrittenLength = [outputStream write:(uint8_t *)UTF8String maxLength:writeLength];
@@ -489,7 +435,7 @@ NSString *const BKForwardCaseAction = @"forward";
 		NSAssert(actualWrittenLength == [d length], @"Must write binary data");
 		
 		NSString *fileEnd = @"\r\n";
-
+		
 		UTF8String = [fileEnd UTF8String];
 		writeLength = strlen(UTF8String);
 		actualWrittenLength = [outputStream write:(uint8_t *)UTF8String maxLength:writeLength];
@@ -518,7 +464,114 @@ NSString *const BKForwardCaseAction = @"forward";
 - (void)finalize
 {
 	[self cleanUpTempFile];
+	[super finalize];
 }
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		NSMutableDictionary *d = [NSMutableDictionary dictionary];
+		
+		[d setObject:inAPIContext.authToken forKey:@"token"];
+		[d setObject:inAction forKey:@"cmd"];
+		
+		if (inCaseNumber) {
+			[d setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] forKey:@"ixBug"];
+		}
+				
+		if (inEventID) {
+			[d setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inEventID] forKey:@"ixBugEventAttachment"];
+		}
+		
+		if ([inURLs count]) {
+			[d setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)[inURLs count]] forKey:@"nFileCount"];
+		}
+		
+		if (inParameters) {
+			[d addEntriesFromDictionary:inParameters];
+		}
+		
+		requestParameterDict = [d retain];
+		
+		if ([inURLs count]) {
+			attachmentURLs = [[NSArray alloc] initWithArray:inURLs];
+		}
+		
+		multipartSeparator = [[self generateUUID] retain];		
+	}
+	
+	return self;	
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters
+{
+	return [self initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:inParameters attachmentURLs:nil attachmentsFromBugEventID:0];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters
+{
+	return [self initWithAPIContext:inAPIContext editAction:inAction caseNumber:0 parameters:inParameters attachmentURLs:nil attachmentsFromBugEventID:0];
+}
+
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
+{
+	id result = [inXMLMappedResponse valueForKeyPath:@"case"];
+	if (!result) {
+		result = [NSDictionary dictionary];
+	}
+	
+	return result;
+}
+
+- (NSString *)editAction
+{
+	return [requestParameterDict objectForKey:@"cmd"];
+}
+
+- (NSDictionary *)editedCase
+{
+	return processedResponse;
+}
+
+- (NSString *)HTTPRequestMethod
+{
+	return LFHTTPRequestPOSTMethod;
+}
+
+- (NSString *)HTTPRequestContentType
+{
+	return [attachmentURLs count] ? [NSString stringWithFormat:@"multipart/form-data; boundary=%@", multipartSeparator] : [super HTTPRequestContentType];
+}
+
+- (NSUInteger)requestInputStreamSize
+{
+	if (![attachmentURLs count]) {
+		return 0;
+	}
+	
+	[self prepareTempFile];	
+	NSError *fileError = NULL;
+	NSDictionary *info = [[NSFileManager defaultManager] attributesOfItemAtPath:tempFilename error:&fileError];	
+	return [[info objectForKey:NSFileSize] unsignedIntegerValue];
+}
+
+- (NSInputStream *)requestInputStream
+{
+	if (![attachmentURLs count]) {
+		return 0;
+	}
+	
+	[self prepareTempFile];
+	return [NSInputStream inputStreamWithFileAtPath:tempFilename];
+}
+
+- (NSData *)requestData
+{
+	return [attachmentURLs count] ? nil : [super requestData];
+}
+@end
+
+@implementation BKMailRequest
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID
 {
@@ -547,48 +600,13 @@ NSString *const BKForwardCaseAction = @"forward";
 		[params setObject:inBCC forKey:@"sBCC"];
 	}
 	
-	if (inEventID) {
-		[params setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)inEventID] forKey:@"ixBugEventAttachment"];
-	}
-	
-	if ([inURLs count]) {
-		[params setObject:[NSString stringWithFormat:@"%ju", (uintmax_t)[inURLs count]] forKey:@"nFileCount"];
-	}
 		 
-	if (self = [super initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:params]) {
-		if ([inURLs count]) {
-			attachmentURLs = [[NSArray alloc] initWithArray:inURLs];
-		}
-		
-		multipartSeparator = [[self generateUUID] retain];
+	if (self = [super initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:params attachmentURLs:inURLs attachmentsFromBugEventID:inEventID]) {
 	}
 	
 	return self;
 }
 
-
-#pragma mark Overwritten BKRequest methods
-- (NSString *)HTTPRequestContentType
-{
-	return [NSString stringWithFormat:@"multipart/form-data; boundary=%@", multipartSeparator];
-}
-
-- (NSUInteger)requestInputStreamSize
-{
-	[self prepareTempFile];	
-	NSError *fileError = NULL;
-	NSDictionary *info = [[NSFileManager defaultManager] attributesOfItemAtPath:tempFilename error:&fileError];	
-	return [[info objectForKey:NSFileSize] unsignedIntegerValue];
-}
-
-- (NSInputStream *)requestInputStream
-{
-	[self prepareTempFile];
-	return [NSInputStream inputStreamWithFileAtPath:tempFilename];
-}
-
-- (NSData *)requestData
-{
-	return nil;
-}
 @end
+
+const NSUInteger BKSiteWorkingSchedulePersonID = 1;

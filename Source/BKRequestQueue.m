@@ -115,7 +115,7 @@
 	HTTPRequest.contentType = nextRequest.HTTPRequestContentType;
 
 	// we must remove in advance in this mode, otherwise if any exception is raised, the object never gets removed
-	if (HTTPRequest.shouldWaitUntilDone) {
+	if (self.shouldWaitUntilDone) {
 		[queue removeObjectAtIndex:0];
 	}
 	
@@ -141,7 +141,7 @@
 		NSAssert1(requestResult, @"HTTP request must be made, or is the BKRequest object bad: %@", nextRequest);
 	}
 	
-	if (!HTTPRequest.shouldWaitUntilDone) {
+	if (!self.shouldWaitUntilDone) {
 		[queue removeObjectAtIndex:0];
 	}    
 }

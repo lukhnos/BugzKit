@@ -110,18 +110,25 @@ extern NSString *const BKForwardCaseAction;
 @interface BKEditCaseRequest : BKRequest
 {
 	NSDictionary *parameters;
+
+	NSString *multipartSeparator;
+	NSString *tempFilename;
+	NSArray *attachmentURLs;	
 }
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction parameters:(NSDictionary *)inParameters;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters;
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
 @property (readonly) NSDictionary *editedCase;
 @property (readonly) NSString *editAction;
 @end
 
 @interface BKMailRequest : BKEditCaseRequest
-{
-	NSString *multipartSeparator;
-	NSString *tempFilename;
-	NSArray *attachmentURLs;
-}
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
+@end
+
+
+extern const NSUInteger BKSiteWorkingSchedulePersonID;
+
+@interface BKListWorkingScheduleRequest : BKRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext personID:(NSUInteger)inPersonID;
 @end
