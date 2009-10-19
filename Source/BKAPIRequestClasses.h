@@ -131,4 +131,6 @@ extern const NSUInteger BKSiteWorkingSchedulePersonID;
 
 @interface BKListWorkingScheduleRequest : BKRequest
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext personID:(NSUInteger)inPersonID;
+
+@property (readonly) NSDictionary *fetchedWorkingSchedule;
 @end

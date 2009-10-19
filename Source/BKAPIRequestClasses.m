@@ -610,3 +610,39 @@ NSString *const BKForwardCaseAction = @"forward";
 @end
 
 const NSUInteger BKSiteWorkingSchedulePersonID = 1;
+
+@implementation BKListWorkingScheduleRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext personID:(NSUInteger)inPersonID
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		NSMutableDictionary *d = [NSMutableDictionary dictionary];
+		
+		[d setObject:inAPIContext.authToken forKey:@"token"];
+		[d setObject:@"listWorkingSchedule" forKey:@"cmd"];
+		
+		if (inPersonID) {
+			[d setObject:[NSString stringWithFormat:@"%jd", (uintmax_t)inPersonID] forKey:@"ixPerson"];
+		}
+		
+		requestParameterDict = [d retain];
+	}
+	
+	return self;
+}
+
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
+{
+	id result = [inXMLMappedResponse valueForKeyPath:@"workingSchedule"];
+	if (!result) {
+		result = [NSDictionary dictionary];
+	}
+	
+	return result;
+}
+
+- (NSDictionary *)fetchedWorkingSchedule
+{
+	return [processedResponse isKindOfClass:[NSDictionary class]] ? processedResponse : nil;	
+}
+
+@end

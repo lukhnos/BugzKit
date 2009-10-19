@@ -347,7 +347,7 @@ static NSString *kTestingCurrentFilterName = @"kTestingCurrentFilterName";
 	STFail(@"request: %@, error: %@", inRequest, inRequest.error);		
 }
 
-#pragma mark Test create new caseQueryDidFail
+#pragma mark Test create new case
 
 static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 
@@ -468,5 +468,36 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 	STAssertTrue([c count] == 0, @"C must be 0");	
 }
 
+#pragma mark Test fetching people list and each's working schedule
+
+- (void)testFetchPeopleWorkingSchedule
+{
+	BKListRequest *peopleListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKPeopleList writableItemsOnly:NO] autorelease];
+	peopleListRequest.blockOnSuccess = ^(BKRequest *inRequest) {
+		NSMutableArray *idArray = [[[((BKListRequest *)inRequest).fetchedList valueForKeyPath:@"ixPerson"] mutableCopy] autorelease];
+		[idArray addObject:[NSNumber numberWithUnsignedInteger:1]];
+		
+		for (NSNumber *n in idArray) {
+			BKListWorkingScheduleRequest *scheduleRequest = [[[BKListWorkingScheduleRequest alloc] initWithAPIContext:[self sharedAPIContext] personID:[n unsignedIntegerValue]] autorelease];
+			
+			scheduleRequest.blockOnSuccess = ^(BKRequest *inRequest) {
+				NSLog(@"Fetched schedule: %@", ((BKListWorkingScheduleRequest *)inRequest).fetchedWorkingSchedule);
+			};
+			
+			scheduleRequest.blockOnFailure = ^(BKRequest *inRequest) {
+				STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
+			};
+			
+			[requestQueue addRequest:scheduleRequest];
+		}
+	};
+	
+	
+	peopleListRequest.blockOnFailure = ^(BKRequest *inRequest) {
+		STFail(@"request: %@, error: %@", inRequest, inRequest.error);	
+	};
+	
+	[requestQueue addRequest:peopleListRequest];
+}
 
 @end
