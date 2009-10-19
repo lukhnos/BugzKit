@@ -37,6 +37,7 @@
 	static BKAPIContext *sharedInstance = nil;
 	if (!sharedInstance) {
 		sharedInstance = [[BKAPIContext alloc] init];
+		sharedInstance.serviceRoot = [NSURL URLWithString:kTestEndpoint];
 	}
 	
 	return sharedInstance;
@@ -54,7 +55,6 @@
 
 - (void)setUp
 {	
-	[self sharedAPIContext].serviceRoot = [NSURL URLWithString:kTestEndpoint];
 	requestQueue = [[BKRequestQueue alloc] init];
 	requestQueue.shouldWaitUntilDone = YES;
 }
@@ -78,9 +78,10 @@
 
 - (void)test00_VersionCheckWithFaultyEndpoint
 {
-	[self sharedAPIContext].serviceRoot = [NSURL URLWithString:@"http://example.org"];
+	BKAPIContext *faultyContext = [[[BKAPIContext alloc] init] autorelease];
 	
-	BKCheckVersionRequest *request = [[[BKCheckVersionRequest alloc] initWithAPIContext:[self sharedAPIContext]] autorelease];
+	faultyContext.serviceRoot = [NSURL URLWithString:@"http://example.org"];	
+	BKCheckVersionRequest *request = [[[BKCheckVersionRequest alloc] initWithAPIContext:faultyContext] autorelease];
 	request.target = self;
 	request.actionOnSuccess = @selector(versionCheckExpectedNotToComplete:);
 	request.actionOnFailure = @selector(versionCheckExpectedToFail:);
