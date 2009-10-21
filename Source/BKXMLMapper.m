@@ -51,14 +51,16 @@ NSString *const BKXMLTextContentKey = @"_text";
 @end
 
 @interface BKXMLMapper (Flattener)
-+ (NSArray *)flattenedArray:(NSArray *)inArray;
-+ (id)flattenedDictionary:(NSDictionary *)inDictionary;
-+ (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey;
+- (NSArray *)flattenedArray:(NSArray *)inArray;
+- (id)flattenedDictionary:(NSDictionary *)inDictionary;
+- (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey;
 @end
 
 @implementation BKXMLMapper
 - (void)dealloc
 {
+	[dateFormatter release];
+	
     [resultantDictionary release];
 	[elementStack release];
 	[currentElementName release];
@@ -70,6 +72,11 @@ NSString *const BKXMLTextContentKey = @"_text";
     if (self = [super init]) {
         resultantDictionary = [[NSMutableDictionary alloc] init];
 		elementStack = [[NSMutableArray alloc] init];
+		
+		dateFormatter = [[NSDateFormatter alloc] init];
+		[dateFormatter setTimeStyle:NSDateFormatterFullStyle];
+		[dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
+		[dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];		
     }
     
     return self;
@@ -90,7 +97,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 	return [[resultantDictionary retain] autorelease];
 }
 
-+ (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey
+- (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey
 {
 	// exceptions: s (returned directly), dt (date), hrs (NSTimeInterval), c (integer)
 	// only two exceptions: s (returned directly), dt (date)
@@ -144,7 +151,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
 		
 		NSAssert([inValue isKindOfClass:[NSString class]], @"must be string");
-		return [NSDate dateFromISO8601String:inValue];
+		return [dateFormatter dateFromString:inValue];
 	}
 	
 	// transform 'hrs'
@@ -155,7 +162,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 	return inValue;
 }
 
-+ (NSArray *)flattenedArray:(NSArray *)inArray
+- (NSArray *)flattenedArray:(NSArray *)inArray
 {
 	NSMutableArray *flattenedArray = [NSMutableArray array];
 	
@@ -171,7 +178,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 	return flattenedArray;
 }
 
-+ (id)flattenedDictionary:(NSDictionary *)inDictionary
+- (id)flattenedDictionary:(NSDictionary *)inDictionary
 {
 	if (![inDictionary count]) {
 		return inDictionary;
@@ -219,7 +226,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 	
 	
 	NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
-	NSDictionary *result = [self flattenedDictionary:resultantDictionary];
+	NSDictionary *result = [mapper flattenedDictionary:resultantDictionary];
 	[mapper release];
 	return result;
 }

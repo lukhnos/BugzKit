@@ -40,6 +40,8 @@ extern NSString *const BKXMLTextContentKey;
 	NSMutableArray *elementStack;
 	NSMutableDictionary *currentDictionary;
 	NSString *currentElementName;
+	
+	NSDateFormatter *dateFormatter;
 }
 + (NSDictionary *)dictionaryMappedFromXMLData:(NSData *)inData;
 @end
