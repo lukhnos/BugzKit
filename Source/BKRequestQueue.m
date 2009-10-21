@@ -253,6 +253,10 @@
 			[self runQueue];			
 		}];
 	}];
+	
+	if (self.shouldWaitUntilDone) {
+		[dispatchQueue waitUntilAllOperationsAreFinished];
+	}
 }
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didFailWithError:(NSString *)inError
