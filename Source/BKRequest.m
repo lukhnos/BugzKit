@@ -175,10 +175,10 @@
 	}
 }
 
-- (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData
+- (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData
 {
-	BKRetainAssign(rawResponseData, inData);
-	BKRetainAssign(rawXMLMappedResponse, [BKXMLMapper dictionaryMappedFromXMLData:inData]);
+	BKRetainAssign(rawResponseData, inRawData);
+	BKRetainAssign(rawXMLMappedResponse, inMappedXMLDictionary);
 
 	// TO DO: Determine if we should handle, e.g. empty response, etc.
 	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];

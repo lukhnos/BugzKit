@@ -42,7 +42,8 @@
     NSMutableArray *queue;
     LFHTTPRequest *HTTPRequest;
     BOOL paused;
-	
+		
+	NSOperationQueue *dispatchQueue;
 	id<BKRequestQueueCachePolicy> cachePolicy;
 }
 

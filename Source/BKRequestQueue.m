@@ -27,6 +27,7 @@
 
 #import "BKRequestQueue.h"
 #import "BKRequest+ProtectedMethods.h"
+#import "BKXMLMapper.h"
 
 @interface BKRequestQueue (PrivateMethods)
 - (void)_runQueue;
@@ -41,6 +42,7 @@
 	
     [queue release];
     [HTTPRequest release];
+	[dispatchQueue release];
 	[cachePolicy release];
 	
     [super dealloc];
@@ -50,6 +52,10 @@
 {
     if (self = [super init]) {
         queue = [[NSMutableArray alloc] init];
+		
+		dispatchQueue = [[NSOperationQueue alloc] init];
+		[dispatchQueue setMaxConcurrentOperationCount:1];
+		
         HTTPRequest = [[LFHTTPRequest alloc] init];
         HTTPRequest.delegate = self;
     }
@@ -123,7 +129,7 @@
 	
 	NSData *cachedData = nil;
 	if (cachedData = [cachePolicy requestQueue:self cachedDataOfRequest:nextRequest]) {
-		[nextRequest requestQueue:self didCompleteWithData:cachedData];
+		[nextRequest requestQueue:self didCompleteWithMappedXMLDictionary:[BKXMLMapper dictionaryMappedFromXMLData:cachedData] rawData:cachedData];
 		[nextRequest requestQueueRequestDidFinish:self];
 		[self runQueue];		
 	}
@@ -230,11 +236,23 @@
 	BKRequest *request = inRequest.sessionInfo;
 	NSData *receivedData = inRequest.receivedData;
 	
-	[cachePolicy requestQueue:self storeData:receivedData ofRequest:request];
+	NSOperationQueue *currentQueue = [NSOperationQueue currentQueue];
 	
-    [request requestQueue:self didCompleteWithData:receivedData];
-	[request requestQueueRequestDidFinish:self];
-    [self runQueue];
+	[dispatchQueue addOperationWithBlock:^(void) {
+		[cachePolicy requestQueue:self storeData:receivedData ofRequest:request];		
+		NSDictionary *mappedXMLDictionary = [BKXMLMapper dictionaryMappedFromXMLData:receivedData];
+		
+		[currentQueue addOperationWithBlock:^(void) {
+			// if we ain't canceled, dispatch the data
+			if (inRequest.sessionInfo == request) {
+				[request requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:receivedData];
+				[request requestQueueRequestDidFinish:self];
+			}
+			
+			inRequest.sessionInfo = nil;	
+			[self runQueue];			
+		}];
+	}];
 }
 
 - (void)httpRequest:(LFHTTPRequest *)inRequest didFailWithError:(NSString *)inError
@@ -245,6 +263,8 @@
 	
     [request requestQueue:self didFailWithError:inError];
 	[request requestQueueRequestDidFinish:self];
+	
+	inRequest.sessionInfo = nil;	
     [self runQueue];
 }
 

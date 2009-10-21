@@ -32,7 +32,7 @@
 - (void)recycleIfUsedBefore;
 
 - (void)requestQueueWillBeginRequest:(BKRequestQueue *)inQueue;
-- (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithData:(NSData *)inData;
+- (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData;
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError;
 - (void)requestQueueRequestDidFinish:(BKRequestQueue *)inQueue;
 
