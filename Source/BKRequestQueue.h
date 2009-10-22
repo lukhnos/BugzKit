@@ -32,8 +32,9 @@
 @class BKRequestQueue;
 
 @protocol BKRequestQueueCachePolicy <NSObject>
-- (void)requestQueue:(BKRequestQueue *)inRequestQueue storeData:(NSData *)inData ofRequest:(BKRequest *)inRequest;
-- (NSData *)requestQueue:(BKRequestQueue *)inRequestQueue cachedDataOfRequest:(BKRequest *)inRequest;
+- (BOOL)requestQueue:(BKRequestQueue *)inRequestQueue hasCachedDataForRequest:(BKRequest *)inRequest;
+- (NSDictionary *)requestQueue:(BKRequestQueue *)inRequestQueue cachedDataOfRequest:(BKRequest *)inRequest;
+- (void)requestQueue:(BKRequestQueue *)inRequestQueue storeData:(NSDictionary *)inMappedData ofRequest:(BKRequest *)inRequest;
 @end
 
 

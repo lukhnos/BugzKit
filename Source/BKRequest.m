@@ -175,7 +175,7 @@
 	}
 }
 
-- (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData
+- (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache
 {
 	BKRetainAssign(rawResponseData, inRawData);
 	BKRetainAssign(rawXMLMappedResponse, inMappedXMLDictionary);
@@ -208,7 +208,7 @@
 	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
 	
 	if (blockOnSuccess) {
-		blockOnSuccess(self);
+		blockOnSuccess(self, inUsingCache);
 	}
 	else if (actionOnSuccess) {
 		[target performSelector:actionOnSuccess withObject:self];   

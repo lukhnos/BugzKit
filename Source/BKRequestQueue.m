@@ -116,24 +116,15 @@
         return;
     }
 
-    BKRequest *nextRequest = [queue objectAtIndex:0];
+    BKRequest *nextRequest = [[[queue objectAtIndex:0] retain] autorelease];
 	HTTPRequest.sessionInfo = nextRequest;
 	HTTPRequest.contentType = nextRequest.HTTPRequestContentType;
 
-	// we must remove in advance in this mode, otherwise if any exception is raised, the object never gets removed
-	if (self.shouldWaitUntilDone) {
-		[queue removeObjectAtIndex:0];
-	}
+	[queue removeObjectAtIndex:0];
 	
 	[nextRequest requestQueueWillBeginRequest:self];
 	
-	NSData *cachedData = nil;
-	if (cachedData = [cachePolicy requestQueue:self cachedDataOfRequest:nextRequest]) {
-		[nextRequest requestQueue:self didCompleteWithMappedXMLDictionary:[BKXMLMapper dictionaryMappedFromXMLData:cachedData] rawData:cachedData];
-		[nextRequest requestQueueRequestDidFinish:self];
-		[self runQueue];		
-	}
-	else {	
+	void (^runRequest)() = ^(){
 		BOOL __unused requestResult;
 		
 		NSInputStream *requestInputStream = nextRequest.requestInputStream;		
@@ -144,12 +135,50 @@
 			requestResult = [HTTPRequest performMethod:nextRequest.HTTPRequestMethod onURL:nextRequest.requestURL withData:nextRequest.requestData];	
 		}
 		
-		NSAssert1(requestResult, @"HTTP request must be made, or is the BKRequest object bad: %@", nextRequest);
-	}
+		NSAssert1(requestResult, @"HTTP request must be made, or is the BKRequest object bad: %@", nextRequest);		
+	};
 	
-	if (!self.shouldWaitUntilDone) {
-		[queue removeObjectAtIndex:0];
-	}    
+	
+	if ([cachePolicy requestQueue:self hasCachedDataForRequest:nextRequest]) {
+		if (self.shouldWaitUntilDone) {
+			// serial processing
+			NSDictionary *mappedXMLDictionary = [cachePolicy requestQueue:self cachedDataOfRequest:nextRequest];
+			if (!mappedXMLDictionary) {
+				runRequest();
+			}
+			else {
+				[nextRequest requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:nil usingCachedResponse:YES];
+				[nextRequest requestQueueRequestDidFinish:self];
+				[self runQueue];
+			}			
+		}
+		else {
+			// dispatched processing
+			NSOperationQueue *currentQueue = [NSOperationQueue currentQueue];
+
+			[dispatchQueue addOperationWithBlock:^(void) {
+				NSDictionary *mappedXMLDictionary = [cachePolicy requestQueue:self cachedDataOfRequest:nextRequest];
+							
+				[currentQueue addOperationWithBlock:^(void) {
+					// if we ain't canceled, dispatch the data
+					if (HTTPRequest.sessionInfo == nextRequest) {						
+						if (mappedXMLDictionary) {
+							[nextRequest requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:nil usingCachedResponse:YES];
+							[nextRequest requestQueueRequestDidFinish:self];
+							HTTPRequest.sessionInfo = nil;	
+							[self runQueue];			
+						}
+						else {
+							runRequest();
+						}
+					}					
+				}];
+			}];
+		}		
+	}
+	else {
+		runRequest();
+	}
 }
 
 - (void)runQueue
@@ -165,6 +194,17 @@
 
 - (void)setPaused:(BOOL)inPaused
 {
+	if (!paused && inPaused) {
+		if ([HTTPRequest isRunning]) {
+			[HTTPRequest cancelWithoutDelegateMessage];
+			
+			if (HTTPRequest.sessionInfo) {
+				[queue insertObject:HTTPRequest.sessionInfo atIndex:0];
+				HTTPRequest.sessionInfo = nil;
+			}
+		}
+	}
+	
     BOOL resumeQueue = (paused && !inPaused);    
     paused = inPaused;
     
@@ -239,13 +279,13 @@
 	NSOperationQueue *currentQueue = [NSOperationQueue currentQueue];
 	
 	[dispatchQueue addOperationWithBlock:^(void) {
-		[cachePolicy requestQueue:self storeData:receivedData ofRequest:request];		
 		NSDictionary *mappedXMLDictionary = [BKXMLMapper dictionaryMappedFromXMLData:receivedData];
+		[cachePolicy requestQueue:self storeData:mappedXMLDictionary ofRequest:request];		
 		
 		[currentQueue addOperationWithBlock:^(void) {
 			// if we ain't canceled, dispatch the data
 			if (inRequest.sessionInfo == request) {
-				[request requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:receivedData];
+				[request requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:receivedData usingCachedResponse:NO];
 				[request requestQueueRequestDidFinish:self];
 			}
 			

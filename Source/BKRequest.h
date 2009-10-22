@@ -36,15 +36,15 @@
     SEL actionOnFailure;
 	
 	void (^blockBeforeRequestStart)(BKRequest *);
-	void (^blockOnSuccess)(BKRequest *);
+	void (^blockOnSuccess)(BKRequest *, BOOL);
 	void (^blockOnFailure)(BKRequest *);
 	void (^blockAfterRequestEnd)(BKRequest *);
 	
     id userInfo;
     BKAPIContext *APIContext;
     NSDictionary *requestParameterDict;
-	NSData *rawResponseData;
 	NSDictionary *rawXMLMappedResponse;
+	NSData *rawResponseData;
     id processedResponse;
     NSError *error;
     NSDate *creationDate;
@@ -58,7 +58,7 @@
 @property (assign) SEL actionOnFailure;
 
 @property (copy) void (^blockBeforeRequestStart)(BKRequest *);
-@property (copy) void (^blockOnSuccess)(BKRequest *);
+@property (copy) void (^blockOnSuccess)(BKRequest *inRequest, BOOL inUsingCachedResponse);
 @property (copy) void (^blockOnFailure)(BKRequest *);
 @property (copy) void (^blockAfterRequestEnd)(BKRequest *);
 @property (retain) id userInfo;

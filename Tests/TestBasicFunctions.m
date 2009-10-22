@@ -473,14 +473,14 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 - (void)testFetchPeopleWorkingSchedule
 {
 	BKListRequest *peopleListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKPeopleList writableItemsOnly:NO] autorelease];
-	peopleListRequest.blockOnSuccess = ^(BKRequest *inRequest) {
+	peopleListRequest.blockOnSuccess = ^(BKRequest *inRequest, BOOL inUsingCachedResponse) {
 		NSMutableArray *idArray = [[[((BKListRequest *)inRequest).fetchedList valueForKeyPath:@"ixPerson"] mutableCopy] autorelease];
 		[idArray addObject:[NSNumber numberWithUnsignedInteger:1]];
 		
 		for (NSNumber *n in idArray) {
 			BKListWorkingScheduleRequest *scheduleRequest = [[[BKListWorkingScheduleRequest alloc] initWithAPIContext:[self sharedAPIContext] personID:[n unsignedIntegerValue]] autorelease];
 			
-			scheduleRequest.blockOnSuccess = ^(BKRequest *inRequest) {
+			scheduleRequest.blockOnSuccess = ^(BKRequest *inRequest, BOOL inUsingCachedResponse) {
 				NSLog(@"Fetched schedule: %@", ((BKListWorkingScheduleRequest *)inRequest).fetchedWorkingSchedule);
 			};
 			
