@@ -198,8 +198,12 @@
 		if ([HTTPRequest isRunning]) {
 			[HTTPRequest cancelWithoutDelegateMessage];
 			
-			if (HTTPRequest.sessionInfo) {
+			if (HTTPRequest.sessionInfo) {				
 				[queue insertObject:HTTPRequest.sessionInfo atIndex:0];
+
+				[((BKRequest *)HTTPRequest.sessionInfo) requestQueueDidGetCancelled:self];
+				[((BKRequest *)HTTPRequest.sessionInfo) requestQueueRequestDidFinish:self];
+
 				HTTPRequest.sessionInfo = nil;
 			}
 		}
@@ -247,7 +251,9 @@
 {
 	if ([HTTPRequest isRunning]) {
 		if (inFilter((BKRequest *)HTTPRequest.sessionInfo)) {
-			[HTTPRequest cancelWithoutDelegateMessage];
+			[HTTPRequest cancelWithoutDelegateMessage];			
+			[((BKRequest *)HTTPRequest.sessionInfo) requestQueueDidGetCancelled:self];
+			[((BKRequest *)HTTPRequest.sessionInfo) requestQueueRequestDidFinish:self];
 			[[HTTPRequest.sessionInfo retain] autorelease];
 			HTTPRequest.sessionInfo = nil;
 		}

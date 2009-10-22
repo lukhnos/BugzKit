@@ -168,6 +168,13 @@
 	}
 }
 
+- (void)requestQueueDidGetCancelled:(BKRequestQueue *)inQueue
+{
+	if (blockOnCancel) {
+		blockOnCancel(self);
+	}
+}
+
 - (void)requestQueueRequestDidFinish:(BKRequestQueue *)inQueue
 {
 	if (blockAfterRequestEnd) {

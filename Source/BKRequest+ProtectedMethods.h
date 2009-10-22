@@ -34,6 +34,7 @@
 - (void)requestQueueWillBeginRequest:(BKRequestQueue *)inQueue;
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache;
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError;
+- (void)requestQueueDidGetCancelled:(BKRequestQueue *)inQueue;
 - (void)requestQueueRequestDidFinish:(BKRequestQueue *)inQueue;
 
 - (NSDictionary *)preparedParameterDict;

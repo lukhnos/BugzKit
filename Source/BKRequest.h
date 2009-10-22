@@ -38,6 +38,7 @@
 	void (^blockBeforeRequestStart)(BKRequest *);
 	void (^blockOnSuccess)(BKRequest *, BOOL);
 	void (^blockOnFailure)(BKRequest *);
+	void (^blockOnCancel)(BKRequest *);	
 	void (^blockAfterRequestEnd)(BKRequest *);
 	
     id userInfo;
@@ -60,6 +61,7 @@
 @property (copy) void (^blockBeforeRequestStart)(BKRequest *);
 @property (copy) void (^blockOnSuccess)(BKRequest *inRequest, BOOL inUsingCachedResponse);
 @property (copy) void (^blockOnFailure)(BKRequest *);
+@property (copy) void (^blockOnCancel)(BKRequest *);
 @property (copy) void (^blockAfterRequestEnd)(BKRequest *);
 @property (retain) id userInfo;
 @property (readonly) NSString *HTTPRequestMethod;
