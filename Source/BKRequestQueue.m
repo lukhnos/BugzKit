@@ -72,6 +72,7 @@
 {
 	[inRequest recycleIfUsedBefore];
     [queue addObject:inRequest];
+	[inRequest requestQueueRequestDidiEnqueue:self];
 	
 	if (!inDeferred) {
 		[self runQueue];
@@ -240,6 +241,13 @@
 - (void)cancelRequestsOfClass:(Class)inClass
 {
 	[self cancelRequestsWithBlock:^(BKRequest *r) { return [r isKindOfClass:inClass]; }];	
+}
+
+- (void)cancelRequestsOfClasses:(NSArray *)inClasses
+{
+	for (Class c in inClasses) {
+		[self cancelRequestsOfClass:c];
+	}
 }
 
 - (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate

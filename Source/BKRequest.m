@@ -135,9 +135,11 @@
 @synthesize target;
 @synthesize actionOnSuccess;
 @synthesize actionOnFailure;
+@synthesize blockWhenEnqueued;
 @synthesize blockBeforeRequestStart;
 @synthesize blockOnSuccess;
 @synthesize blockOnFailure;
+@synthesize blockOnCancel;
 @synthesize blockAfterRequestEnd;
 @synthesize userInfo;
 @synthesize APIContext;
@@ -158,6 +160,13 @@
 		BKRetainAssign(processedResponse, nil);
 		BKRetainAssign(error, nil);
 		BKRetainAssign(creationDate, [NSDate date]);
+	}
+}
+
+- (void)requestQueueRequestDidiEnqueue:(BKRequestQueue *)inQueue
+{
+	if (blockWhenEnqueued) {
+		blockWhenEnqueued(self, inQueue);
 	}
 }
 

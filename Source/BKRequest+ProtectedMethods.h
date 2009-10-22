@@ -31,6 +31,7 @@
 @interface BKRequest (ProtectedMethods)
 - (void)recycleIfUsedBefore;
 
+- (void)requestQueueRequestDidiEnqueue:(BKRequestQueue *)inQueue;
 - (void)requestQueueWillBeginRequest:(BKRequestQueue *)inQueue;
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache;
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError;

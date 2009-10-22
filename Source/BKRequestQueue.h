@@ -57,6 +57,7 @@
 - (void)cancelRequest:(BKRequest *)inRequest;
 - (void)cancelRequestsOfTarget:(id)inTarget;
 - (void)cancelRequestsOfClass:(Class)inClass;
+- (void)cancelRequestsOfClasses:(NSArray *)inClasses;
 - (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate;
 - (void)cancelRequestsWithBlock:(BOOL (^)(BKRequest *))inFilter;
 

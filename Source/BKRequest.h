@@ -28,6 +28,7 @@
 #import "BKAPIContext.h"
 
 @class BKRequest;
+@class BKRequestQueue;
 
 @interface BKRequest : NSObject
 {
@@ -35,6 +36,7 @@
     SEL actionOnSuccess;
     SEL actionOnFailure;
 	
+	void (^blockWhenEnqueued)(BKRequest *, BKRequestQueue *);
 	void (^blockBeforeRequestStart)(BKRequest *);
 	void (^blockOnSuccess)(BKRequest *, BOOL);
 	void (^blockOnFailure)(BKRequest *);
@@ -58,6 +60,7 @@
 @property (assign) SEL actionOnSuccess;
 @property (assign) SEL actionOnFailure;
 
+@property (copy) void (^blockWhenEnqueued)(BKRequest *, BKRequestQueue *);
 @property (copy) void (^blockBeforeRequestStart)(BKRequest *);
 @property (copy) void (^blockOnSuccess)(BKRequest *inRequest, BOOL inUsingCachedResponse);
 @property (copy) void (^blockOnFailure)(BKRequest *);
