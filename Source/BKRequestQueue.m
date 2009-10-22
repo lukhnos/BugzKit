@@ -233,6 +233,11 @@
 	[self cancelRequestsWithBlock:^(BKRequest *r) { return (BOOL)(inTarget == r.target); }];	
 }
 
+- (void)cancelRequestsOfClass:(Class)inClass
+{
+	[self cancelRequestsWithBlock:^(BKRequest *r) { return [r isKindOfClass:inClass]; }];	
+}
+
 - (void)cancelRequestsWithPredicate:(NSPredicate *)inPredicate
 {
 	[self cancelRequestsWithBlock:^(BKRequest *r) { return [inPredicate evaluateWithObject:r]; }];
