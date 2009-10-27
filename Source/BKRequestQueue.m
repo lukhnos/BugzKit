@@ -79,6 +79,15 @@
 	}
 }
 
+- (void)addRequests:(NSArray *)inRequests
+{
+	for (BKRequest *request in inRequests) {
+		[self addRequest:request deferred:YES];
+	}
+	
+	[self runQueue];
+}
+
 - (NSArray *)queuedRequestsWithPredicate:(NSPredicate *)inPredicate
 {
 	NSMutableArray *result = [NSMutableArray array];

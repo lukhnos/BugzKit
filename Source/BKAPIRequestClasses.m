@@ -360,14 +360,6 @@ NSString *const BKForwardCaseAction = @"forward";
 	}
 }
 
-- (NSString *)generateUUID
-{
-	CFUUIDRef uuid = CFUUIDCreate(NULL);
-	CFStringRef uuidStr = CFUUIDCreateString(NULL, uuid);
-	CFRelease(uuid);
-	return [NSMakeCollectable(uuidStr) autorelease];
-}
-
 - (void)prepareTempFile
 {
 	if ([tempFilename length]) {
@@ -497,7 +489,7 @@ NSString *const BKForwardCaseAction = @"forward";
 			attachmentURLs = [[NSArray alloc] initWithArray:inURLs];
 		}
 		
-		multipartSeparator = [[self generateUUID] retain];		
+		multipartSeparator = [BKGenerateUUID() retain];		
 	}
 	
 	return self;	

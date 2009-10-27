@@ -38,8 +38,8 @@
 	
 	void (^blockWhenEnqueued)(BKRequest *, BKRequestQueue *);
 	void (^blockBeforeRequestStart)(BKRequest *);
-	void (^blockOnSuccess)(BKRequest *, BOOL);
-	void (^blockOnFailure)(BKRequest *);
+	void (^blockOnSuccess)(BKRequest *, BOOL, BKRequestQueue *);
+	void (^blockOnFailure)(BKRequest *, BKRequestQueue *);
 	void (^blockOnCancel)(BKRequest *);	
 	void (^blockAfterRequestEnd)(BKRequest *);
 	
@@ -62,8 +62,8 @@
 
 @property (copy) void (^blockWhenEnqueued)(BKRequest *, BKRequestQueue *);
 @property (copy) void (^blockBeforeRequestStart)(BKRequest *);
-@property (copy) void (^blockOnSuccess)(BKRequest *inRequest, BOOL inUsingCachedResponse);
-@property (copy) void (^blockOnFailure)(BKRequest *);
+@property (copy) void (^blockOnSuccess)(BKRequest *inRequest, BOOL inUsingCachedResponse, BKRequestQueue *);
+@property (copy) void (^blockOnFailure)(BKRequest *, BKRequestQueue *);
 @property (copy) void (^blockOnCancel)(BKRequest *);
 @property (copy) void (^blockAfterRequestEnd)(BKRequest *);
 @property (retain) id userInfo;

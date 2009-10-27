@@ -68,3 +68,11 @@ NS_INLINE NSString *BKQuotedString(id s)
 	
 	return nil;
 }
+
+NS_INLINE NSString *BKGenerateUUID()
+{
+	CFUUIDRef uuid = CFUUIDCreate(NULL);
+	CFStringRef uuidStr = CFUUIDCreateString(NULL, uuid);
+	CFRelease(uuid);
+	return [NSMakeCollectable(uuidStr) autorelease];	
+}

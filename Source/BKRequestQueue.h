@@ -50,6 +50,7 @@
 
 - (void)addRequest:(BKRequest *)inRequest;
 - (void)addRequest:(BKRequest *)inRequest deferred:(BOOL)inDeferred;
+- (void)addRequests:(NSArray *)inRequests;
 
 - (NSArray *)queuedRequestsWithPredicate:(NSPredicate *)inPredicate;
 

@@ -212,7 +212,7 @@
 		[self postprocessError:responseError];
 		
 		if (blockOnFailure) {
-			blockOnFailure(self);
+			blockOnFailure(self, inQueue);
 		}
 		else if (actionOnFailure) {
 			[target performSelector:actionOnFailure withObject:self];
@@ -224,7 +224,7 @@
 	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
 	
 	if (blockOnSuccess) {
-		blockOnSuccess(self, inUsingCache);
+		blockOnSuccess(self, inUsingCache, inQueue);
 	}
 	else if (actionOnSuccess) {
 		[target performSelector:actionOnSuccess withObject:self];   
@@ -248,7 +248,7 @@
 	BKRetainAssign(error, [NSError errorWithDomain:BKConnectionErrorDomain code:errorCode userInfo:nil]);	
 	
 	if (blockOnFailure) {
-		blockOnFailure(self);
+		blockOnFailure(self, inQueue);
 	}
 	else if (actionOnFailure) {
 		[target performSelector:actionOnFailure withObject:self];
