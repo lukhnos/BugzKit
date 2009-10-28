@@ -99,7 +99,7 @@ extern NSString *const BKMailboxList;
 extern NSString *const BKNewCaseAction;
 extern NSString *const BKEditCaseAction;
 extern NSString *const BKAssignCaseAction;
-extern NSString *const BKReactiateCaseAction;
+extern NSString *const BKReactivateCaseAction;
 extern NSString *const BKReopenCaseAction;
 extern NSString *const BKResolveCaseAction;
 extern NSString *const BKCloseCaseAction;
@@ -123,6 +123,7 @@ extern NSString *const BKForwardCaseAction;
 @end
 
 @interface BKMailRequest : BKEditCaseRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
 @end
 

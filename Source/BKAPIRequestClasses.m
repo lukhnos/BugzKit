@@ -336,7 +336,7 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 NSString *const BKNewCaseAction = @"new";
 NSString *const BKEditCaseAction = @"edit";
 NSString *const BKAssignCaseAction = @"assign";
-NSString *const BKReactiateCaseAction = @"reactivate";
+NSString *const BKReactivateCaseAction = @"reactivate";
 NSString *const BKReopenCaseAction = @"reopen";
 NSString *const BKResolveCaseAction = @"resolve";
 NSString *const BKCloseCaseAction = @"close";
@@ -565,9 +565,13 @@ NSString *const BKForwardCaseAction = @"forward";
 
 @implementation BKMailRequest
 
-- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
 {
 	NSMutableDictionary *params = [NSMutableDictionary dictionary];
+	if (inParameters) {
+		[params addEntriesFromDictionary:inParameters];
+	}
+	
 	if ([inSubject length]) {
 		[params setObject:inSubject forKey:@"sSubject"];
 	}
@@ -591,12 +595,16 @@ NSString *const BKForwardCaseAction = @"forward";
 	if ([inBCC length]) {
 		[params setObject:inBCC forKey:@"sBCC"];
 	}
-	
-		 
+			 
 	if (self = [super initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:params attachmentURLs:inURLs attachmentsFromBugEventID:inEventID]) {
 	}
 	
 	return self;
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber text:(NSString *)inText subject:(NSString *)inSubject from:(NSString *)inFrom to:(NSString *)inTo CC:(NSString *)inCC BCC:(NSString *)inBCC attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID
+{
+	return [self initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:nil text:inText subject:inSubject from:inFrom to:inTo CC:inCC BCC:inBCC attachmentURLs:inURLs attachmentsFromBugEventID:inEventID];
 }
 
 @end
