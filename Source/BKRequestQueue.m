@@ -281,6 +281,10 @@
 		if (!inFilter(request)) {
 			[newQueue addObject:request];
 		}
+		else {
+			[request requestQueueDidGetCancelled:self];
+			[request requestQueueRequestDidFinish:self];			
+		}
 	}
 	
 	[queue removeAllObjects];

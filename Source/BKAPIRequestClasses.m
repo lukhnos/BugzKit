@@ -646,3 +646,30 @@ const NSUInteger BKSiteWorkingSchedulePersonID = 1;
 }
 
 @end
+
+
+@implementation BKMarkAsViewedRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber
+{
+	return [self initWithAPIContext:inAPIContext caseNumber:inCaseNumber eventID:NSUIntegerMax];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber eventID:(NSUInteger)inEventID
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		NSMutableDictionary *d = [NSMutableDictionary dictionary];
+		
+		[d setObject:inAPIContext.authToken forKey:@"token"];
+		[d setObject:@"view" forKey:@"cmd"];
+		[d setObject:[NSString stringWithFormat:@"%jd", (uintmax_t)inCaseNumber] forKey:@"ixBug"];
+		
+		if (inEventID != NSUIntegerMax) {
+			[d setObject:[NSString stringWithFormat:@"%jd", (uintmax_t)inEventID] forKey:@"ixBugEvent"];
+		}
+		
+		requestParameterDict = [d retain];
+	}
+	
+	return self;	
+}
+@end
