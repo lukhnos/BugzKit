@@ -30,26 +30,6 @@
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
 
-@interface NSDate (ISO8601)
-+ (NSDate *)dateFromISO8601String:(NSString *)inString;
-@end
-
-@implementation NSDate (ISO8601)
-+ (NSDate *)dateFromISO8601String:(NSString *)inString
-{
-	static NSDateFormatter *sISO8601 = nil;
-	
-	if (!sISO8601) {
-		sISO8601 = [[NSDateFormatter alloc] init];
-		[sISO8601 setTimeStyle:NSDateFormatterFullStyle];
-		[sISO8601 setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-		[sISO8601 setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-	}
-	
-	return [sISO8601 dateFromString:inString];
-}
-@end
-
 @interface BKXMLMapper (Flattener)
 - (NSArray *)flattenedArray:(NSArray *)inArray;
 - (id)flattenedDictionary:(NSDictionary *)inDictionary;
@@ -57,6 +37,12 @@ NSString *const BKXMLTextContentKey = @"_text";
 @end
 
 @implementation BKXMLMapper
+- (void)finalize
+{
+	CFRelease(dateFormatter);
+	[super finalize];
+}
+
 - (void)dealloc
 {
 	[dateFormatter release];
@@ -73,10 +59,9 @@ NSString *const BKXMLTextContentKey = @"_text";
         resultantDictionary = [[NSMutableDictionary alloc] init];
 		elementStack = [[NSMutableArray alloc] init];
 		
-		dateFormatter = [[NSDateFormatter alloc] init];
-		[dateFormatter setTimeStyle:NSDateFormatterFullStyle];
-		[dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-		[dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];		
+		dateFormatter = CFDateFormatterCreate(NULL, NULL, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);
+		CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, (CFTimeZoneRef)[NSTimeZone timeZoneWithName:@"GMT"]);
+		CFDateFormatterSetFormat(dateFormatter, (CFStringRef)@"yyyy-MM-dd'T'HH:mm:ss'Z'");
     }
     
     return self;
@@ -151,7 +136,8 @@ NSString *const BKXMLTextContentKey = @"_text";
 	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
 		
 		NSAssert([inValue isKindOfClass:[NSString class]], @"must be string");
-		return [dateFormatter dateFromString:inValue];
+		return NSMakeCollectable(CFDateFormatterCreateDateFromString(NULL, dateFormatter, (CFStringRef)inValue, NULL));
+		
 	}
 	
 	// transform 'hrs'

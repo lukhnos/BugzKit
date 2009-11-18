@@ -41,7 +41,7 @@ extern NSString *const BKXMLTextContentKey;
 	NSMutableDictionary *currentDictionary;
 	NSString *currentElementName;
 	
-	NSDateFormatter *dateFormatter;
+	CFDateFormatterRef dateFormatter;
 }
 + (NSDictionary *)dictionaryMappedFromXMLData:(NSData *)inData;
 @end
