@@ -45,7 +45,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 
 - (void)dealloc
 {
-	[dateFormatter release];
+	CFRelease(dateFormatter);
 	
     [resultantDictionary release];
 	[elementStack release];
@@ -59,9 +59,15 @@ NSString *const BKXMLTextContentKey = @"_text";
         resultantDictionary = [[NSMutableDictionary alloc] init];
 		elementStack = [[NSMutableArray alloc] init];
 		
-		dateFormatter = CFDateFormatterCreate(NULL, NULL, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);
-		CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, (CFTimeZoneRef)[NSTimeZone timeZoneWithName:@"GMT"]);
+		CFLocaleRef currentLocale = CFLocaleCopyCurrent();		
+		CFTimeZoneRef timeZone = CFTimeZoneCreateWithName(NULL, (CFStringRef)@"GMT", NO);
+		
+		dateFormatter = CFDateFormatterCreate(NULL, currentLocale, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);		
+		CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
 		CFDateFormatterSetFormat(dateFormatter, (CFStringRef)@"yyyy-MM-dd'T'HH:mm:ss'Z'");
+		
+		CFRelease(timeZone);
+		CFRelease(currentLocale);
     }
     
     return self;
