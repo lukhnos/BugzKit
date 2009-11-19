@@ -93,7 +93,9 @@ NSString *const BKXMLTextContentKey = @"_text";
 	// exceptions: s (returned directly), dt (date), hrs (NSTimeInterval), c (integer)
 	// only two exceptions: s (returned directly), dt (date)
 	
-	if ([inKey length] < 2) {
+	NSUInteger length = [inKey length];
+	
+	if (length < 2) {
 		if ([inKey isEqualToString:@"c"]) {
 			return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
 		}
@@ -108,7 +110,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 			
 	UniChar firstChar = [inKey characterAtIndex:0];
 	UniChar secondChar = [inKey characterAtIndex:1];	
-	UniChar thirdChar = [inKey length] > 2 ? [inKey characterAtIndex:2] : 0;	
+	UniChar thirdChar = length > 2 ? [inKey characterAtIndex:2] : 0;	
 	BOOL secondCharIsUpperCase = (secondChar >= 'A' &&  secondChar <= 'Z');
 	BOOL thirdCharIsUpperCase = [inKey isEqualToString:@"dt"] ? YES : (thirdChar >= 'A' && thirdChar <= 'Z');
 
@@ -130,6 +132,12 @@ NSString *const BKXMLTextContentKey = @"_text";
 	
 	// transform 'ix'
 	if (firstChar == 'i' && secondChar == 'x' && thirdCharIsUpperCase) {
+		
+		// if it's ixBugChildren or ixRelatedBugs, don't translate it
+		if (length == 13 && ([inKey isEqualToString:@"ixBugChildren"] || [inKey isEqualToString:@"ixRelatedBugs"])) {
+			return inValue;
+		}		
+		
 		return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
 	}
 	
