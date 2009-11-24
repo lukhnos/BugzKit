@@ -35,7 +35,7 @@
 
 NS_INLINE NSString *BKEscapedURLStringFromNSString(NSString *inStr)
 {
-	CFStringRef escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)inStr, NULL, CFSTR("&"), kCFStringEncodingUTF8);
+	CFStringRef escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)inStr, NULL, CFSTR("&+"), kCFStringEncodingUTF8);
 	
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4	
 	return (NSString *)[escaped autorelease];			    
