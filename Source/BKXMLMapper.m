@@ -30,26 +30,6 @@
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
 
-@interface NSDate (ISO8601)
-+ (NSDate *)dateFromISO8601String:(NSString *)inString;
-@end
-
-@implementation NSDate (ISO8601)
-+ (NSDate *)dateFromISO8601String:(NSString *)inString
-{
-	static NSDateFormatter *sISO8601 = nil;
-	
-	if (!sISO8601) {
-		sISO8601 = [[NSDateFormatter alloc] init];
-		[sISO8601 setTimeStyle:NSDateFormatterFullStyle];
-		[sISO8601 setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-		[sISO8601 setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-	}
-	
-	return [sISO8601 dateFromString:inString];
-}
-@end
-
 @interface BKXMLMapper (Flattener)
 - (NSArray *)flattenedArray:(NSArray *)inArray;
 - (id)flattenedDictionary:(NSDictionary *)inDictionary;
@@ -57,9 +37,15 @@ NSString *const BKXMLTextContentKey = @"_text";
 @end
 
 @implementation BKXMLMapper
+- (void)finalize
+{
+	CFRelease(dateFormatter);
+	[super finalize];
+}
+
 - (void)dealloc
 {
-	[dateFormatter release];
+	CFRelease(dateFormatter);
 	
     [resultantDictionary release];
 	[elementStack release];
@@ -73,10 +59,15 @@ NSString *const BKXMLTextContentKey = @"_text";
         resultantDictionary = [[NSMutableDictionary alloc] init];
 		elementStack = [[NSMutableArray alloc] init];
 		
-		dateFormatter = [[NSDateFormatter alloc] init];
-		[dateFormatter setTimeStyle:NSDateFormatterFullStyle];
-		[dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-		[dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];		
+		CFLocaleRef currentLocale = CFLocaleCopyCurrent();		
+		CFTimeZoneRef timeZone = CFTimeZoneCreateWithName(NULL, (CFStringRef)@"GMT", NO);
+		
+		dateFormatter = CFDateFormatterCreate(NULL, currentLocale, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);		
+		CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
+		CFDateFormatterSetFormat(dateFormatter, (CFStringRef)@"yyyy-MM-dd'T'HH:mm:ss'Z'");
+		
+		CFRelease(timeZone);
+		CFRelease(currentLocale);
     }
     
     return self;
@@ -102,7 +93,9 @@ NSString *const BKXMLTextContentKey = @"_text";
 	// exceptions: s (returned directly), dt (date), hrs (NSTimeInterval), c (integer)
 	// only two exceptions: s (returned directly), dt (date)
 	
-	if ([inKey length] < 2) {
+	NSUInteger length = [inKey length];
+	
+	if (length < 2) {
 		if ([inKey isEqualToString:@"c"]) {
 			return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
 		}
@@ -117,7 +110,7 @@ NSString *const BKXMLTextContentKey = @"_text";
 			
 	UniChar firstChar = [inKey characterAtIndex:0];
 	UniChar secondChar = [inKey characterAtIndex:1];	
-	UniChar thirdChar = [inKey length] > 2 ? [inKey characterAtIndex:2] : 0;	
+	UniChar thirdChar = length > 2 ? [inKey characterAtIndex:2] : 0;	
 	BOOL secondCharIsUpperCase = (secondChar >= 'A' &&  secondChar <= 'Z');
 	BOOL thirdCharIsUpperCase = [inKey isEqualToString:@"dt"] ? YES : (thirdChar >= 'A' && thirdChar <= 'Z');
 
@@ -139,6 +132,12 @@ NSString *const BKXMLTextContentKey = @"_text";
 	
 	// transform 'ix'
 	if (firstChar == 'i' && secondChar == 'x' && thirdCharIsUpperCase) {
+		
+		// if it's ixBugChildren or ixRelatedBugs, don't translate it
+		if (length == 13 && ([inKey isEqualToString:@"ixBugChildren"] || [inKey isEqualToString:@"ixRelatedBugs"])) {
+			return inValue;
+		}		
+		
 		return [NSNumber numberWithUnsignedInteger:[inValue integerValue]];
 	}
 	
@@ -151,7 +150,8 @@ NSString *const BKXMLTextContentKey = @"_text";
 	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
 		
 		NSAssert([inValue isKindOfClass:[NSString class]], @"must be string");
-		return [dateFormatter dateFromString:inValue];
+		return NSMakeCollectable(CFDateFormatterCreateDateFromString(NULL, dateFormatter, (CFStringRef)inValue, NULL));
+		
 	}
 	
 	// transform 'hrs'
