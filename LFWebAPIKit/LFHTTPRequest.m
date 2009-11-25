@@ -129,9 +129,14 @@ void LFHRReadStreamClientCallBack(CFReadStreamRef stream, CFStreamEventType even
 
 - (void)_exitRunLoop
 {
+#if TARGET_OS_IPHONE
+	[_synchronousMessagePort sendBeforeDate:[NSDate date] msgid:0 components:nil from:_synchronousMessagePort reserved:0];
+	
+#else
 	NSPortMessage *message = [[[NSPortMessage alloc] initWithSendPort:_synchronousMessagePort receivePort:_synchronousMessagePort components:nil] autorelease];
 	[message setMsgid:0];
-	[message sendBeforeDate:[NSDate date]];
+	[message sendBeforeDate:[NSDate date]];	
+#endif
 }
 
 - (void)handleTimeout
@@ -139,7 +144,7 @@ void LFHRReadStreamClientCallBack(CFReadStreamRef stream, CFStreamEventType even
 	if (_shouldWaitUntilDone) {
 		[self _exitRunLoop];
 	}
-
+	
     [self cleanUp];
     if ([_delegate respondsToSelector:@selector(httpRequest:didFailWithError:)]) {
         [_delegate httpRequest:self didFailWithError:LFHTTPRequestTimeoutError];
@@ -576,22 +581,22 @@ void LFHRReadStreamClientCallBack(CFReadStreamRef stream, CFStreamEventType even
     if (_shouldWaitUntilDone) {
         NSRunLoop *currentRunLoop = [NSRunLoop currentRunLoop];
         NSString *currentMode = [currentRunLoop currentMode];
-
+		
 		if (![currentMode length]) {
 			currentMode = NSDefaultRunLoopMode;
 		}
-
+		
 		BOOL isReentrant = (_synchronousMessagePort != nil);
-
+		
 		if (!isReentrant) {
 			_synchronousMessagePort = [[NSPort port] retain];
 			[currentRunLoop addPort:_synchronousMessagePort forMode:currentMode];
 		}
-
+		
         while ([self isRunning]) {
             [currentRunLoop runMode:currentMode beforeDate:[NSDate distantFuture]];
         }
-
+		
 		if (!isReentrant) {
 			[currentRunLoop removePort:_synchronousMessagePort forMode:currentMode];
 			[_synchronousMessagePort release];
@@ -695,6 +700,12 @@ void LFHRReadStreamClientCallBack(CFReadStreamRef stream, CFStreamEventType even
 {
     return [[_receivedData retain] autorelease];
 }
+
+- (NSString *)receivedContentType
+{
+	return [[_receivedContentType copy] autorelease];
+}
+
 - (NSUInteger)expectedDataLength
 {
     return _expectedDataLength;
