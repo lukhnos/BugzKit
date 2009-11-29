@@ -181,7 +181,11 @@
 						else {
 							runRequest();
 						}
-					}					
+					}
+					else {
+						// we're canceled, so we proceed with the next request
+						[self runQueue];
+					}
 				}];
 			}];
 		}		
@@ -268,11 +272,11 @@
 {
 	if ([HTTPRequest isRunning]) {
 		if (inFilter((BKRequest *)HTTPRequest.sessionInfo)) {
-			[HTTPRequest cancelWithoutDelegateMessage];			
-			[((BKRequest *)HTTPRequest.sessionInfo) requestQueueDidGetCancelled:self];
-			[((BKRequest *)HTTPRequest.sessionInfo) requestQueueRequestDidFinish:self];
-			[[HTTPRequest.sessionInfo retain] autorelease];
+			BKRequest *request = (BKRequest *)[[HTTPRequest.sessionInfo retain] autorelease];
 			HTTPRequest.sessionInfo = nil;
+			[HTTPRequest cancelWithoutDelegateMessage];			
+			[request requestQueueDidGetCancelled:self];
+			[request requestQueueRequestDidFinish:self];
 		}
 	}
 
