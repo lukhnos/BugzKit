@@ -366,7 +366,7 @@ NSString *const BKForwardCaseAction = @"forward";
 		return;
 	}
 	
-	NSString *bundleID = [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+	NSString *bundleID = [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:(id)kCFBundleIdentifierKey];
 	NSString *filenameRoot = [NSTemporaryDirectory() stringByAppendingFormat:@"%@.%@.data-XXXXXX", NSStringFromClass([self class]), bundleID];
 	
 	const char *filenameUTF8 = [filenameRoot UTF8String];

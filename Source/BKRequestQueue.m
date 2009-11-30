@@ -165,6 +165,7 @@
 		else {
 			// dispatched processing
 			NSOperationQueue *currentQueue = [NSOperationQueue currentQueue];
+			NSAssert(currentQueue, @"Must have the current queue");
 
 			[dispatchQueue addOperationWithBlock:^(void) {
 				NSDictionary *mappedXMLDictionary = [cachePolicy requestQueue:self cachedDataOfRequest:nextRequest];
@@ -202,7 +203,7 @@
     }
     else {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_runQueue) object:nil];
-		[self performSelector:@selector(_runQueue) withObject:nil afterDelay:0.0 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[self performSelector:@selector(_runQueue) withObject:nil afterDelay:0.0];
     }
 }
 
@@ -313,6 +314,7 @@
 	NSData *receivedData = inRequest.receivedData;
 	
 	NSOperationQueue *currentQueue = [NSOperationQueue currentQueue];
+	NSAssert(currentQueue, @"Must have the current queue");
 	
 	[dispatchQueue addOperationWithBlock:^(void) {
 		NSDictionary *mappedXMLDictionary = [BKXMLMapper dictionaryMappedFromXMLData:receivedData];
