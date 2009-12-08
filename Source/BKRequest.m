@@ -274,8 +274,17 @@
 			value = [NSString stringWithFormat:@"%ju", (uintmax_t)[value unsignedIntegerValue]];
 		}
 		else if ([value isKindOfClass:[NSDate class]]) {
-			// TO DO: See assert
-			NSAssert(0, @"NSDate mapping not yet completed");
+			CFLocaleRef currentLocale = CFLocaleCopyCurrent();		
+			CFTimeZoneRef timeZone = CFTimeZoneCreateWithName(NULL, (CFStringRef)@"GMT", NO);			
+			CFDateFormatterRef dateFormatter = CFDateFormatterCreate(NULL, currentLocale, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);		
+			CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
+			CFDateFormatterSetFormat(dateFormatter, (CFStringRef)@"yyyy-MM-dd'T'HH:mm:ss'Z'");			
+
+			value = NSMakeCollectable(CFDateFormatterCreateStringWithDate(NULL, dateFormatter, (CFDateRef)value));
+
+			CFRelease(dateFormatter);
+			CFRelease(timeZone);
+			CFRelease(currentLocale);
 		}
 		
 		[params addObject:[NSString stringWithFormat:@"%@=%@", key, BKEscapedURLStringFromNSString(value)]];

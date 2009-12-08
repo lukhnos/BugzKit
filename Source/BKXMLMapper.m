@@ -219,16 +219,19 @@ NSString *const BKXMLTextContentKey = @"_text";
 
 + (NSDictionary *)dictionaryMappedFromXMLData:(NSData *)inData
 {
-	BKXMLMapper *mapper = [[BKXMLMapper alloc] init];
-	[mapper runWithData:inData];
-	
-	// flattens the text contents	
-	
-	
-	NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
-	NSDictionary *result = [mapper flattenedDictionary:resultantDictionary];
-	[mapper release];
-	return result;
+    // NSXMLParser only allows us to run one instance per thread at any give time, so we need to ensure this
+	@synchronized(self) {
+		BKXMLMapper *mapper = [[BKXMLMapper alloc] init];
+		[mapper runWithData:inData];
+		
+		// flattens the text contents	
+		
+		
+		NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
+		NSDictionary *result = [mapper flattenedDictionary:resultantDictionary];
+		[mapper release];
+		return result;
+	}
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
