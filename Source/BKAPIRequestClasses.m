@@ -226,8 +226,8 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 	if (self = [super initWithAPIContext:inAPIContext]) {
 		filterName = [inFilterName copy];
 		
-		// TO DO: Check if API keeps the name
-		// TO DO: Ask if there's a way to set the sFilter to none
+		// TODO: Check if API keeps the name
+		// TODO: Ask if there's a way to set the sFilter to none
 		requestParameterDict = [[NSDictionary dictionaryWithObjectsAndKeys:@"setCurrentFilter", @"cmd", inAPIContext.authToken, @"token", ([inFilterName length] ? inFilterName : @"inbox"), @"sFilter", nil] retain];
 	}
 	
@@ -406,10 +406,10 @@ NSString *const BKForwardCaseAction = @"forward";
 	
 	NSUInteger fileIndex = 1;
 	for (NSURL *u in attachmentURLs) {
-		// TO DO: Speed this part up (measure performance first)
+		// TODO: Speed this part up (measure performance first)
 		NSData *d = [NSData dataWithContentsOfURL:u];
 		
-		// TO DO: Ensure the correctness
+		// TODO: Ensure the correctness
 		NSString *lastPathComponent = [u lastPathComponent];
 		
 		NSMutableString *fileHeader = [NSMutableString string];

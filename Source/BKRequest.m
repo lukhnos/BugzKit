@@ -196,7 +196,7 @@
 	BKRetainAssign(rawResponseData, inRawData);
 	BKRetainAssign(rawXMLMappedResponse, inMappedXMLDictionary);
 
-	// TO DO: Determine if we should handle, e.g. empty response, etc.
+	// TODO: Determine if we should handle, e.g. empty response, etc.
 	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
 
 	NSError *responseError = [self errorFromXMLMappedResponse:innerResponse];
