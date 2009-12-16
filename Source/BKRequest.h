@@ -49,10 +49,10 @@ typedef enum {
     SEL actionOnSuccess;
     SEL actionOnFailure;
 	
-	void (^blockWhenEnqueued)(BKRequest *, BKRequestQueue *);
+	void (^blockWhenEnqueued)(BKRequest *);
 	void (^blockBeforeRequestStart)(BKRequest *);
-	void (^blockOnSuccess)(BKRequest *, BOOL, BKRequestQueue *);
-	void (^blockOnFailure)(BKRequest *, BKRequestQueue *);
+	void (^blockOnSuccess)(BKRequest *);
+	void (^blockOnFailure)(BKRequest *);
 	void (^blockOnCancel)(BKRequest *);	
 	void (^blockAfterRequestEnd)(BKRequest *);
 	
@@ -60,6 +60,7 @@ typedef enum {
     BKAPIContext *APIContext;
     NSDictionary *requestParameterDict;
 
+	__weak BKRequestQueue *requestQueue;
 	BOOL cachedResponseUsed;
 	BOOL cachedResponseEverUsedInLifetime;
 	NSData *rawResponseData;
@@ -81,10 +82,10 @@ typedef enum {
 @property (assign) SEL actionOnSuccess;
 @property (assign) SEL actionOnFailure;
 
-@property (copy) void (^blockWhenEnqueued)(BKRequest *, BKRequestQueue *);
+@property (copy) void (^blockWhenEnqueued)(BKRequest *);
 @property (copy) void (^blockBeforeRequestStart)(BKRequest *);
-@property (copy) void (^blockOnSuccess)(BKRequest *inRequest, BOOL inUsingCachedResponse, BKRequestQueue *);
-@property (copy) void (^blockOnFailure)(BKRequest *, BKRequestQueue *);
+@property (copy) void (^blockOnSuccess)(BKRequest *);
+@property (copy) void (^blockOnFailure)(BKRequest *);
 @property (copy) void (^blockOnCancel)(BKRequest *);
 @property (copy) void (^blockAfterRequestEnd)(BKRequest *);
 
@@ -98,6 +99,7 @@ typedef enum {
 @property (readonly) NSUInteger requestInputStreamSize;
 @property (readonly) NSInputStream *requestInputStream;
 
+@property (readonly) __weak BKRequestQueue *requestQueue;
 @property (readonly) BOOL cachedResponseUsed;
 @property (readonly) BOOL cachedResponseEverUsedInLifetime;
 @property (readonly) NSData *rawResponseData;

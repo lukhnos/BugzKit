@@ -188,7 +188,9 @@
 @synthesize APIContext;
 @synthesize requestParameterDict;
 
+@synthesize requestQueue;
 @synthesize cachedResponseUsed;
+@synthesize cachedResponseEverUsedInLifetime;
 @synthesize rawResponseData;
 @synthesize rawXMLMappedResponse;
 @synthesize processedResponse;
@@ -237,6 +239,7 @@
 
 - (void)requestQueueRequestDidEnqueue:(BKRequestQueue *)inQueue
 {
+	requestQueue = inQueue;
 	BKRetainAssign(dateEnqueued, [NSDate date]);
 	
 	if (state) {
@@ -247,7 +250,7 @@
 	}
 	
 	if (blockWhenEnqueued) {
-		blockWhenEnqueued(self, inQueue);
+		blockWhenEnqueued(self);
 	}
 }
 
@@ -284,6 +287,8 @@
 	if (blockAfterRequestEnd) {
 		blockAfterRequestEnd(self);
 	}
+	
+	requestQueue = nil;
 }
 
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache
@@ -317,7 +322,7 @@
 		[self postprocessError:responseError];
 		
 		if (blockOnFailure) {
-			blockOnFailure(self, inQueue);
+			blockOnFailure(self);
 		}
 		else if (actionOnFailure) {
 			[target performSelector:actionOnFailure withObject:self];
@@ -329,7 +334,7 @@
 	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
 	
 	if (blockOnSuccess) {
-		blockOnSuccess(self, inUsingCache, inQueue);
+		blockOnSuccess(self);
 	}
 	else if (actionOnSuccess) {
 		[target performSelector:actionOnSuccess withObject:self];   
@@ -361,7 +366,7 @@
 	BKRetainAssign(error, [NSError errorWithDomain:BKConnectionErrorDomain code:errorCode userInfo:nil]);	
 	
 	if (blockOnFailure) {
-		blockOnFailure(self, inQueue);
+		blockOnFailure(self);
 	}
 	else if (actionOnFailure) {
 		[target performSelector:actionOnFailure withObject:self];
