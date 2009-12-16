@@ -207,15 +207,13 @@
 		BKReleaseClean(rawResponseData);
 		[self didChangeValueForKey:@"rawResponseData"];
 	}
-		
-	// Note: cachedResponseUsed will not change; this flag marks that in the request's lifetime, cached response has been ever used
 
+	cachedResponseUsed = NO;
 	BKReleaseClean(rawXMLMappedResponse);	
 	BKReleaseClean(processedResponse);
 	BKReleaseClean(error);
 	BKReleaseClean(dateEnqueued);
-	
-	
+
 	NSDate *oldDateStarted = nil;
 	if (dateStarted) {
 		oldDateStarted = dateStarted;
@@ -291,6 +289,11 @@
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache
 {	
 	[self setState:BKRequestCompletedState];
+	
+	cachedResponseUsed = inUsingCache;
+	if (inUsingCache) {
+		cachedResponseEverUsedInLifetime = YES;
+	}
 	
 	[self willChangeValueForKey:@"rawResponseData"];
 	BKRetainAssign(rawResponseData, inRawData);

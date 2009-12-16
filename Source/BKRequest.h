@@ -61,6 +61,7 @@ typedef enum {
     NSDictionary *requestParameterDict;
 
 	BOOL cachedResponseUsed;
+	BOOL cachedResponseEverUsedInLifetime;
 	NSData *rawResponseData;
 	NSDictionary *rawXMLMappedResponse;
     id processedResponse;
@@ -97,7 +98,8 @@ typedef enum {
 @property (readonly) NSUInteger requestInputStreamSize;
 @property (readonly) NSInputStream *requestInputStream;
 
-@property (readonly) BOOL cachedResponseUsed;	// Note: Will not be reset during the request's lifetime
+@property (readonly) BOOL cachedResponseUsed;
+@property (readonly) BOOL cachedResponseEverUsedInLifetime;
 @property (readonly) NSData *rawResponseData;
 @property (readonly) NSUInteger rawResponseDataSize;
 @property (readonly) NSString *rawResponseString;
