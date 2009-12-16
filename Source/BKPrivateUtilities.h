@@ -25,10 +25,11 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#define BKRetainAssign(foo, bar)    do { id tmp = foo; foo = [(id)bar retain]; [tmp release]; } while(0)
-#define BKReleaseClean(foo)	        do { id tmp = foo; foo = nil; [tmp release]; } while(0)
-#define BKAutoreleasedCopy(foo)     ([[foo copy] autorelease])
+#import <Foundation/Foundation.h>
 
+#define BKRetainAssign(foo, bar)    do { id tmp = foo; foo = [(id)bar retain]; [tmp release]; } while(0)
+#define BKReleaseClean(foo)         do { id tmp = (foo); foo = nil; [tmp release]; } while(0)
+#define BKAutoreleasedCopy(foo)     ([[foo copy] autorelease])
 
 #define BKNotNil(x)		(x ? (id)x : (id)[NSNull null])
 #define BKNotNSNull(x)	(x == [NSNull null] ? nil : x)

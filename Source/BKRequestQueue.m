@@ -72,7 +72,7 @@
 {
 	[inRequest recycleIfUsedBefore];
     [queue addObject:inRequest];
-	[inRequest requestQueueRequestDidiEnqueue:self];
+	[inRequest requestQueueRequestDidEnqueue:self];
 	
 	if (!inDeferred) {
 		[self runQueue];

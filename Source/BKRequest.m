@@ -38,16 +38,23 @@
     target = nil;
     actionOnSuccess = NULL;
     actionOnFailure = NULL;
-	[blockOnSuccess release];
-	[blockOnFailure release];
-    [userInfo release];
-    [APIContext release];
-    [requestParameterDict release];
-	[rawResponseData release];
-    [rawXMLMappedResponse release];
-	[processedResponse release];
-    [error release];
-    [creationDate release];
+	[blockWhenEnqueued release], blockWhenEnqueued = nil;
+	[blockBeforeRequestStart release], blockBeforeRequestStart = nil;
+	[blockOnSuccess release], blockOnFailure = nil;
+	[blockOnFailure release], blockOnFailure = nil;
+	[blockOnCancel release], blockOnCancel = nil;
+	[blockAfterRequestEnd release], blockAfterRequestEnd = nil;
+	
+    [userInfo release], userInfo = nil;
+    [APIContext release], APIContext = nil;
+    [requestParameterDict release], requestParameterDict = nil;
+    [rawXMLMappedResponse release], rawXMLMappedResponse = nil;
+	[rawResponseData release], rawResponseData = nil;
+	[processedResponse release], processedResponse = nil;
+    [error release], error = nil;
+    [dateEnqueued release], dateEnqueued = nil;
+    [dateStarted release], dateStarted = nil;
+    [dateEnded release], dateEnded = nil;
     [super dealloc];
 }
 
@@ -60,7 +67,6 @@
 {
 	if (self = [super init]) {
 		APIContext = [inAPIContext retain];
-		creationDate = [[NSDate date] retain];
 	}
 	
 	return self;
@@ -118,7 +124,7 @@
 	return [NSString stringWithFormat:@"<%@: %p> {created: %@, target: %p, actionOnSuccess: %s, actionOnFailure: %s, userInfo: %@, APIContext: %p, req params: %@}",
 			[self class],
 			self,
-			creationDate,
+			dateEnqueued,
 			target,
 			actionOnSuccess,
 			actionOnFailure,
@@ -127,60 +133,151 @@
 			requestParameterDict];			
 }
 
+- (NSUInteger)rawResponseDataSize
+{
+	return [rawResponseData length];
+}
+
++ (NSSet *)keyPathsForValuesAffectingRawResponseDataSize
+{
+	return [NSSet setWithObject:@"rawResponseData"];
+}
+
 - (NSString *)rawResponseString
 {
 	return [[[NSString alloc] initWithData:rawResponseData encoding:NSUTF8StringEncoding] autorelease];
 }
 
++ (NSSet *)keyPathsForValuesAffectingRawResponseString
+{
+	return [NSSet setWithObject:@"rawResponseData"];
+}
+
+- (NSTimeInterval)elapsedTimeSinceStarted
+{
+	if (!dateStarted) {
+		return NAN;
+	}
+
+	if (!dateEnded) {
+		return [[NSDate date] timeIntervalSinceDate:dateStarted];
+	}
+	
+	return [dateEnded timeIntervalSinceDate:dateStarted];
+}
+
++ (NSSet *)keyPathsForValuesAffectingElapsedTimeSinceStarted
+{
+	return [NSSet setWithObjects:@"dateStarted", @"dateEnded", nil];
+}
+
+@synthesize state;
+
 @synthesize target;
 @synthesize actionOnSuccess;
 @synthesize actionOnFailure;
+
 @synthesize blockWhenEnqueued;
 @synthesize blockBeforeRequestStart;
 @synthesize blockOnSuccess;
 @synthesize blockOnFailure;
 @synthesize blockOnCancel;
 @synthesize blockAfterRequestEnd;
+
 @synthesize userInfo;
 @synthesize APIContext;
 @synthesize requestParameterDict;
+
+@synthesize cachedResponseUsed;
 @synthesize rawResponseData;
 @synthesize rawXMLMappedResponse;
 @synthesize processedResponse;
+
 @synthesize error;
-@synthesize creationDate;
+@synthesize dateEnqueued;
+@synthesize dateStarted;
+@synthesize dateEnded;
 @end
 
 @implementation BKRequest (ProtectedMethods)
 - (void)recycleIfUsedBefore
 {
-	if (rawResponseData) {	
-		BKRetainAssign(rawResponseData, nil);
-		BKRetainAssign(rawXMLMappedResponse, nil);
-		BKRetainAssign(processedResponse, nil);
-		BKRetainAssign(error, nil);
-		BKRetainAssign(creationDate, [NSDate date]);
+	if (rawResponseData) {
+		[self willChangeValueForKey:@"rawResponseData"];
+		BKReleaseClean(rawResponseData);
+		[self didChangeValueForKey:@"rawResponseData"];
+	}
+		
+	// Note: cachedResponseUsed will not change; this flag marks that in the request's lifetime, cached response has been ever used
+
+	BKReleaseClean(rawXMLMappedResponse);	
+	BKReleaseClean(processedResponse);
+	BKReleaseClean(error);
+	BKReleaseClean(dateEnqueued);
+	
+	
+	NSDate *oldDateStarted = nil;
+	if (dateStarted) {
+		oldDateStarted = dateStarted;
+		[self willChangeValueForKey:@"dateStarted"];
+	}
+	
+	if (dateEnded) {
+		NSDate *oldDateEnded = dateEnded;
+		[self willChangeValueForKey:@"dateEnded"];
+		dateEnded = nil;
+		[self didChangeValueForKey:@"dateEnded"];
+		[oldDateEnded release];
+	}
+	
+	if (oldDateStarted) {
+		dateStarted = nil;		
+		[self didChangeValueForKey:@"dateStarted"];
+		[oldDateStarted release];
 	}
 }
 
-- (void)requestQueueRequestDidiEnqueue:(BKRequestQueue *)inQueue
+- (void)requestQueueRequestDidEnqueue:(BKRequestQueue *)inQueue
 {
+	BKRetainAssign(dateEnqueued, [NSDate date]);
+	
+	if (state) {
+		[self setState:BKRequestReenqueuedState];
+	}
+	else {
+		[self setState:BKRequestEnqueuedState];
+	}
+	
 	if (blockWhenEnqueued) {
 		blockWhenEnqueued(self, inQueue);
 	}
 }
 
 - (void)requestQueueWillBeginRequest:(BKRequestQueue *)inQueue
-{
+{	
 	if (blockBeforeRequestStart) {
 		blockBeforeRequestStart(self);
 	}
+
+	[self willChangeValueForKey:@"dateStarted"];
+	BKRetainAssign(dateStarted, [NSDate date]);
+	[self didChangeValueForKey:@"dateStarted"];
+	
+	[self setState:BKRequestRunningState];
 }
 
 - (void)requestQueueDidGetCancelled:(BKRequestQueue *)inQueue
 {
+	[self setState:BKRequestCanceledState];
+
 	if (blockOnCancel) {
 		blockOnCancel(self);
+	}
+	
+	if (dateStarted) {
+		[self willChangeValueForKey:@"dateEnded"];
+		BKRetainAssign(dateEnded, [NSDate date]);
+		[self didChangeValueForKey:@"dateEnded"];
 	}
 }
 
@@ -192,8 +289,13 @@
 }
 
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache
-{
+{	
+	[self setState:BKRequestCompletedState];
+	
+	[self willChangeValueForKey:@"rawResponseData"];
 	BKRetainAssign(rawResponseData, inRawData);
+	[self didChangeValueForKey:@"rawResponseDate"];
+	
 	BKRetainAssign(rawXMLMappedResponse, inMappedXMLDictionary);
 
 	// TODO: Determine if we should handle, e.g. empty response, etc.
@@ -229,10 +331,18 @@
 	else if (actionOnSuccess) {
 		[target performSelector:actionOnSuccess withObject:self];   
 	}
+
+	if (dateStarted) {
+		[self willChangeValueForKey:@"dateEnded"];
+		BKRetainAssign(dateEnded, [NSDate date]);
+		[self didChangeValueForKey:@"dateEnded"];
+	}	
 }
 
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError
-{
+{	
+	[self setState:BKRequestFailedState];
+	
 	NSInteger errorCode = BKUnknownError;
 	
 	if ([inHTTPRequestError isEqualToString:LFHTTPRequestConnectionError]) {
@@ -253,6 +363,12 @@
 	else if (actionOnFailure) {
 		[target performSelector:actionOnFailure withObject:self];
 	}
+	
+	if (dateStarted) {
+		[self willChangeValueForKey:@"dateEnded"];
+		BKRetainAssign(dateEnded, [NSDate date]);
+		[self didChangeValueForKey:@"dateEnded"];
+	}	
 }
 
 - (NSDictionary *)preparedParameterDict
@@ -319,6 +435,11 @@
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
 {
 	return inXMLMappedResponse;
+}
+
+- (void)setState:(BKRequestState)inState
+{
+	state = inState;
 }
 @end
 

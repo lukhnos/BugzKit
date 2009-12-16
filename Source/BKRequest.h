@@ -30,8 +30,21 @@
 @class BKRequest;
 @class BKRequestQueue;
 
+typedef enum {
+	BKRequestCanceledState = -2,
+	BKRequestFailedState = -1,
+	BKRequestUnqueuedState = 0,
+	BKRequestReenqueuedState = 1,
+	BKRequestCompletedState = 2,
+	BKRequestEnqueuedState = 3,
+	BKRequestRunningState = 4
+} BKRequestState;
+
+
 @interface BKRequest : NSObject
 {
+	BKRequestState state;
+	
     id target;
     SEL actionOnSuccess;
     SEL actionOnFailure;
@@ -46,15 +59,22 @@
     id userInfo;
     BKAPIContext *APIContext;
     NSDictionary *requestParameterDict;
-	NSDictionary *rawXMLMappedResponse;
+
+	BOOL cachedResponseUsed;
 	NSData *rawResponseData;
+	NSDictionary *rawXMLMappedResponse;
     id processedResponse;
     NSError *error;
-    NSDate *creationDate;
+	
+	NSDate *dateEnqueued;
+	NSDate *dateStarted;
+	NSDate *dateEnded;
 }
 + (id)requestWithAPIContext:(BKAPIContext *)inAPIContext;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext;
 - (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure;
+
+@property (assign) BKRequestState state;
 
 @property (assign) id target;
 @property (assign) SEL actionOnSuccess;
@@ -66,19 +86,27 @@
 @property (copy) void (^blockOnFailure)(BKRequest *, BKRequestQueue *);
 @property (copy) void (^blockOnCancel)(BKRequest *);
 @property (copy) void (^blockAfterRequestEnd)(BKRequest *);
+
 @property (retain) id userInfo;
+@property (readonly) BKAPIContext *APIContext;
+@property (readonly) NSDictionary *requestParameterDict;
 @property (readonly) NSString *HTTPRequestMethod;
 @property (readonly) NSString *HTTPRequestContentType;
-@property (readonly) BKAPIContext *APIContext;
-@property (readonly) NSData *rawResponseData;
-@property (readonly) NSString *rawResponseString;
-@property (readonly) NSDictionary *requestParameterDict;
 @property (readonly) NSURL *requestURL;
+@property (readonly) NSData *requestData;
 @property (readonly) NSUInteger requestInputStreamSize;
 @property (readonly) NSInputStream *requestInputStream;
-@property (readonly) NSData *requestData;
+
+@property (readonly) BOOL cachedResponseUsed;	// Note: Will not be reset during the request's lifetime
+@property (readonly) NSData *rawResponseData;
+@property (readonly) NSUInteger rawResponseDataSize;
+@property (readonly) NSString *rawResponseString;
 @property (readonly) NSDictionary *rawXMLMappedResponse;
 @property (readonly) id processedResponse;
+
 @property (readonly) NSError *error;
-@property (readonly) NSDate *creationDate;
+@property (readonly) NSDate *dateEnqueued;
+@property (readonly) NSDate *dateStarted;
+@property (readonly) NSDate *dateEnded;
+@property (readonly) NSTimeInterval elapsedTimeSinceStarted;
 @end

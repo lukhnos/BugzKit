@@ -31,7 +31,7 @@
 @interface BKRequest (ProtectedMethods)
 - (void)recycleIfUsedBefore;
 
-- (void)requestQueueRequestDidiEnqueue:(BKRequestQueue *)inQueue;
+- (void)requestQueueRequestDidEnqueue:(BKRequestQueue *)inQueue;
 - (void)requestQueueWillBeginRequest:(BKRequestQueue *)inQueue;
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache;
 - (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError;
@@ -46,6 +46,8 @@
 - (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse;
 - (void)postprocessError:(NSError *)inError;
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse;
+
+- (void)setState:(BKRequestState)inState;
 @end
 
 extern NSString *const BKHTTPRequestServerError;
