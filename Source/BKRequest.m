@@ -242,12 +242,7 @@
 	requestQueue = inQueue;
 	BKRetainAssign(dateEnqueued, [NSDate date]);
 	
-	if (state) {
-		[self setState:BKRequestReenqueuedState];
-	}
-	else {
-		[self setState:BKRequestEnqueuedState];
-	}
+	[self setState:BKRequestEnqueuedState];
 	
 	if (blockWhenEnqueued) {
 		blockWhenEnqueued(self);

@@ -34,10 +34,9 @@ typedef enum {
 	BKRequestCanceledState = -2,
 	BKRequestFailedState = -1,
 	BKRequestUnqueuedState = 0,
-	BKRequestReenqueuedState = 1,
-	BKRequestCompletedState = 2,
-	BKRequestEnqueuedState = 3,
-	BKRequestRunningState = 4
+	BKRequestCompletedState = 1,
+	BKRequestEnqueuedState = 2,
+	BKRequestRunningState = 3
 } BKRequestState;
 
 
