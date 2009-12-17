@@ -184,6 +184,9 @@
 						}
 					}
 					else {
+						[nextRequest requestQueueDidGetCancelled:self];
+						[nextRequest requestQueueRequestDidFinish:self];
+						
 						// we're canceled, so we proceed with the next request
 						[self runQueue];
 					}
@@ -324,6 +327,10 @@
 			// if we ain't canceled, dispatch the data
 			if (inRequest.sessionInfo == request) {
 				[request requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:receivedData usingCachedResponse:NO];
+				[request requestQueueRequestDidFinish:self];
+			}
+			else {
+				[request requestQueueDidGetCancelled:self];
 				[request requestQueueRequestDidFinish:self];
 			}
 			
