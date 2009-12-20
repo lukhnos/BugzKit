@@ -45,7 +45,7 @@ extern NSString *const BKCategoryList;
 extern NSString *const BKPriorityList;
 extern NSString *const BKPeopleList;
 extern NSString *const BKStatusList;
-extern NSString *const BKFixForList;
+extern NSString *const BKMilestoneList;
 extern NSString *const BKMailboxList;
 
 @interface BKListRequest : BKRequest
