@@ -193,7 +193,7 @@ static NSString *kProjects = @"kProjects";
 
 - (void)testLists
 {
-	NSArray *lists = [NSArray arrayWithObjects:BKFilterList, BKProjectList, BKCategoryList, BKPriorityList, BKPeopleList, BKStatusList, BKFixForList, BKMailboxList, nil];
+	NSArray *lists = [NSArray arrayWithObjects:BKFilterList, BKProjectList, BKCategoryList, BKPriorityList, BKPeopleList, BKStatusList, BKMilestoneList, BKMailboxList, nil];
 	
 	for (NSString *t in lists) {
 		BKListRequest *request = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:t writableItemsOnly:NO] autorelease];
@@ -450,15 +450,15 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 	filterListRequest.actionOnSuccess = @selector(getCurrentFilter:);
 	[requestQueue addRequest:filterListRequest deferred:YES];
 	
-	filterListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKFixForList writableItemsOnly:NO] autorelease];
+	filterListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKMilestoneList writableItemsOnly:NO] autorelease];
 	filterListRequest.target = self;
 	filterListRequest.actionOnFailure = @selector(currentFilterSettingFail:);								  
 	filterListRequest.actionOnSuccess = @selector(getCurrentFilter:);
 	[requestQueue addRequest:filterListRequest deferred:YES];
 	
 
-	NSArray *a = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithFormat:@"creationDate < %@", date]];
-	NSArray *b = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithFormat:@"creationDate > %@", date]];	
+	NSArray *a = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithFormat:@"dateEnqueued < %@", date]];
+	NSArray *b = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithFormat:@"dateEnqueued > %@", date]];	
 	
 	[requestQueue cancelAllRequests];
 	NSArray *c = [requestQueue queuedRequestsWithPredicate:[NSPredicate predicateWithValue:YES]];
@@ -473,14 +473,14 @@ static NSString *kCurrentCaseInfo = @"kCurrentCaseInfo";
 - (void)testFetchPeopleWorkingSchedule
 {
 	BKListRequest *peopleListRequest = [[[BKListRequest alloc] initWithAPIContext:[self sharedAPIContext] list:BKPeopleList writableItemsOnly:NO] autorelease];
-	peopleListRequest.blockOnSuccess = ^(BKRequest *inRequest, BOOL inUsingCachedResponse) {
+	peopleListRequest.blockOnSuccess = ^(BKRequest *inRequest) {
 		NSMutableArray *idArray = [[[((BKListRequest *)inRequest).fetchedList valueForKeyPath:@"ixPerson"] mutableCopy] autorelease];
 		[idArray addObject:[NSNumber numberWithUnsignedInteger:1]];
 		
 		for (NSNumber *n in idArray) {
 			BKListWorkingScheduleRequest *scheduleRequest = [[[BKListWorkingScheduleRequest alloc] initWithAPIContext:[self sharedAPIContext] personID:[n unsignedIntegerValue]] autorelease];
 			
-			scheduleRequest.blockOnSuccess = ^(BKRequest *inRequest, BOOL inUsingCachedResponse) {
+			scheduleRequest.blockOnSuccess = ^(BKRequest *inRequest) {
 				NSLog(@"Fetched schedule: %@", ((BKListWorkingScheduleRequest *)inRequest).fetchedWorkingSchedule);
 			};
 			
