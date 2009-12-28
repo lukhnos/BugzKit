@@ -118,6 +118,11 @@
         return;
     }
     
+    // dispatching in progress
+    if (HTTPRequest.sessionInfo) {
+        return;
+    }
+    
     if (paused) {
         return;
     }
@@ -172,7 +177,7 @@
 							
 				[currentQueue addOperationWithBlock:^(void) {
 					// if we ain't canceled, dispatch the data
-					if (HTTPRequest.sessionInfo == nextRequest) {						
+					if (nextRequest.state == BKRequestRunningState) {						
 						if (mappedXMLDictionary) {
 							[nextRequest requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:nil usingCachedResponse:YES];
 							[nextRequest requestQueueRequestDidFinish:self];
@@ -184,9 +189,6 @@
 						}
 					}
 					else {
-						[nextRequest requestQueueDidGetCancelled:self];
-						[nextRequest requestQueueRequestDidFinish:self];
-						
 						// we're canceled, so we proceed with the next request
 						[self runQueue];
 					}
@@ -324,16 +326,12 @@
 		[cachePolicy requestQueue:self storeData:mappedXMLDictionary ofRequest:request];		
 		
 		[currentQueue addOperationWithBlock:^(void) {
-			// if we ain't canceled, dispatch the data
-			if (inRequest.sessionInfo == request) {
+            // if not canceled
+            if (request.state == BKRequestRunningState) {
 				[request requestQueue:self didCompleteWithMappedXMLDictionary:mappedXMLDictionary rawData:receivedData usingCachedResponse:NO];
 				[request requestQueueRequestDidFinish:self];
 			}
-			else {
-				[request requestQueueDidGetCancelled:self];
-				[request requestQueueRequestDidFinish:self];
-			}
-			
+            
 			inRequest.sessionInfo = nil;	
 			[self runQueue];			
 		}];
