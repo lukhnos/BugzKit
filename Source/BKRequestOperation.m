@@ -72,7 +72,9 @@
 - (void)main
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
+
+    [self dispatchSelector:@selector(handleRequestStarted)];
+
     [self fetchMappedXMLData];
     
     if (![self isCancelled]) {
