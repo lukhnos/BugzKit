@@ -63,10 +63,13 @@
 
 - (void)cancel
 {
+    if (![self isCancelled] && ![self isFinished]) {
+        [self cancelFetch];    
+        [self dispatchSelector:@selector(handleRequestCancelled)];
+        [self dispatchSelector:@selector(handleRequestOperationEnded)];
+    }
+
     [super cancel];
-    [self cancelFetch];    
-    [self dispatchSelector:@selector(handleRequestCancelled)];
-    [self dispatchSelector:@selector(handleRequestOperationEnded)];
 }
 
 - (void)main

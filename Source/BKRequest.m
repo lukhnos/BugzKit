@@ -286,9 +286,10 @@
 	requestQueue = nil;
 }
 
+// TODO: We don't really need this!
 - (void)setRawXMLMappedResponse:(NSDictionary *)inMappedXMLDictionary
 {
-	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
+	NSDictionary *innerResponse = [inMappedXMLDictionary objectForKey:@"response"];
     
 	// TODO: Determine if we should handle, e.g. empty response, etc.
 
@@ -304,9 +305,18 @@
 		return;
 	}
     
-	BKRetainAssign(error, nil);
+	BKReleaseClean(error);
+    
+    // TODO: Add a flag saying we don't need to do this--or altogether?
     BKRetainAssign(rawXMLMappedResponse, inMappedXMLDictionary);
 	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
+}
+
+- (void)setProcessedResponse:(id)inResponse
+{
+    BKRetainAssign(processedResponse, inResponse);
+	BKReleaseClean(error);
+    BKReleaseClean(rawXMLMappedResponse);
 }
 
 - (void)setError:(NSError *)inError
