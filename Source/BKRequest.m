@@ -286,6 +286,28 @@
 	requestQueue = nil;
 }
 
+- (void)setRawXMLMappedResponse:(NSDictionary *)inMappedXMLDictionary
+{
+	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
+    
+	// TODO: Determine if we should handle, e.g. empty response, etc.
+
+	NSError *responseError = [self errorFromXMLMappedResponse:innerResponse];
+	if (!responseError) {
+		responseError = [self validateResponse:innerResponse];
+	}
+	
+    
+	if (responseError) {
+		BKRetainAssign(processedResponse, nil);
+		BKRetainAssign(error, responseError);        
+		return;
+	}
+    
+	BKRetainAssign(error, nil);
+	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
+}
+
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache
 {	
 	[self setState:BKRequestCompletedState];

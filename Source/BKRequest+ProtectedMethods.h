@@ -38,16 +38,18 @@
 - (void)requestQueueDidGetCancelled:(BKRequestQueue *)inQueue;
 - (void)requestQueueRequestDidFinish:(BKRequestQueue *)inQueue;
 
+// TODO: Move
 - (NSDictionary *)preparedParameterDict;
 - (NSString *)preparedParameterString;
 - (NSError *)errorFromXMLMappedResponse:(NSDictionary *)inXMLMappedResponse;
 
+- (void)setState:(BKRequestState)inState;
+
 // override these
+// TODO: Move to BKRequest.h
 - (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse;
 - (void)postprocessError:(NSError *)inError;
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse;
-
-- (void)setState:(BKRequestState)inState;
 @end
 
 extern NSString *const BKHTTPRequestServerError;

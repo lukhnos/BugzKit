@@ -71,7 +71,7 @@ typedef enum {
 	NSDate *dateStarted;
 	NSDate *dateEnded;
 }
-+ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext;
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext DEPRECATED_ATTRIBUTE;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext;
 - (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure;
 
@@ -89,6 +89,8 @@ typedef enum {
 @property (copy) void (^blockAfterRequestEnd)(BKRequest *);
 
 @property (retain) id userInfo;
+
+// Keep these
 @property (readonly) BKAPIContext *APIContext;
 @property (readonly) NSDictionary *requestParameterDict;
 @property (readonly) NSString *HTTPRequestMethod;
@@ -104,10 +106,14 @@ typedef enum {
 @property (readonly) NSData *rawResponseData;
 @property (readonly) NSUInteger rawResponseDataSize;
 @property (readonly) NSString *rawResponseString;
-@property (readonly) NSDictionary *rawXMLMappedResponse;
-@property (readonly) id processedResponse;
 
+// Keep these
+// @property (readonly) NSDictionary *rawXMLMappedResponse;
+
+@property (retain) NSDictionary *rawXMLMappedResponse;
+@property (readonly) id processedResponse;
 @property (readonly) NSError *error;
+
 @property (readonly) NSDate *dateEnqueued;
 @property (readonly) NSDate *dateStarted;
 @property (readonly) NSDate *dateEnded;
