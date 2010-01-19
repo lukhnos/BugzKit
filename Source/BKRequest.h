@@ -112,7 +112,7 @@ typedef enum {
 
 @property (retain) NSDictionary *rawXMLMappedResponse;
 @property (readonly) id processedResponse;
-@property (readonly) NSError *error;
+@property (retain) NSError *error;
 
 @property (readonly) NSDate *dateEnqueued;
 @property (readonly) NSDate *dateStarted;

@@ -21,12 +21,12 @@
 - (void)dispatchSelector:(SEL)inSelector;
 
 // Override these (no need to call super if overriden)
-- (void)dispatchRequestStarted;
-- (void)dispatchRequestCancelled;
-- (void)dispatchRequestCompleted;
-- (void)dispatchRequestFailed;
-- (void)dispatchRequestOperationEnded;
+- (void)handleRequestStarted;
+- (void)handleRequestCancelled;
+- (void)handleRequestCompleted;
+- (void)handleRequestFailed;
+- (void)handleRequestOperationEnded;
 
 @property (readonly) BKRequest *request;
-@proprety (readonly) __weak NSOperationQueue *operationQueue;
+@property (readonly) __weak NSOperationQueue *operationQueue;
 @end

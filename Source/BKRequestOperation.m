@@ -39,19 +39,23 @@
 }
 
 // Override these (no need to call super if overriden)
-- (void)dispatchRequestStarted
+- (void)handleRequestStarted
 {
 }
 
-- (void)dispatchRequestCancelled
+- (void)handleRequestCancelled
 {
 }
 
-- (void)dispatchRequestCompleted
+- (void)handleRequestCompleted
 {
 }
 
-- (void)dispatchRequestFailed
+- (void)handleRequestFailed
+{
+}
+
+- (void)handleRequestOperationEnded
 {
 }
 
@@ -61,8 +65,8 @@
 {
     [super cancel];
     [self cancelFetch];    
-    [self dispatchSelector:@selector(dispatchRequestCancelled)];
-    [self dispatchSelector:@selector(dispatchRequestOperationEnded)];
+    [self dispatchSelector:@selector(handleRequestCancelled)];
+    [self dispatchSelector:@selector(handleRequestOperationEnded)];
 }
 
 - (void)main
@@ -73,13 +77,13 @@
     
     if (![self isCancelled]) {
         if (request.error) {
-            [self dispatchSelector:@selector(dispatchRequestFailed)];            
+            [self dispatchSelector:@selector(handleRequestFailed)];            
         }
         else {
-            [self dispatchSelector:@selector(dispatchRequestCompleted)];            
+            [self dispatchSelector:@selector(handleRequestCompleted)];            
         }
         
-        [self dispatchSelector:@selector(dispatchRequestOperationEnded)];
+        [self dispatchSelector:@selector(handleRequestOperationEnded)];
     }
     
     [pool drain];

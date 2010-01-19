@@ -296,16 +296,24 @@
 	if (!responseError) {
 		responseError = [self validateResponse:innerResponse];
 	}
-	
     
 	if (responseError) {
-		BKRetainAssign(processedResponse, nil);
+        BKReleaseClean(rawXMLMappedResponse);
+        BKReleaseClean(processedResponse);
 		BKRetainAssign(error, responseError);        
 		return;
 	}
     
 	BKRetainAssign(error, nil);
+    BKRetainAssign(rawXMLMappedResponse, inMappedXMLDictionary);
 	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
+}
+
+- (void)setError:(NSError *)inError
+{
+    BKRetainAssign(error, inError);
+    BKReleaseClean(rawXMLMappedResponse);
+    BKReleaseClean(processedResponse);
 }
 
 - (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache
