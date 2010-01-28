@@ -9,9 +9,8 @@
 @interface BKRequestOperation : NSOperation
 {
     BKRequest *request;
-    __weak NSOperationQueue *operationQueue;
 }
-- (id)initWithRequest:(BKRequest *)inRequest operationQueue:(NSOperationQueue *)inQueue;
+- (id)initWithRequest:(BKRequest *)inRequest;
 
 // Override these (no need to call super)
 - (void)fetchMappedXMLData;
@@ -28,5 +27,4 @@
 - (void)handleRequestOperationEnded;
 
 @property (readonly) BKRequest *request;
-@property (readonly) __weak NSOperationQueue *operationQueue;
 @end

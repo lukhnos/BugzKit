@@ -14,11 +14,10 @@
     [super dealloc];
 }
 
-- (id)initWithRequest:(BKRequest *)inRequest operationQueue:(NSOperationQueue *)inQueue
+- (id)initWithRequest:(BKRequest *)inRequest
 {
     if (self = [super init]) {
         request = [inRequest retain];
-        operationQueue = inQueue;
     }
     
     return self;
@@ -62,7 +61,7 @@
 #pragma mark Overriden NSOperationQueue methods
 
 - (void)cancel
-{
+{    
     if (![self isCancelled] && ![self isFinished]) {
         [self cancelFetch];    
         [self dispatchSelector:@selector(handleRequestCancelled)];
@@ -76,24 +75,37 @@
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-    [self dispatchSelector:@selector(handleRequestStarted)];
-
-    [self fetchMappedXMLData];
+    // see if any of the dependencies is cancelled or has error
+    BOOL allDependenciesCompleted = YES;
+    for (BKRequestOperation *dependency in [self dependencies]) {
+        if ([dependency isCancelled] || dependency.request.error) {
+            allDependenciesCompleted = NO;
+            break;
+        }
+    }
     
-    if (![self isCancelled]) {
-        if (request.error) {
-            [self dispatchSelector:@selector(handleRequestFailed)];            
-        }
-        else {
-            [self dispatchSelector:@selector(handleRequestCompleted)];            
-        }
+    if (allDependenciesCompleted) {    
+        [self dispatchSelector:@selector(handleRequestStarted)];
+
+        [self fetchMappedXMLData];
         
-        [self dispatchSelector:@selector(handleRequestOperationEnded)];
+        if (![self isCancelled]) {
+            if (request.error) {
+                [self dispatchSelector:@selector(handleRequestFailed)];            
+            }
+            else {
+                [self dispatchSelector:@selector(handleRequestCompleted)];            
+            }
+            
+            [self dispatchSelector:@selector(handleRequestOperationEnded)];
+        }
+    }
+    else {
+        [self cancel];
     }
     
     [pool drain];
 }
 
 @synthesize request;
-@synthesize operationQueue;
 @end
