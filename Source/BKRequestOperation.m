@@ -58,6 +58,13 @@
 {
 }
 
+// Internal handler
+
+- (void)handleDependencyCancellation
+{
+    [self cancel];    
+}
+
 #pragma mark Overriden NSOperationQueue methods
 
 - (void)cancel
@@ -101,7 +108,7 @@
         }
     }
     else {
-        [self cancel];
+        [self handleDependencyCancellation];
     }
     
     [pool drain];

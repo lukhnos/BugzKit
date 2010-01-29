@@ -26,5 +26,8 @@
 - (void)handleRequestFailed;
 - (void)handleRequestOperationEnded;
 
+// Internal handler for dependency-caused cancellation, invoked by -main
+- (void)handleDependencyCancellation;
+
 @property (readonly) BKRequest *request;
 @end
