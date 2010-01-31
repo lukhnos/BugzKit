@@ -22,7 +22,8 @@
 // Override these (no need to call super if overriden)
 - (void)handleRequestStarted;
 - (void)handleRequestCancelled;
-- (void)handleRequestCompleted;
+- (void)processRequestCompletion;   // invoked in the same thread of the -main
+- (void)handleRequestCompleted;     // dispatched, usually in the thread the operation is created 
 - (void)handleRequestFailed;
 - (void)handleRequestOperationEnded;
 

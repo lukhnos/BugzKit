@@ -46,6 +46,10 @@
 {
 }
 
+- (void)processRequestCompletion
+{
+}
+
 - (void)handleRequestCompleted
 {
 }
@@ -101,6 +105,7 @@
                 [self dispatchSelector:@selector(handleRequestFailed)];            
             }
             else {
+                [self processRequestCompletion];
                 [self dispatchSelector:@selector(handleRequestCompleted)];            
             }
             
