@@ -30,3 +30,4 @@
 #import "BKError.h"
 #import "BKRequest.h"
 #import "BKRequestQueue.h"
+#import "BKRequestOperation.h"
