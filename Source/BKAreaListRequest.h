@@ -28,7 +28,7 @@
 #import "BKListRequest.h"
 
 @interface BKAreaListRequest : BKListRequest
-+ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables;
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables DEPRECATED_ATTRIBUTE;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables;
 
 @property (readonly) NSUInteger projectID;

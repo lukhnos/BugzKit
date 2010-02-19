@@ -29,7 +29,7 @@
 
 // TODO: Deprecate this class
 @interface BKQueryEventRequest : BKQueryCaseRequest
-+ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber;
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber DEPRECATED_ATTRIBUTE;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber;
 
 @property (readonly) NSArray *fetchedEvents;

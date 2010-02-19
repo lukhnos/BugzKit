@@ -31,7 +31,7 @@
 {
 	NSString *filterName;
 }
-+ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName;
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName DEPRECATED_ATTRIBUTE;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName;
 
 @property (readonly) NSString *filterName;

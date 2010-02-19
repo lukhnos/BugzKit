@@ -27,9 +27,11 @@
 
 #import "BKAPIContext.h"
 
-@class BKRequest;
+
+// TODO: Deprecate this
 @class BKRequestQueue;
 
+// TODO: Deprecate this
 typedef enum {
 	BKRequestCanceledState = -2,
 	BKRequestFailedState = -1,
@@ -39,26 +41,31 @@ typedef enum {
 	BKRequestRunningState = 3
 } BKRequestState;
 
-
 @interface BKRequest : NSObject
 {
+    // TODO: Deprecate this
 	BKRequestState state;
 	
+    // TODO: Deprecate these
     id target;
     SEL actionOnSuccess;
     SEL actionOnFailure;
 	
+    // TODO: Deprecate these
 	void (^blockWhenEnqueued)(BKRequest *);
 	void (^blockBeforeRequestStart)(BKRequest *);
 	void (^blockOnSuccess)(BKRequest *);
 	void (^blockOnFailure)(BKRequest *);
 	void (^blockOnCancel)(BKRequest *);	
 	void (^blockAfterRequestEnd)(BKRequest *);
-	
+
+	// TODO: Deprecate this
     id userInfo;
+
     BKAPIContext *APIContext;
     NSDictionary *requestParameterDict;
 
+    // TODO: Deprecate these    
 	__weak BKRequestQueue *requestQueue;
 	BOOL cachedResponseUsed;
 	BOOL cachedResponseEverUsedInLifetime;
@@ -66,40 +73,47 @@ typedef enum {
 	NSDictionary *rawXMLMappedResponse;
     id processedResponse;
     NSError *error;
-	
+
+	// TODO: Deprecate this
 	NSDate *dateEnqueued;
 	NSDate *dateStarted;
 	NSDate *dateEnded;
 }
 + (id)requestWithAPIContext:(BKAPIContext *)inAPIContext DEPRECATED_ATTRIBUTE;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext;
-- (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure;
-
-@property (assign) BKRequestState state;
-
-@property (assign) id target;
-@property (assign) SEL actionOnSuccess;
-@property (assign) SEL actionOnFailure;
-
-@property (copy) void (^blockWhenEnqueued)(BKRequest *);
-@property (copy) void (^blockBeforeRequestStart)(BKRequest *);
-@property (copy) void (^blockOnSuccess)(BKRequest *);
-@property (copy) void (^blockOnFailure)(BKRequest *);
-@property (copy) void (^blockOnCancel)(BKRequest *);
-@property (copy) void (^blockAfterRequestEnd)(BKRequest *);
-
-@property (retain) id userInfo;
+- (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure DEPRECATED_ATTRIBUTE;
 
 // Keep these
 @property (readonly) BKAPIContext *APIContext;
 @property (readonly) NSDictionary *requestParameterDict;
-@property (readonly) NSString *HTTPRequestMethod;
+@property (readonly) BOOL usesPOSTRequest;
 @property (readonly) NSString *HTTPRequestContentType;
 @property (readonly) NSURL *requestURL;
 @property (readonly) NSData *requestData;
 @property (readonly) NSUInteger requestInputStreamSize;
 @property (readonly) NSInputStream *requestInputStream;
 
+// Keep these
+@property (retain) NSDictionary *rawXMLMappedResponse;
+@property (retain) id processedResponse;
+@property (retain) NSError *error;
+
+
+// TODO: Deprecate these
+@property (assign) BKRequestState state;
+@property (assign) id target;
+@property (assign) SEL actionOnSuccess;
+@property (assign) SEL actionOnFailure;
+@property (copy) void (^blockWhenEnqueued)(BKRequest *);
+@property (copy) void (^blockBeforeRequestStart)(BKRequest *);
+@property (copy) void (^blockOnSuccess)(BKRequest *);
+@property (copy) void (^blockOnFailure)(BKRequest *);
+@property (copy) void (^blockOnCancel)(BKRequest *);
+@property (copy) void (^blockAfterRequestEnd)(BKRequest *);
+@property (retain) id userInfo;
+@property (readonly) NSString *HTTPRequestMethod;
+
+// TODO: Deprecate these
 @property (readonly) __weak BKRequestQueue *requestQueue;
 @property (readonly) BOOL cachedResponseUsed;
 @property (readonly) BOOL cachedResponseEverUsedInLifetime;
@@ -107,13 +121,7 @@ typedef enum {
 @property (readonly) NSUInteger rawResponseDataSize;
 @property (readonly) NSString *rawResponseString;
 
-// Keep these
-// @property (readonly) NSDictionary *rawXMLMappedResponse;
-
-@property (retain) NSDictionary *rawXMLMappedResponse;
-@property (retain) id processedResponse;
-@property (retain) NSError *error;
-
+// TODO: Deprecate these
 @property (readonly) NSDate *dateEnqueued;
 @property (readonly) NSDate *dateStarted;
 @property (readonly) NSDate *dateEnded;

@@ -55,7 +55,12 @@
 	return self;	
 }
 
-// TODO: Refactor this
+- (BOOL)usesPOSTRequest
+{
+    return YES;
+}
+
+// TODO: Removes this
 - (NSString *)HTTPRequestMethod
 {
 	return LFHTTPRequestPOSTMethod;

@@ -85,6 +85,11 @@
 	return LFHTTPRequestWWWFormURLEncodedContentType;
 }
 
+- (BOOL)usesPOSTRequest
+{
+    return NO;
+}
+
 - (NSString *)HTTPRequestMethod
 {
 	return LFHTTPRequestGETMethod;
@@ -92,7 +97,7 @@
 
 - (NSURL *)requestURL
 {
-	if ([self.HTTPRequestMethod isEqualToString:LFHTTPRequestGETMethod]) {
+	if (!self.usesPOSTRequest) {
 		NSString *paramsString = [self preparedParameterString];
 
 		return [paramsString length] ? [NSURL URLWithString:[@"?" stringByAppendingString:paramsString] relativeToURL:APIContext.endpoint] : APIContext.endpoint;
@@ -113,7 +118,7 @@
 
 - (NSData *)requestData
 {
-    if ([self.HTTPRequestMethod isEqualToString:LFHTTPRequestPOSTMethod]) {
+    if (self.usesPOSTRequest) {
 		return [[self preparedParameterString] dataUsingEncoding:NSUTF8StringEncoding];
 	}
 	

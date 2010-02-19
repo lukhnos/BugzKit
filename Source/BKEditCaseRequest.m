@@ -224,7 +224,12 @@ NSString *const BKResolveCaseAction = @"resolve";
 }
 
 
-// TODO: Refactors BKRequest
+- (BOOL)usesPOSTRequest
+{
+    return YES;
+}
+
+// TODO: Removes this
 - (NSString *)HTTPRequestMethod
 {
 	return LFHTTPRequestPOSTMethod;
