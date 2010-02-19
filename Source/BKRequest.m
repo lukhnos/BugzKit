@@ -1,7 +1,7 @@
 //
 // BKRequest.m
 //
-// Copyright (c) 2009 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2009-2010 Lukhnos D. Liu (http://lukhnos.org)
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -14,6 +14,7 @@
 //
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
+//
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
