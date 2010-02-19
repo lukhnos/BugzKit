@@ -1,7 +1,7 @@
 //
-// BugzKit.h
+// BKListWorkingScheduleRequest.h
 //
-// Copyright (c) 2009-2010 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -25,25 +25,11 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BKAPIContext.h"
-#import "BKError.h"
 #import "BKRequest.h"
-#import "BKRequestOperation.h"
-#import "BKXMLMapper.h"
 
-// TODO: Deprecate this
-#import "BKRequestQueue.h"
+@interface BKListWorkingScheduleRequest : BKRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext personID:(NSUInteger)inPersonID;
+@property (readonly) NSDictionary *fetchedWorkingSchedule;
+@end
 
-// Request classes
-#import "BKAreaListRequest.h"
-#import "BKCheckVersionRequest.h"
-#import "BKEditCaseRequest.h"
-#import "BKListRequest.h"
-#import "BKListWorkingScheduleRequest.h"
-#import "BKLogOffRequest.h"
-#import "BKLogOnRequest.h"
-#import "BKMailRequest.h"
-#import "BKMarkAsViewedRequest.h"
-#import "BKQueryCaseRequest.h"
-#import "BKQueryEventRequest.h"
-#import "BKSetCurrentFilterRequest.h"
+extern const NSUInteger BKSiteWorkingSchedulePersonID;

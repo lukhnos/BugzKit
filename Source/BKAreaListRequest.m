@@ -1,7 +1,7 @@
 //
-// BugzKit.h
+// BKAreaListRequest.m
 //
-// Copyright (c) 2009-2010 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -25,25 +25,25 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BKAPIContext.h"
-#import "BKError.h"
-#import "BKRequest.h"
-#import "BKRequestOperation.h"
-#import "BKXMLMapper.h"
-
-// TODO: Deprecate this
-#import "BKRequestQueue.h"
-
-// Request classes
 #import "BKAreaListRequest.h"
-#import "BKCheckVersionRequest.h"
-#import "BKEditCaseRequest.h"
-#import "BKListRequest.h"
-#import "BKListWorkingScheduleRequest.h"
-#import "BKLogOffRequest.h"
-#import "BKLogOnRequest.h"
-#import "BKMailRequest.h"
-#import "BKMarkAsViewedRequest.h"
-#import "BKQueryCaseRequest.h"
-#import "BKQueryEventRequest.h"
-#import "BKSetCurrentFilterRequest.h"
+
+@implementation BKAreaListRequest
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables
+{
+	return [[[self alloc] initWithAPIContext:inAPIContext projectID:inProjectID writableItemsOnly:inListOnlyWritables] autorelease];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext projectID:(NSUInteger)inProjectID writableItemsOnly:(BOOL)inListOnlyWritables
+{
+	if (self = [super initWithAPIContext:inAPIContext list:BKAreaList writableItemsOnly:inListOnlyWritables]) {
+		[(NSMutableDictionary *)requestParameterDict setObject:[NSNumber numberWithUnsignedInteger:inProjectID] forKey:@"ixProject"];
+	}
+	
+	return self;
+}
+
+- (NSUInteger)projectID
+{
+	return (NSUInteger)[[requestParameterDict objectForKey:@"ixProject"] integerValue];
+}
+@end

@@ -1,7 +1,7 @@
 //
-// BugzKit.h
+// BKListWorkingScheduleRequest.m
 //
-// Copyright (c) 2009-2010 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -25,25 +25,41 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BKAPIContext.h"
-#import "BKError.h"
-#import "BKRequest.h"
-#import "BKRequestOperation.h"
-#import "BKXMLMapper.h"
-
-// TODO: Deprecate this
-#import "BKRequestQueue.h"
-
-// Request classes
-#import "BKAreaListRequest.h"
-#import "BKCheckVersionRequest.h"
-#import "BKEditCaseRequest.h"
-#import "BKListRequest.h"
 #import "BKListWorkingScheduleRequest.h"
-#import "BKLogOffRequest.h"
-#import "BKLogOnRequest.h"
-#import "BKMailRequest.h"
-#import "BKMarkAsViewedRequest.h"
-#import "BKQueryCaseRequest.h"
-#import "BKQueryEventRequest.h"
-#import "BKSetCurrentFilterRequest.h"
+
+const NSUInteger BKSiteWorkingSchedulePersonID = 1;
+
+@implementation BKListWorkingScheduleRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext personID:(NSUInteger)inPersonID
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		NSMutableDictionary *d = [NSMutableDictionary dictionary];
+		
+		[d setObject:inAPIContext.authToken forKey:@"token"];
+		[d setObject:@"listWorkingSchedule" forKey:@"cmd"];
+		
+		if (inPersonID) {
+			[d setObject:[NSString stringWithFormat:@"%jd", (uintmax_t)inPersonID] forKey:@"ixPerson"];
+		}
+		
+		requestParameterDict = [d retain];
+	}
+	
+	return self;
+}
+
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
+{
+	id result = [inXMLMappedResponse valueForKeyPath:@"workingSchedule"];
+	if (!result) {
+		result = [NSDictionary dictionary];
+	}
+	
+	return result;
+}
+
+- (NSDictionary *)fetchedWorkingSchedule
+{
+	return [processedResponse isKindOfClass:[NSDictionary class]] ? processedResponse : nil;	
+}
+@end

@@ -1,7 +1,7 @@
 //
-// BugzKit.h
+// BKListRequest.h
 //
-// Copyright (c) 2009-2010 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -25,25 +25,25 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BKAPIContext.h"
-#import "BKError.h"
 #import "BKRequest.h"
-#import "BKRequestOperation.h"
-#import "BKXMLMapper.h"
 
-// TODO: Deprecate this
-#import "BKRequestQueue.h"
+@interface BKListRequest : BKRequest
+{
+	NSString *listType;
+}
++ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables;
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables;
 
-// Request classes
-#import "BKAreaListRequest.h"
-#import "BKCheckVersionRequest.h"
-#import "BKEditCaseRequest.h"
-#import "BKListRequest.h"
-#import "BKListWorkingScheduleRequest.h"
-#import "BKLogOffRequest.h"
-#import "BKLogOnRequest.h"
-#import "BKMailRequest.h"
-#import "BKMarkAsViewedRequest.h"
-#import "BKQueryCaseRequest.h"
-#import "BKQueryEventRequest.h"
-#import "BKSetCurrentFilterRequest.h"
+@property (readonly) NSString *listType;
+@property (readonly) NSArray *fetchedList;
+@end
+
+extern NSString *const BKAreaList;
+extern NSString *const BKCategoryList;
+extern NSString *const BKFilterList;
+extern NSString *const BKMailboxList;
+extern NSString *const BKMilestoneList;
+extern NSString *const BKPeopleList;
+extern NSString *const BKPriorityList;
+extern NSString *const BKProjectList;
+extern NSString *const BKStatusList;

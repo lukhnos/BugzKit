@@ -1,7 +1,7 @@
 //
-// BugzKit.h
+// BKMarkAsViewedRequest.m
 //
-// Copyright (c) 2009-2010 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2007-2010 Lukhnos D. Liu (http://lukhnos.org)
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -25,25 +25,30 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BKAPIContext.h"
-#import "BKError.h"
-#import "BKRequest.h"
-#import "BKRequestOperation.h"
-#import "BKXMLMapper.h"
-
-// TODO: Deprecate this
-#import "BKRequestQueue.h"
-
-// Request classes
-#import "BKAreaListRequest.h"
-#import "BKCheckVersionRequest.h"
-#import "BKEditCaseRequest.h"
-#import "BKListRequest.h"
-#import "BKListWorkingScheduleRequest.h"
-#import "BKLogOffRequest.h"
-#import "BKLogOnRequest.h"
-#import "BKMailRequest.h"
 #import "BKMarkAsViewedRequest.h"
-#import "BKQueryCaseRequest.h"
-#import "BKQueryEventRequest.h"
-#import "BKSetCurrentFilterRequest.h"
+
+@implementation BKMarkAsViewedRequest
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber
+{
+	return [self initWithAPIContext:inAPIContext caseNumber:inCaseNumber eventID:NSUIntegerMax];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber eventID:(NSUInteger)inEventID
+{
+	if (self = [super initWithAPIContext:inAPIContext]) {
+		NSMutableDictionary *d = [NSMutableDictionary dictionary];
+		
+		[d setObject:inAPIContext.authToken forKey:@"token"];
+		[d setObject:@"view" forKey:@"cmd"];
+		[d setObject:[NSString stringWithFormat:@"%jd", (uintmax_t)inCaseNumber] forKey:@"ixBug"];
+		
+		if (inEventID != NSUIntegerMax) {
+			[d setObject:[NSString stringWithFormat:@"%jd", (uintmax_t)inEventID] forKey:@"ixBugEvent"];
+		}
+		
+		requestParameterDict = [d retain];
+	}
+	
+	return self;	
+}
+@end
