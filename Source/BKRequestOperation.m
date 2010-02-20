@@ -89,7 +89,7 @@
     // see if any of the dependencies is cancelled or has error
     BOOL allDependenciesCompleted = YES;
     for (BKRequestOperation *dependency in [self dependencies]) {
-        if ([dependency isCancelled] || dependency.request.error) {
+        if ([dependency isCancelled] || ([dependency isKindOfClass:[BKRequestOperation class]] && dependency.request.error)) {
             allDependenciesCompleted = NO;
             break;
         }
