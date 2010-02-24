@@ -41,6 +41,8 @@ typedef enum {
 	BKRequestRunningState = 3
 } BKRequestState;
 
+@class BKRequest;
+
 @interface BKRequest : NSObject
 {
     // TODO: Deprecate this
