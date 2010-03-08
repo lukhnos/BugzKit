@@ -27,41 +27,25 @@
 //
 
 #import "BKRequest.h"
-#import "BKRequest+ProtectedMethods.h"
 #import "BKError.h"
 #import "BKPrivateUtilities.h"
 #import "BKXMLMapper.h"
-#import "LFWebAPIKit.h"
+
+@interface BKRequest (PrivateMethods)
+- (NSError *)errorFromXMLMappedResponse:(NSDictionary *)inXMLMappedResponse;
+- (NSString *)preparedParameterString;
+@end
+
 
 @implementation BKRequest
 - (void)dealloc
 {
-    target = nil;
-    actionOnSuccess = NULL;
-    actionOnFailure = NULL;
-	[blockWhenEnqueued release], blockWhenEnqueued = nil;
-	[blockBeforeRequestStart release], blockBeforeRequestStart = nil;
-	[blockOnSuccess release], blockOnFailure = nil;
-	[blockOnFailure release], blockOnFailure = nil;
-	[blockOnCancel release], blockOnCancel = nil;
-	[blockAfterRequestEnd release], blockAfterRequestEnd = nil;
-	
-    [userInfo release], userInfo = nil;
     [APIContext release], APIContext = nil;
     [requestParameterDict release], requestParameterDict = nil;
     [rawXMLMappedResponse release], rawXMLMappedResponse = nil;
-	[rawResponseData release], rawResponseData = nil;
 	[processedResponse release], processedResponse = nil;
     [error release], error = nil;
-    [dateEnqueued release], dateEnqueued = nil;
-    [dateStarted release], dateStarted = nil;
-    [dateEnded release], dateEnded = nil;
     [super dealloc];
-}
-
-+ (id)requestWithAPIContext:(BKAPIContext *)inAPIContext
-{
-	return [[[[self class] alloc] initWithAPIContext:inAPIContext] autorelease];
 }
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext
@@ -73,26 +57,53 @@
 	return self;
 }
 
-- (void)setTarget:(id)inTarget actionOnSuccess:(SEL)inActionOnSuccess actionOnFailure:(SEL)inActionOnFailure
+#pragma mark NSObject methods
+
+- (NSString *)description
 {
-	target = inTarget;
-	actionOnFailure = inActionOnFailure;
-	actionOnSuccess = inActionOnSuccess;
+	return [NSString stringWithFormat:@"<%@: %p> {APIContext: %p, req params: %@}", [self class], self, APIContext, requestParameterDict];			
 }
+
+#pragma mark Methods to be overriden
+
+- (void)postprocessError:(NSError *)inError
+{
+}
+
+- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
+{
+	return inXMLMappedResponse;
+}
+
+- (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse
+{
+	return nil;
+}
+
+#pragma mark Dynamic properties
 
 - (NSString *)HTTPRequestContentType
 {
-	return LFHTTPRequestWWWFormURLEncodedContentType;
+	return @"application/x-www-form-urlencoded";
 }
 
-- (BOOL)usesPOSTRequest
+- (NSData *)requestData
 {
-    return NO;
+    if (self.usesPOSTRequest) {
+		return [[self preparedParameterString] dataUsingEncoding:NSUTF8StringEncoding];
+	}
+	
+	return nil;
 }
 
-- (NSString *)HTTPRequestMethod
+- (NSInputStream *)requestInputStream
 {
-	return LFHTTPRequestGETMethod;
+	return nil;
+}
+
+- (NSUInteger)requestInputStreamSize
+{
+	return 0;
 }
 
 - (NSURL *)requestURL
@@ -106,199 +117,20 @@
 	return APIContext.endpoint;
 }
 
-- (NSUInteger)requestInputStreamSize
+- (BOOL)usesPOSTRequest
 {
-	return 0;
+    return NO;
 }
 
-- (NSInputStream *)requestInputStream
-{
-	return nil;
-}
 
-- (NSData *)requestData
-{
-    if (self.usesPOSTRequest) {
-		return [[self preparedParameterString] dataUsingEncoding:NSUTF8StringEncoding];
-	}
-	
-	return nil;
-}
+#pragma mark Dynamic setters
 
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<%@: %p> {created: %@, target: %p, actionOnSuccess: %s, actionOnFailure: %s, userInfo: %@, APIContext: %p, req params: %@}",
-			[self class],
-			self,
-			dateEnqueued,
-			target,
-			actionOnSuccess,
-			actionOnFailure,
-			userInfo,
-			APIContext,
-			requestParameterDict];			
-}
-
-- (NSUInteger)rawResponseDataSize
-{
-	return [rawResponseData length];
-}
-
-+ (NSSet *)keyPathsForValuesAffectingRawResponseDataSize
-{
-	return [NSSet setWithObject:@"rawResponseData"];
-}
-
-- (NSString *)rawResponseString
-{
-	return [[[NSString alloc] initWithData:rawResponseData encoding:NSUTF8StringEncoding] autorelease];
-}
-
-+ (NSSet *)keyPathsForValuesAffectingRawResponseString
-{
-	return [NSSet setWithObject:@"rawResponseData"];
-}
-
-- (NSTimeInterval)elapsedTimeSinceStarted
-{
-	if (!dateStarted) {
-		return NAN;
-	}
-
-	if (!dateEnded) {
-		return [[NSDate date] timeIntervalSinceDate:dateStarted];
-	}
-	
-	return [dateEnded timeIntervalSinceDate:dateStarted];
-}
-
-+ (NSSet *)keyPathsForValuesAffectingElapsedTimeSinceStarted
-{
-	return [NSSet setWithObjects:@"dateStarted", @"dateEnded", nil];
-}
-
-@synthesize state;
-
-@synthesize target;
-@synthesize actionOnSuccess;
-@synthesize actionOnFailure;
-
-@synthesize blockWhenEnqueued;
-@synthesize blockBeforeRequestStart;
-@synthesize blockOnSuccess;
-@synthesize blockOnFailure;
-@synthesize blockOnCancel;
-@synthesize blockAfterRequestEnd;
-
-@synthesize userInfo;
-@synthesize APIContext;
-@synthesize requestParameterDict;
-
-@synthesize requestQueue;
-@synthesize cachedResponseUsed;
-@synthesize cachedResponseEverUsedInLifetime;
-@synthesize rawResponseData;
-@synthesize rawXMLMappedResponse;
-@synthesize processedResponse;
-
-@synthesize error;
-@synthesize dateEnqueued;
-@synthesize dateStarted;
-@synthesize dateEnded;
-@end
-
-@implementation BKRequest (ProtectedMethods)
-- (void)recycleIfUsedBefore
-{
-	if (rawResponseData) {
-		[self willChangeValueForKey:@"rawResponseData"];
-		BKReleaseClean(rawResponseData);
-		[self didChangeValueForKey:@"rawResponseData"];
-	}
-
-	cachedResponseUsed = NO;
-	BKReleaseClean(rawXMLMappedResponse);	
-	BKReleaseClean(processedResponse);
-	BKReleaseClean(error);
-	BKReleaseClean(dateEnqueued);
-
-	NSDate *oldDateStarted = nil;
-	if (dateStarted) {
-		oldDateStarted = dateStarted;
-		[self willChangeValueForKey:@"dateStarted"];
-	}
-	
-	if (dateEnded) {
-		NSDate *oldDateEnded = dateEnded;
-		[self willChangeValueForKey:@"dateEnded"];
-		dateEnded = nil;
-		[self didChangeValueForKey:@"dateEnded"];
-		[oldDateEnded release];
-	}
-	
-	if (oldDateStarted) {
-		dateStarted = nil;		
-		[self didChangeValueForKey:@"dateStarted"];
-		[oldDateStarted release];
-	}
-}
-
-- (void)requestQueueRequestDidEnqueue:(BKRequestQueue *)inQueue
-{
-	requestQueue = inQueue;
-	BKRetainAssign(dateEnqueued, [NSDate date]);
-	
-	[self setState:BKRequestEnqueuedState];
-	
-	if (blockWhenEnqueued) {
-		blockWhenEnqueued(self);
-	}
-}
-
-- (void)requestQueueWillBeginRequest:(BKRequestQueue *)inQueue
-{	
-	if (blockBeforeRequestStart) {
-		blockBeforeRequestStart(self);
-	}
-
-	[self willChangeValueForKey:@"dateStarted"];
-	BKRetainAssign(dateStarted, [NSDate date]);
-	[self didChangeValueForKey:@"dateStarted"];
-	
-	[self setState:BKRequestRunningState];
-}
-
-- (void)requestQueueDidGetCancelled:(BKRequestQueue *)inQueue
-{
-	[self setState:BKRequestCanceledState];
-
-	if (blockOnCancel) {
-		blockOnCancel(self);
-	}
-	
-	if (dateStarted) {
-		[self willChangeValueForKey:@"dateEnded"];
-		BKRetainAssign(dateEnded, [NSDate date]);
-		[self didChangeValueForKey:@"dateEnded"];
-	}
-}
-
-- (void)requestQueueRequestDidFinish:(BKRequestQueue *)inQueue
-{
-	if (blockAfterRequestEnd) {
-		blockAfterRequestEnd(self);
-	}
-	
-	requestQueue = nil;
-}
-
-// TODO: We don't really need this!
 - (void)setRawXMLMappedResponse:(NSDictionary *)inMappedXMLDictionary
 {
 	NSDictionary *innerResponse = [inMappedXMLDictionary objectForKey:@"response"];
     
 	// TODO: Determine if we should handle, e.g. empty response, etc.
-
+    
 	NSError *responseError = [self errorFromXMLMappedResponse:innerResponse];
 	if (!responseError) {
 		responseError = [self validateResponse:innerResponse];
@@ -332,102 +164,30 @@
     BKReleaseClean(processedResponse);
 }
 
-- (void)requestQueue:(BKRequestQueue *)inQueue didCompleteWithMappedXMLDictionary:(NSDictionary *)inMappedXMLDictionary rawData:(NSData *)inRawData usingCachedResponse:(BOOL)inUsingCache
-{	
-	[self setState:BKRequestCompletedState];
-	
-	cachedResponseUsed = inUsingCache;
-	if (inUsingCache) {
-		cachedResponseEverUsedInLifetime = YES;
-	}
-	
-	[self willChangeValueForKey:@"rawResponseData"];
-	BKRetainAssign(rawResponseData, inRawData);
-	[self didChangeValueForKey:@"rawResponseDate"];
-	
-	BKRetainAssign(rawXMLMappedResponse, inMappedXMLDictionary);
+@synthesize rawXMLMappedResponse;
+@synthesize processedResponse;
+@synthesize error;
+@end
 
-	// TODO: Determine if we should handle, e.g. empty response, etc.
-	NSDictionary *innerResponse = [rawXMLMappedResponse objectForKey:@"response"];
 
-	NSError *responseError = [self errorFromXMLMappedResponse:innerResponse];
-	
-	if (!responseError) {
-		responseError = [self validateResponse:innerResponse];
-	}
-	
-	if (responseError) {
-		BKRetainAssign(error, responseError);
-		BKRetainAssign(processedResponse, nil);
-		
-		[self postprocessError:responseError];
-		
-		if (blockOnFailure) {
-			blockOnFailure(self);
-		}
-		else if (actionOnFailure) {
-			[target performSelector:actionOnFailure withObject:self];
-		}
-		return;
-	}
-
-	BKRetainAssign(error, nil);
-	BKRetainAssign(processedResponse, [self postprocessResponse:innerResponse]);							
-	
-	if (blockOnSuccess) {
-		blockOnSuccess(self);
-	}
-	else if (actionOnSuccess) {
-		[target performSelector:actionOnSuccess withObject:self];   
-	}
-
-	if (dateStarted) {
-		[self willChangeValueForKey:@"dateEnded"];
-		BKRetainAssign(dateEnded, [NSDate date]);
-		[self didChangeValueForKey:@"dateEnded"];
-	}	
-}
-
-- (void)requestQueue:(BKRequestQueue *)inQueue didFailWithError:(NSString *)inHTTPRequestError
-{	
-	[self setState:BKRequestFailedState];
-	
-	NSInteger errorCode = BKUnknownError;
-	
-	if ([inHTTPRequestError isEqualToString:LFHTTPRequestConnectionError]) {
-		errorCode = BKConnecitonLostError;
-	}
-	else if ([inHTTPRequestError isEqualToString:LFHTTPRequestTimeoutError]) {
-		errorCode = BKConnectionTimeoutError;
-	}
-	else if ([inHTTPRequestError isEqualToString:BKHTTPRequestServerError]) {
-		errorCode = BKConnectionServerHTTPError;
-	}
-
-	BKRetainAssign(error, [NSError errorWithDomain:BKConnectionErrorDomain code:errorCode userInfo:nil]);	
-	
-	if (blockOnFailure) {
-		blockOnFailure(self);
-	}
-	else if (actionOnFailure) {
-		[target performSelector:actionOnFailure withObject:self];
-	}
-	
-	if (dateStarted) {
-		[self willChangeValueForKey:@"dateEnded"];
-		BKRetainAssign(dateEnded, [NSDate date]);
-		[self didChangeValueForKey:@"dateEnded"];
-	}	
-}
-
-- (NSDictionary *)preparedParameterDict
+@implementation BKRequest (PrivateMethods)
+- (NSError *)errorFromXMLMappedResponse:(NSDictionary *)inXMLMappedResponse
 {
-	return requestParameterDict;
+	NSDictionary *errorDictionary = [inXMLMappedResponse objectForKey:@"error"];
+	if ([errorDictionary count]) {
+		NSString *errorDomain = BKAPIErrorDomain;
+		NSString *localizedMessage = NSLocalizedString(errorDictionary.textContent, nil);
+		NSInteger errorCode = [[errorDictionary objectForKey:@"code"] integerValue];			
+		
+		return [NSError errorWithDomain:errorDomain code:errorCode userInfo:(!localizedMessage ? nil : [NSDictionary dictionaryWithObjectsAndKeys:localizedMessage, NSLocalizedDescriptionKey, nil])];		
+	}
+	
+	return nil;
 }
 
 - (NSString *)preparedParameterString
 {
-	NSDictionary *dict = [self preparedParameterDict];
+	NSDictionary *dict = requestParameterDict;
 	NSMutableArray *params = [NSMutableArray array];
 	for (NSString *key in dict) {
 		id value = [dict objectForKey:key];
@@ -444,9 +204,9 @@
 			CFDateFormatterRef dateFormatter = CFDateFormatterCreate(NULL, currentLocale, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);		
 			CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
 			CFDateFormatterSetFormat(dateFormatter, (CFStringRef)@"yyyy-MM-dd'T'HH:mm:ss'Z'");			
-
+            
 			value = NSMakeCollectable(CFDateFormatterCreateStringWithDate(NULL, dateFormatter, (CFDateRef)value));
-
+            
 			CFRelease(dateFormatter);
 			CFRelease(timeZone);
 			CFRelease(currentLocale);
@@ -457,39 +217,4 @@
 	
 	return [params count] ? [params componentsJoinedByString:@"&"] : nil;
 }
-
-- (NSError *)errorFromXMLMappedResponse:(NSDictionary *)inXMLMappedResponse
-{
-	NSDictionary *errorDictionary = [inXMLMappedResponse objectForKey:@"error"];
-	if ([errorDictionary count]) {
-		NSString *errorDomain = BKAPIErrorDomain;
-		NSString *localizedMessage = NSLocalizedString(errorDictionary.textContent, nil);
-		NSInteger errorCode = [[errorDictionary objectForKey:@"code"] integerValue];			
-		
-		return [NSError errorWithDomain:errorDomain code:errorCode userInfo:(!localizedMessage ? nil : [NSDictionary dictionaryWithObjectsAndKeys:localizedMessage, NSLocalizedDescriptionKey, nil])];		
-	}
-	
-	return nil;
-}
-
-- (void)postprocessError:(NSError *)inError
-{
-}
-
-- (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse
-{
-	return nil;
-}
-
-- (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
-{
-	return inXMLMappedResponse;
-}
-
-- (void)setState:(BKRequestState)inState
-{
-	state = inState;
-}
 @end
-
-NSString *const BKHTTPRequestServerError = @"BKHTTPRequestServerError";

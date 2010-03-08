@@ -27,7 +27,6 @@
 
 #import "BKCheckVersionRequest.h"
 #import "BKAPIContext+ProtectedMethods.h"
-#import "BKRequest+ProtectedMethods.h"
 
 @implementation BKCheckVersionRequest
 - (NSURL *)requestURL

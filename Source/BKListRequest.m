@@ -27,7 +27,6 @@
 
 #import "BKListRequest.h"
 #import "BKError.h"
-#import "BKRequest+ProtectedMethods.h"
 
 NSString *const BKAreaList = @"BKAreaList";
 NSString *const BKCategoryList = @"BKCategoryList";
