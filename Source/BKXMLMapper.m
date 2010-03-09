@@ -26,7 +26,12 @@
 //
 
 #import "BKXMLMapper.h"
+
+#ifndef BKXMLMAPPER_USER_NSXMLPARSER
 #import <expat.h>
+#endif
+
+#import <time.h>
 
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
@@ -39,32 +44,11 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 - (NSArray *)flattenedArray:(NSArray *)inArray;
 - (id)flattenedDictionary:(NSDictionary *)inDictionary;
 - (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey;
-
-- (void)cleanUpForGCMode;
 @end
 
 @implementation BKXMLMapper
-- (void)cleanUpForGCMode
-{
-	CFRelease(dateFormatter);
-    dateFormatter = NULL;
-}
-
-- (void)finalize
-{
-    if (dateFormatter) {
-        CFRelease(dateFormatter);
-    }
-    
-	[super finalize];
-}
-
 - (void)dealloc
 {
-    if (dateFormatter) {
-        CFRelease(dateFormatter);
-    }
-
     [resultantDictionary release];
 	[elementStack release];
 	[currentElementName release];
@@ -74,22 +58,8 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 - (id)init
 {
     if (self = [super init]) {
-        
-        
-        @synchronized([self class]) {
-            resultantDictionary = [[NSMutableDictionary alloc] init];
-            elementStack = [[NSMutableArray alloc] init];
-            
-            CFLocaleRef currentLocale = CFLocaleCopyCurrent();		
-            CFTimeZoneRef timeZone = CFTimeZoneCreateWithName(NULL, CFSTR("GMT"), NO);
-            
-            dateFormatter = CFDateFormatterCreate(NULL, currentLocale, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);		
-            CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
-            CFDateFormatterSetFormat(dateFormatter, CFSTR("yyyy-MM-dd'T'HH:mm:ss'Z'"));
-            
-            CFRelease(timeZone);
-            CFRelease(currentLocale);
-        }
+        resultantDictionary = [[NSMutableDictionary alloc] init];
+        elementStack = [[NSMutableArray alloc] init];
     }
     
     return self;
@@ -98,23 +68,21 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 - (void)runWithData:(NSData *)inData
 {
 	currentDictionary = resultantDictionary;
-	
-	/*
+
+#ifdef BKXMLMAPPER_USER_NSXMLPARSER
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:inData];
 	[parser setDelegate:self];
 	[parser parse];
 	[parser release];
     parser = nil;
-    */
+#endif
     
-    @synchronized([self class]) {
-        XML_Parser parser = XML_ParserCreate("UTF-8");
-        XML_SetElementHandler(parser, BKXMExpatParserStart, BKXMExpatParserEnd);
-        XML_SetCharacterDataHandler(parser, BKXMExpatParserCharData);
-        XML_SetUserData(parser, self);
-        XML_Parse(parser, [inData bytes], [inData length], 1);
-        XML_ParserFree(parser);
-    }
+    XML_Parser parser = XML_ParserCreate("UTF-8");
+    XML_SetElementHandler(parser, BKXMExpatParserStart, BKXMExpatParserEnd);
+    XML_SetCharacterDataHandler(parser, BKXMExpatParserCharData);
+    XML_SetUserData(parser, self);
+    XML_Parse(parser, [inData bytes], [inData length], 1);
+    XML_ParserFree(parser);
 }
 
 - (NSMutableDictionary *)resultantDictionary
@@ -182,10 +150,22 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 	
 	// transform 'dt'
 	if (firstChar == 'd' && secondChar == 't' && thirdCharIsUpperCase) {
-		
 		NSAssert([inValue isKindOfClass:[NSString class]], @"must be string");
-		return NSMakeCollectable(CFDateFormatterCreateDateFromString(NULL, dateFormatter, (CFStringRef)inValue, NULL));
-		
+        
+        struct tm *t = (struct tm *)calloc(1, sizeof(struct tm));
+        time_t gmt = 0;
+        
+        // 2010-01-04T10:06:24Z
+        t->tm_year = [[inValue substringWithRange:NSMakeRange(0, 4)] integerValue] - 1900;
+        t->tm_mon = [[inValue substringWithRange:NSMakeRange(5, 2)] integerValue] - 1;
+        t->tm_mday = [[inValue substringWithRange:NSMakeRange(8, 2)] integerValue];
+        t->tm_hour = [[inValue substringWithRange:NSMakeRange(11, 2)] integerValue];
+        t->tm_min = [[inValue substringWithRange:NSMakeRange(14, 2)] integerValue];
+        t->tm_sec = [[inValue substringWithRange:NSMakeRange(17, 2)] integerValue];        
+        gmt = timegm(t);        
+        free (t);
+        
+		return [[[NSDate alloc] initWithTimeIntervalSince1970:(NSTimeInterval)gmt] autorelease];
 	}
 	
 	// transform 'hrs'
@@ -253,21 +233,17 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 
 + (NSDictionary *)dictionaryMappedFromXMLData:(NSData *)inData
 {
-    // NSXMLParser only allows us to run one instance per thread at any give time, so we need to ensure this
-    //	@synchronized(self) {
-		BKXMLMapper *mapper = [[BKXMLMapper alloc] init];
-		[mapper runWithData:inData];        
-		
-		// flattens the text contents	
-		
-		
-		NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
-		NSDictionary *result = [mapper flattenedDictionary:resultantDictionary];
-        [mapper cleanUpForGCMode];
-		[mapper release];
-        mapper = nil;
-		return result;
-	// }
+    BKXMLMapper *mapper = [[BKXMLMapper alloc] init];
+    [mapper runWithData:inData];        
+    
+    // flattens the text contents	
+    
+    
+    NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
+    NSDictionary *result = [mapper flattenedDictionary:resultantDictionary];
+    [mapper release];
+    mapper = nil;
+    return result;
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
