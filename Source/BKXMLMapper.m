@@ -26,27 +26,45 @@
 //
 
 #import "BKXMLMapper.h"
+#import <expat.h>
 
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
+
+static void BKXMExpatParserStart(void *inContext, const char *inElement, const char **attributes);
+static void BKXMExpatParserEnd(void *inContext, const char *inElement);
+static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, int inLength);
 
 @interface BKXMLMapper (Flattener)
 - (NSArray *)flattenedArray:(NSArray *)inArray;
 - (id)flattenedDictionary:(NSDictionary *)inDictionary;
 - (id)transformValue:(id)inValue usingTypeInferredFromKey:(NSString *)inKey;
+
+- (void)cleanUpForGCMode;
 @end
 
 @implementation BKXMLMapper
-- (void)finalize
+- (void)cleanUpForGCMode
 {
 	CFRelease(dateFormatter);
+    dateFormatter = NULL;
+}
+
+- (void)finalize
+{
+    if (dateFormatter) {
+        CFRelease(dateFormatter);
+    }
+    
 	[super finalize];
 }
 
 - (void)dealloc
 {
-	CFRelease(dateFormatter);
-	
+    if (dateFormatter) {
+        CFRelease(dateFormatter);
+    }
+
     [resultantDictionary release];
 	[elementStack release];
 	[currentElementName release];
@@ -56,18 +74,22 @@ NSString *const BKXMLTextContentKey = @"_text";
 - (id)init
 {
     if (self = [super init]) {
-        resultantDictionary = [[NSMutableDictionary alloc] init];
-		elementStack = [[NSMutableArray alloc] init];
-		
-		CFLocaleRef currentLocale = CFLocaleCopyCurrent();		
-		CFTimeZoneRef timeZone = CFTimeZoneCreateWithName(NULL, (CFStringRef)@"GMT", NO);
-		
-		dateFormatter = CFDateFormatterCreate(NULL, currentLocale, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);		
-		CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
-		CFDateFormatterSetFormat(dateFormatter, (CFStringRef)@"yyyy-MM-dd'T'HH:mm:ss'Z'");
-		
-		CFRelease(timeZone);
-		CFRelease(currentLocale);
+        
+        
+        @synchronized([self class]) {
+            resultantDictionary = [[NSMutableDictionary alloc] init];
+            elementStack = [[NSMutableArray alloc] init];
+            
+            CFLocaleRef currentLocale = CFLocaleCopyCurrent();		
+            CFTimeZoneRef timeZone = CFTimeZoneCreateWithName(NULL, CFSTR("GMT"), NO);
+            
+            dateFormatter = CFDateFormatterCreate(NULL, currentLocale, kCFDateFormatterFullStyle, kCFDateFormatterFullStyle);		
+            CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
+            CFDateFormatterSetFormat(dateFormatter, CFSTR("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+            
+            CFRelease(timeZone);
+            CFRelease(currentLocale);
+        }
     }
     
     return self;
@@ -77,10 +99,22 @@ NSString *const BKXMLTextContentKey = @"_text";
 {
 	currentDictionary = resultantDictionary;
 	
+	/*
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:inData];
 	[parser setDelegate:self];
 	[parser parse];
 	[parser release];
+    parser = nil;
+    */
+    
+    @synchronized([self class]) {
+        XML_Parser parser = XML_ParserCreate("UTF-8");
+        XML_SetElementHandler(parser, BKXMExpatParserStart, BKXMExpatParserEnd);
+        XML_SetCharacterDataHandler(parser, BKXMExpatParserCharData);
+        XML_SetUserData(parser, self);
+        XML_Parse(parser, [inData bytes], [inData length], 1);
+        XML_ParserFree(parser);
+    }
 }
 
 - (NSMutableDictionary *)resultantDictionary
@@ -220,18 +254,20 @@ NSString *const BKXMLTextContentKey = @"_text";
 + (NSDictionary *)dictionaryMappedFromXMLData:(NSData *)inData
 {
     // NSXMLParser only allows us to run one instance per thread at any give time, so we need to ensure this
-	@synchronized(self) {
+    //	@synchronized(self) {
 		BKXMLMapper *mapper = [[BKXMLMapper alloc] init];
-		[mapper runWithData:inData];
+		[mapper runWithData:inData];        
 		
 		// flattens the text contents	
 		
 		
 		NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
 		NSDictionary *result = [mapper flattenedDictionary:resultantDictionary];
+        [mapper cleanUpForGCMode];
 		[mapper release];
+        mapper = nil;
 		return result;
-	}
+	// }
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
@@ -341,5 +377,35 @@ NSString *const BKXMLTextContentKey = @"_text";
 {
 	return [[self valueForKeyPath:inKeyPath] objectForKey:BKXMLTextContentKey];
 }
-
 @end
+
+static void BKXMExpatParserStart(void *inContext, const char *inElement, const char **attributes)
+{
+    BKXMLMapper *mapper = (BKXMLMapper *)inContext;
+    NSString *elementName = [NSString stringWithUTF8String:inElement];
+    NSMutableDictionary *attrDict = [NSMutableDictionary dictionary];
+    
+    const char **attr = attributes;
+    while (*attr) {
+        const char *key = *attr++;
+        const char *value = *attr++;        
+        [attrDict setObject:[NSString stringWithUTF8String:value] forKey:[NSString stringWithUTF8String:key]];
+    }
+    
+    [mapper parser:nil didStartElement:elementName namespaceURI:nil qualifiedName:nil attributes:attrDict];
+}
+
+static void BKXMExpatParserEnd(void *inContext, const char *inElement)
+{
+    BKXMLMapper *mapper = (BKXMLMapper *)inContext;
+    NSString *elementName = [NSString stringWithUTF8String:inElement];
+    [mapper parser:nil didEndElement:elementName namespaceURI:nil qualifiedName:nil];
+}
+
+static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, int inLength)
+{
+    BKXMLMapper *mapper = (BKXMLMapper *)inContext;
+    
+    NSString *s = [[[NSString alloc] initWithBytes:inString length:inLength encoding:NSUTF8StringEncoding] autorelease];    
+    [mapper parser:nil foundCharacters:s];
+}
