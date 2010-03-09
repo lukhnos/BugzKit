@@ -30,8 +30,10 @@
 #ifndef BKXMLMAPPER_USER_NSXMLPARSER
 #import <expat.h>
 #endif
-
+#import <libkern/OSAtomic.h>
 #import <time.h>
+
+static OSSpinLock BKXMSpinLock = OS_SPINLOCK_INIT;
 
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
@@ -77,12 +79,14 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
     parser = nil;
 #endif
     
+    OSSpinLockLock(&BKXMSpinLock);
     XML_Parser parser = XML_ParserCreate("UTF-8");
     XML_SetElementHandler(parser, BKXMExpatParserStart, BKXMExpatParserEnd);
     XML_SetCharacterDataHandler(parser, BKXMExpatParserCharData);
     XML_SetUserData(parser, self);
     XML_Parse(parser, [inData bytes], [inData length], 1);
     XML_ParserFree(parser);
+    OSSpinLockUnlock(&BKXMSpinLock);
 }
 
 - (NSMutableDictionary *)resultantDictionary
