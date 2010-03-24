@@ -28,8 +28,11 @@
 #import "BKXMLMapper.h"
 
 #ifndef BKXMLMAPPER_USER_NSXMLPARSER
-#import <expat.h>
+    // this suppresses (a useless, anyway, on Clang) an annoying "cdecl attribute ignored" warning that we can't turn off
+    #define XMLCALL
+    #import <expat.h>
 #endif
+
 #import <libkern/OSAtomic.h>
 #import <time.h>
 
