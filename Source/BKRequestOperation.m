@@ -101,7 +101,7 @@
         [self fetchMappedXMLData];
         
         if (![self isCancelled]) {
-            if (request.error) {
+            if (request.error || ![request.rawXMLMappedResponse count]) {
                 [self dispatchSelector:@selector(handleRequestFailed)];            
             }
             else {
