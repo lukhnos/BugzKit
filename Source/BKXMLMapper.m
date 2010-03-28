@@ -244,8 +244,6 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
     [mapper runWithData:inData];        
     
     // flattens the text contents	
-    
-    
     NSMutableDictionary *resultantDictionary = [mapper resultantDictionary];	
     NSDictionary *result = [mapper flattenedDictionary:resultantDictionary];
     [mapper release];
