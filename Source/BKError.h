@@ -36,6 +36,7 @@ typedef enum {
 	BKConnecitonLostError = -1,
 	BKConnectionTimeoutError = -2,
 	BKConnectionServerHTTPError = -3,	// e.g. 404
+    BKConnectionCannotPerformHTTPRequestError = -4, // performMethod: returns NO
 	
 	BKAPIMalformedResponseError = -100,
 	BKUnknownError = -9999,
