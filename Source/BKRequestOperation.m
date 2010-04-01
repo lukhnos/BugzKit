@@ -72,14 +72,15 @@
 #pragma mark Overriden NSOperationQueue methods
 
 - (void)cancel
-{    
+{
+    // call super first, so isCancelled is set for subsequent handlers
+    [super cancel];
+
     if (![self isCancelled] && ![self isFinished]) {
         [self cancelFetch];    
         [self dispatchSelector:@selector(handleRequestCancelled)];
         [self dispatchSelector:@selector(handleRequestOperationEnded)];
     }
-
-    [super cancel];
 }
 
 - (void)main
