@@ -118,7 +118,12 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 
 - (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse
 {
-	if (![inXMLMappedResponse objectForKey:[[self class] firstLevelValueKey:listType]]) {
+	if (![inXMLMappedResponse objectForKey:[[self class] firstLevelValueKey:listType]]) {        
+        // it's perfectly ok for BKMailboxList to return nothing
+        if ([listType isEqualToString:BKMailboxList]) {
+            return nil;
+        }
+        
 		return [NSError errorWithDomain:BKAPIErrorDomain code:BKAPIMalformedResponseError userInfo:nil];
 	}
 	
