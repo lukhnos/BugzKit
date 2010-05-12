@@ -38,6 +38,9 @@ NSString *const BKPriorityList = @"BKPriorityList";
 NSString *const BKProjectList = @"BKProjectList";
 NSString *const BKStatusList = @"BKStatusList";
 
+NSString *const BKPeopleListIncludeNormalUsersParameterKey = @"fIncludeNormal";
+NSString *const BKPeopleListIncludeVirtualUsersParameterKey = @"fIncludeVirtual";
+
 static NSString *kListCommandKey = @"kListCommandKey";
 static NSString *kListResultValueKeyPathKey = @"kListResultValueKeyPathKey";
 static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
@@ -101,19 +104,24 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables
 {
+	return [self initWithAPIContext:inAPIContext list:inListType parameters:(inListOnlyWritables ? [NSDictionary dictionary] : [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:inListOnlyWritables], @"fWrite", nil])];
+}
+
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType parameters:(NSDictionary *)inParameters
+{
 	if (self = [super initWithAPIContext:inAPIContext]) {
 		listType = [inListType retain];		
 		requestParameterDict = [[NSMutableDictionary alloc] init];
 		
 		[(NSMutableDictionary *)requestParameterDict setObject:[[self class] commandForListType:listType] forKey:@"cmd"];
 		[(NSMutableDictionary *)requestParameterDict setObject:inAPIContext.authToken forKey:@"token"];
-
-		if (inListOnlyWritables) {
-			[(NSMutableDictionary *)requestParameterDict setObject:[NSNumber numberWithBool:inListOnlyWritables] forKey:@"fWrite"];
+		
+		if ([inParameters count]) {
+			[(NSMutableDictionary *)requestParameterDict addEntriesFromDictionary:inParameters];
 		}
 	}
 	
-	return self;
+	return self;	
 }
 
 - (NSError *)validateResponse:(NSDictionary *)inXMLMappedResponse

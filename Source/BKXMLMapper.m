@@ -257,7 +257,7 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 
 	// see if it's duplicated
 	id element;
-	if (element = [currentDictionary objectForKey:elementName]) {
+	if ((element = [currentDictionary objectForKey:elementName])) {
 		if (![element isKindOfClass:[NSMutableArray class]]) {
 			if ([element isKindOfClass:[NSMutableDictionary class]]) {
 				[element retain];

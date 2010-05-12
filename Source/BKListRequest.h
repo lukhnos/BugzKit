@@ -33,6 +33,7 @@
 }
 + (id)requestWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables DEPRECATED_ATTRIBUTE;
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType writableItemsOnly:(BOOL)inListOnlyWritables;
+- (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType parameters:(NSDictionary *)inParameters;
 
 @property (readonly) NSString *listType;
 @property (readonly) NSArray *fetchedList;
@@ -47,3 +48,6 @@ extern NSString *const BKPeopleList;
 extern NSString *const BKPriorityList;
 extern NSString *const BKProjectList;
 extern NSString *const BKStatusList;
+
+extern NSString *const BKPeopleListIncludeNormalUsersParameterKey;
+extern NSString *const BKPeopleListIncludeVirtualUsersParameterKey;
