@@ -196,7 +196,7 @@
 			value = @"";
 		}
 		else if ([value isKindOfClass:[NSNumber class]]) {
-			value = [NSString stringWithFormat:@"%ju", (uintmax_t)[value unsignedIntegerValue]];
+			value = [value stringValue];
 		}
 		else if ([value isKindOfClass:[NSDate class]]) {
 			CFLocaleRef currentLocale = CFLocaleCopyCurrent();		
