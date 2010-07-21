@@ -31,9 +31,6 @@
 #import "BKRequestOperation.h"
 #import "BKXMLMapper.h"
 
-// TODO: Deprecate this
-#import "BKRequestQueue.h"
-
 // Request classes
 #import "BKAreaListRequest.h"
 #import "BKCheckVersionRequest.h"
