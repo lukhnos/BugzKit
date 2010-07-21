@@ -50,12 +50,14 @@ NSString *const BKResolveCaseAction = @"resolve";
 	}
 	
 	BOOL isDir = NO;
-	if ([[NSFileManager defaultManager] fileExistsAtPath:tempFilename isDirectory:&isDir]) {
+	NSFileManager *fileManager = [[NSFileManager alloc] init];
+	if ([fileManager fileExistsAtPath:tempFilename isDirectory:&isDir]) {
 		
 		NSError *ourError = NULL;
 		BOOL __unused removeResult = [[NSFileManager defaultManager] removeItemAtPath:tempFilename error:&ourError];
 		NSAssert2(removeResult, @"Must remove the temp file at: %@, error: %@", tempFilename, ourError);
 	}
+	[fileManager release];
 }
 
 - (void)prepareTempFile

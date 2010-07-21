@@ -56,24 +56,27 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 + (NSDictionary *)listParameterDictionary
 
 {
-	NSDictionary *parameterDictionary = nil;
-	if (!parameterDictionary) {
-		parameterDictionary = [[NSMutableDictionary dictionary] retain];
+	static NSDictionary *parameterDictionary = nil;
+
+	@synchronized(self) {
+		if (!parameterDictionary) {
+			parameterDictionary = [[NSMutableDictionary dictionary] retain];
+			
+			#define POPULATE(dict, key, cmd, kvPath, lvk) do { [(NSMutableDictionary *)dict setObject:[NSDictionary dictionaryWithObjectsAndKeys:cmd, kListCommandKey, kvPath, kListResultValueKeyPathKey, lvk, kFirstLevelValueKey, nil] forKey:key]; } while(0);
+			POPULATE(parameterDictionary, BKFilterList, @"listFilters", @"filters.filter", @"filters");
+			POPULATE(parameterDictionary, BKProjectList, @"listProjects", @"projects.project", @"projects");
+			POPULATE(parameterDictionary, BKAreaList, @"listAreas", @"areas.area", @"areas");
+			POPULATE(parameterDictionary, BKCategoryList, @"listCategories", @"categories.category", @"categories");
+			POPULATE(parameterDictionary, BKPriorityList, @"listPriorities", @"priorities.priority", @"priorities");
+			POPULATE(parameterDictionary, BKPeopleList, @"listPeople", @"people.person", @"people");
+			POPULATE(parameterDictionary, BKStatusList, @"listStatuses", @"statuses.status", @"statuses");
+			POPULATE(parameterDictionary, BKMilestoneList, @"listFixFors", @"fixfors.fixfor", @"fixfors");
+			POPULATE(parameterDictionary, BKMailboxList, @"listMailboxes", @"mailboxes.mailbox", @"mailboxes");		
+			#undef POPULATE
+		}
 		
-		#define POPULATE(dict, key, cmd, kvPath, lvk) do { [(NSMutableDictionary *)dict setObject:[NSDictionary dictionaryWithObjectsAndKeys:cmd, kListCommandKey, kvPath, kListResultValueKeyPathKey, lvk, kFirstLevelValueKey, nil] forKey:key]; } while(0);
-		POPULATE(parameterDictionary, BKFilterList, @"listFilters", @"filters.filter", @"filters");
-		POPULATE(parameterDictionary, BKProjectList, @"listProjects", @"projects.project", @"projects");
-		POPULATE(parameterDictionary, BKAreaList, @"listAreas", @"areas.area", @"areas");
-		POPULATE(parameterDictionary, BKCategoryList, @"listCategories", @"categories.category", @"categories");
-		POPULATE(parameterDictionary, BKPriorityList, @"listPriorities", @"priorities.priority", @"priorities");
-		POPULATE(parameterDictionary, BKPeopleList, @"listPeople", @"people.person", @"people");
-		POPULATE(parameterDictionary, BKStatusList, @"listStatuses", @"statuses.status", @"statuses");
-		POPULATE(parameterDictionary, BKMilestoneList, @"listFixFors", @"fixfors.fixfor", @"fixfors");
-		POPULATE(parameterDictionary, BKMailboxList, @"listMailboxes", @"mailboxes.mailbox", @"mailboxes");		
-		#undef POPULATE
+		return parameterDictionary;
 	}
-	
-	return parameterDictionary;
 }
 
 + (NSString *)commandForListType:(NSString *)inListType

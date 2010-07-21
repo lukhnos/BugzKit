@@ -205,7 +205,7 @@
 			CFDateFormatterSetProperty(dateFormatter, kCFDateFormatterTimeZone, timeZone);
 			CFDateFormatterSetFormat(dateFormatter, (CFStringRef)@"yyyy-MM-dd'T'HH:mm:ss'Z'");			
             
-			value = NSMakeCollectable(CFDateFormatterCreateStringWithDate(NULL, dateFormatter, (CFDateRef)value));
+			value = [NSMakeCollectable(CFDateFormatterCreateStringWithDate(NULL, dateFormatter, (CFDateRef)value)) autorelease];
             
 			CFRelease(dateFormatter);
 			CFRelease(timeZone);
