@@ -73,10 +73,12 @@
 
 - (void)cancel
 {
-    // call super first, so isCancelled is set for subsequent handlers
+	BOOL alreadyCanceled = [self isCancelled];
+	BOOL alreadyFinished = [self isFinished];
+	
     [super cancel];
-
-    if (![self isCancelled] && ![self isFinished]) {
+	
+    if (!alreadyCanceled && !alreadyFinished) {
         [self cancelFetch];    
         [self dispatchSelector:@selector(handleRequestCancelled)];
         [self dispatchSelector:@selector(handleRequestOperationEnded)];
