@@ -74,9 +74,9 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 			POPULATE(parameterDictionary, BKMailboxList, @"listMailboxes", @"mailboxes.mailbox", @"mailboxes");		
 			#undef POPULATE
 		}
-		
-		return parameterDictionary;
 	}
+	
+	return parameterDictionary;
 }
 
 + (NSString *)commandForListType:(NSString *)inListType

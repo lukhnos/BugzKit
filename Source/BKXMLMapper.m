@@ -38,8 +38,6 @@
 #import <libkern/OSAtomic.h>
 #import <time.h>
 
-static OSSpinLock BKXMSpinLock = OS_SPINLOCK_INIT;
-
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
 
