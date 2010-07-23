@@ -168,7 +168,11 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
         t->tm_mday = [[inValue substringWithRange:NSMakeRange(8, 2)] integerValue];
         t->tm_hour = [[inValue substringWithRange:NSMakeRange(11, 2)] integerValue];
         t->tm_min = [[inValue substringWithRange:NSMakeRange(14, 2)] integerValue];
-        t->tm_sec = [[inValue substringWithRange:NSMakeRange(17, 2)] integerValue];        
+		
+		if ([inValue length] > 16) {		
+			t->tm_sec = [[inValue substringWithRange:NSMakeRange(17, 2)] integerValue];        
+		}
+		
         gmt = timegm(t);        
         free (t);
         
