@@ -27,6 +27,8 @@
 
 #import "BKXMLMapper.h"
 
+#define BKXMLMAPPER_USER_NSXMLPARSER
+
 #ifndef BKXMLMAPPER_USER_NSXMLPARSER
     // this suppresses (a useless, anyway, on Clang) an annoying "cdecl attribute ignored" warning that we can't turn off
     #define XMLCALL
@@ -41,9 +43,11 @@ static OSSpinLock BKXMSpinLock = OS_SPINLOCK_INIT;
 NSString *const BKXMLMapperExceptionName = @"BKXMLMapperException";
 NSString *const BKXMLTextContentKey = @"_text";
 
+#ifndef BKXMLMAPPER_USER_NSXMLPARSER
 static void BKXMExpatParserStart(void *inContext, const char *inElement, const char **attributes);
 static void BKXMExpatParserEnd(void *inContext, const char *inElement);
 static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, int inLength);
+#endif
 
 @interface BKXMLMapper (Flattener)
 - (NSArray *)flattenedArray:(NSArray *)inArray;
@@ -74,22 +78,22 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 {
 	currentDictionary = resultantDictionary;
 
+	@synchronized([BKXMLMapper class]) {
 #ifdef BKXMLMAPPER_USER_NSXMLPARSER
-    NSXMLParser *parser = [[NSXMLParser alloc] initWithData:inData];
-	[parser setDelegate:self];
-	[parser parse];
-	[parser release];
-    parser = nil;
+		NSXMLParser *parser = [[NSXMLParser alloc] initWithData:inData];
+		[parser setDelegate:self];
+		[parser parse];
+		[parser release];
+		parser = nil;
+#else    
+		XML_Parser parser = XML_ParserCreate("UTF-8");
+		XML_SetElementHandler(parser, BKXMExpatParserStart, BKXMExpatParserEnd);
+		XML_SetCharacterDataHandler(parser, BKXMExpatParserCharData);
+		XML_SetUserData(parser, self);
+		XML_Parse(parser, [inData bytes], [inData length], 1);
+		XML_ParserFree(parser);
 #endif
-    
-    OSSpinLockLock(&BKXMSpinLock);
-    XML_Parser parser = XML_ParserCreate("UTF-8");
-    XML_SetElementHandler(parser, BKXMExpatParserStart, BKXMExpatParserEnd);
-    XML_SetCharacterDataHandler(parser, BKXMExpatParserCharData);
-    XML_SetUserData(parser, self);
-    XML_Parse(parser, [inData bytes], [inData length], 1);
-    XML_ParserFree(parser);
-    OSSpinLockUnlock(&BKXMSpinLock);
+	}
 }
 
 - (NSMutableDictionary *)resultantDictionary
@@ -364,6 +368,8 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 }
 @end
 
+#ifndef BKXMLMAPPER_USER_NSXMLPARSER
+
 static void BKXMExpatParserStart(void *inContext, const char *inElement, const char **attributes)
 {
     BKXMLMapper *mapper = (BKXMLMapper *)inContext;
@@ -394,3 +400,5 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
     NSString *s = [[[NSString alloc] initWithBytes:inString length:inLength encoding:NSUTF8StringEncoding] autorelease];    
     [mapper parser:nil foundCharacters:s];
 }
+
+#endif
