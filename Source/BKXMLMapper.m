@@ -273,7 +273,11 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 	id element;
 	if ((element = [currentDictionary objectForKey:elementName])) {
 		if (![element isKindOfClass:[NSMutableArray class]]) {
-			if ([element isKindOfClass:[NSMutableDictionary class]]) {
+			// FogBugz 8.0 beta bug
+			if ([elementName isEqualToString:@"c"]) {
+				// let's overwrite the element
+			}
+			else if ([element isKindOfClass:[NSMutableDictionary class]]) {
 				[element retain];
 				[currentDictionary removeObjectForKey:elementName];
 				
