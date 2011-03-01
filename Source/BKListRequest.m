@@ -148,10 +148,13 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
 {
     id result = nil;
-    @try {
-        result = [inXMLMappedResponse valueForKeyPath:[[self class] resultValueKeyPathKey:listType]];
-    }
-    @catch (NSException *exception) {
+    
+    if ([inXMLMappedResponse isKindOfClass:[NSDictionary class]]) {    
+        @try {
+            result = [inXMLMappedResponse valueForKeyPath:[[self class] resultValueKeyPathKey:listType]];
+        }
+        @catch (NSException *exception) {
+        }
     }
 
 	if (!result) {
