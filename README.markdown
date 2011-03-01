@@ -12,7 +12,7 @@ Basically, the library is designed to separate request objects (objects that enc
 Copyright
 ---------
 
-Copyright (c) 2007-2011 Lukhnos D. Liu.
+Copyright (c) 2009-2011 Lukhnos D. Liu.
 
 This library is released under the MIT License.
 

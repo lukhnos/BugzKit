@@ -1,7 +1,7 @@
 //
 // BKXMLMapper.m
 //
-// Copyright (c) 2009-2010 Lukhnos D. Liu (http://lukhnos.org)
+// Copyright (c) 2009-2011 Lukhnos D. Liu (http://lukhnos.org)
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -165,7 +165,7 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
         time_t gmt = 0;
         
         // 12345678901234567890
-        // 2010-01-04T10:06:24Z
+        // 2011-01-04T10:06:24Z
         NSUInteger inValueLength = [inValue length];
         
         if (inValueLength >= 10) {
