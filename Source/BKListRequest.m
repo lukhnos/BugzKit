@@ -114,7 +114,9 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext list:(NSString *)inListType parameters:(NSDictionary *)inParameters
 {
-	if (self = [super initWithAPIContext:inAPIContext]) {
+    self = [super initWithAPIContext:inAPIContext];
+
+	if (self) {
 		listType = [inListType retain];		
 		requestParameterDict = [[NSMutableDictionary alloc] init];
 		
@@ -145,7 +147,13 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 
 - (id)postprocessResponse:(NSDictionary *)inXMLMappedResponse
 {
-	id result = [inXMLMappedResponse valueForKeyPath:[[self class] resultValueKeyPathKey:listType]];
+    id result = nil;
+    @try {
+        result = [inXMLMappedResponse valueForKeyPath:[[self class] resultValueKeyPathKey:listType]];
+    }
+    @catch (NSException *exception) {
+    }
+
 	if (!result) {
 		result = [NSArray array];
 	}
