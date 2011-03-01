@@ -48,6 +48,7 @@ extern NSString *const BKPeopleList;
 extern NSString *const BKPriorityList;
 extern NSString *const BKProjectList;
 extern NSString *const BKStatusList;
+extern NSString *const BKSnippetList;
 
 extern NSString *const BKPeopleListIncludeNormalUsersParameterKey;
 extern NSString *const BKPeopleListIncludeVirtualUsersParameterKey;

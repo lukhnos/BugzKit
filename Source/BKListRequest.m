@@ -37,6 +37,7 @@ NSString *const BKPeopleList = @"BKPeopleList";
 NSString *const BKPriorityList = @"BKPriorityList";
 NSString *const BKProjectList = @"BKProjectList";
 NSString *const BKStatusList = @"BKStatusList";
+NSString *const BKSnippetList = @"BKSnippetList";
 
 NSString *const BKPeopleListIncludeNormalUsersParameterKey = @"fIncludeNormal";
 NSString *const BKPeopleListIncludeVirtualUsersParameterKey = @"fIncludeVirtual";
@@ -69,6 +70,7 @@ static NSString *kFirstLevelValueKey = @"kFirstLevelValueKey";
 			POPULATE(parameterDictionary, BKCategoryList, @"listCategories", @"categories.category", @"categories");
 			POPULATE(parameterDictionary, BKPriorityList, @"listPriorities", @"priorities.priority", @"priorities");
 			POPULATE(parameterDictionary, BKPeopleList, @"listPeople", @"people.person", @"people");
+			POPULATE(parameterDictionary, BKSnippetList, @"listSnippets", @"snippets.snippet", @"snippets");            
 			POPULATE(parameterDictionary, BKStatusList, @"listStatuses", @"statuses.status", @"statuses");
 			POPULATE(parameterDictionary, BKMilestoneList, @"listFixFors", @"fixfors.fixfor", @"fixfors");
 			POPULATE(parameterDictionary, BKMailboxList, @"listMailboxes", @"mailboxes.mailbox", @"mailboxes");		
