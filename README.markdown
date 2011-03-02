@@ -19,7 +19,7 @@ Perhaps the best way to understand how this framework can be used is to walk thr
 
 To build the example, first checkout this project, then go to `Examples/BasicRequests`, and make a copy of `AccountInfo.template.h` and name it `AccountInfo.h`, and fill in your FogBugz account details.
 
-The Xcode project file `BasicRequests.xcodeproj` is made using Xcode 4, but I've also tested with the latest Xcode 3.2.1. Please note that the sample app is built with 64-bit Debug config. I haven't tested it on any 32-bit config and there might be things you want to take care of (I've commented those things in the source code).
+The Xcode project file `BasicRequests.xcodeproj` is made using Xcode 4, but I've also tested with the latest Xcode 3.2.5. Please note that the sample app is built with 64-bit Debug config. I haven't tested it on any 32-bit config and there might be things you want to take care of (I've commented those things in the source code).
 
 In this sample app (note: a command-line tool), we want to do a few things:
 
@@ -42,7 +42,7 @@ Take a look at `RequestOperation.m`, and you'll understand why I leave so many i
 
 After the request operation has received the HTTP payload, it has to convert the raw byte stream into meaningful data. FogBugz uses XML, and BugzKit supplies a `BKXMLMapper` helper class to first parse the XML then map the elements to an NSDictionary, much like what many XML-to-JSON libraries do. Using NSDictionary and NSArray objects to manipulate structured data is way then dealing with XML.
 
-A very important note here: `BKXMLMapper` has an option to let you use `NSXMLParser` (default) or libxml2. Both libraries are unfortunately either totally thread-safe or garbage collection-compatible. `BKXMLMapper` takes care of the thread-safe issue by using putting using the `@synchronized` block. If you want to make a number of large requests at the same time, the XML parsing phase can become a bottleneck. And that they leak memory in GC is one of the reason LadyBugz couldn't use GC. FogBugz API actually only uses a small subset of XML, and it should be possible to pick an efficient, thread-safe, GC-compatible XML parser to work with BugzKit.
+A very important note here: `BKXMLMapper` has an option to let you use `NSXMLParser` (default) or libxml2. Unfortunately neither library is thread-safe and garbage collection-compatible. `BKXMLMapper` takes care of the thread-safe issue by using putting using the `@synchronized` block. If you want to make a number of large requests at the same time, the XML parsing phase can become a bottleneck. And that they leak memory in GC is one of the reason LadyBugz couldn't use GC. FogBugz API actually only uses a small subset of XML, and it should be possible to pick an efficient, thread-safe, GC-compatible XML parser to work with BugzKit.
 
 After the request operation has the NSDictionary object at hand, it passes the dictionary to the request object's `rawXMLMappedResponse` property. It is at this stage that the request object *processes* the data, and determines if there's an error. If there's no error, the untyped `processedResponse` (more accurately, the `id`-typed) will contain the processed response, the type of which (usually either NSDictionary or NSArray) depends on the nature of the request. If an error is the response from the server, the `error` property will be set an NSError object.
 
