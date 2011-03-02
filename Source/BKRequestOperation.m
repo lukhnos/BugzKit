@@ -16,7 +16,8 @@
 
 - (id)initWithRequest:(BKRequest *)inRequest
 {
-    if (self = [super init]) {
+    self = [super init];
+    if (self) {
         request = [inRequest retain];
     }
     

@@ -28,9 +28,6 @@
 #import "BKEditCaseRequest.h"
 #import "BKPrivateUtilities.h"
 
-// TODO: Remove this
-#import "LFHTTPRequest.h"
-
 NSString *const BKAssignCaseAction = @"assign";
 NSString *const BKCloseCaseAction = @"close";
 NSString *const BKEditCaseAction = @"edit";
@@ -161,7 +158,8 @@ NSString *const BKResolveCaseAction = @"resolve";
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext editAction:(NSString *)inAction caseNumber:(NSUInteger)inCaseNumber parameters:(NSDictionary *)inParameters attachmentURLs:(NSArray *)inURLs attachmentsFromBugEventID:(NSUInteger)inEventID;
 {
-	if (self = [super initWithAPIContext:inAPIContext]) {
+    self = [super initWithAPIContext:inAPIContext];
+	if (self) {
 		NSMutableDictionary *d = [NSMutableDictionary dictionary];
 		
 		[d setObject:inAPIContext.authToken forKey:@"token"];
@@ -229,12 +227,6 @@ NSString *const BKResolveCaseAction = @"resolve";
 - (BOOL)usesPOSTRequest
 {
     return YES;
-}
-
-// TODO: Removes this
-- (NSString *)HTTPRequestMethod
-{
-	return LFHTTPRequestPOSTMethod;
 }
 
 - (NSString *)HTTPRequestContentType

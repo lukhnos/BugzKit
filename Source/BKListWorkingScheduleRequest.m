@@ -32,7 +32,8 @@ const NSUInteger BKSiteWorkingSchedulePersonID = 1;
 @implementation BKListWorkingScheduleRequest
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext personID:(NSUInteger)inPersonID
 {
-	if (self = [super initWithAPIContext:inAPIContext]) {
+    self = [super initWithAPIContext:inAPIContext];
+	if (self) {
 		NSMutableDictionary *d = [NSMutableDictionary dictionary];
 		
 		[d setObject:inAPIContext.authToken forKey:@"token"];

@@ -64,7 +64,8 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
 
 - (id)init
 {
-    if (self = [super init]) {
+    self = [super init];
+    if (self) {
         resultantDictionary = [[NSMutableDictionary alloc] init];
         elementStack = [[NSMutableArray alloc] init];
     }
@@ -169,18 +170,18 @@ static void BKXMExpatParserCharData(void *inContext, const XML_Char *inString, i
         NSUInteger inValueLength = [inValue length];
         
         if (inValueLength >= 10) {
-            t->tm_year = [[inValue substringWithRange:NSMakeRange(0, 4)] integerValue] - 1900;
-            t->tm_mon = [[inValue substringWithRange:NSMakeRange(5, 2)] integerValue] - 1;
-            t->tm_mday = [[inValue substringWithRange:NSMakeRange(8, 2)] integerValue];            
+            t->tm_year = (int)[[inValue substringWithRange:NSMakeRange(0, 4)] integerValue] - 1900;
+            t->tm_mon = (int)[[inValue substringWithRange:NSMakeRange(5, 2)] integerValue] - 1;
+            t->tm_mday = (int)[[inValue substringWithRange:NSMakeRange(8, 2)] integerValue];            
         }
         
         if (inValueLength >= 16) {
-            t->tm_hour = [[inValue substringWithRange:NSMakeRange(11, 2)] integerValue];
-            t->tm_min = [[inValue substringWithRange:NSMakeRange(14, 2)] integerValue];            
+            t->tm_hour = (int)[[inValue substringWithRange:NSMakeRange(11, 2)] integerValue];
+            t->tm_min = (int)[[inValue substringWithRange:NSMakeRange(14, 2)] integerValue];            
         }
 		
 		if (inValueLength >= 20) {
-			t->tm_sec = [[inValue substringWithRange:NSMakeRange(17, 2)] integerValue];        
+			t->tm_sec = (int)[[inValue substringWithRange:NSMakeRange(17, 2)] integerValue];        
 		}
 		
         gmt = timegm(t);        

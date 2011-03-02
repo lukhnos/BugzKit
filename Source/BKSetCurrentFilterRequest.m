@@ -27,9 +27,6 @@
 
 #import "BKSetCurrentFilterRequest.h"
 
-// TODO: Refactor this
-#import "LFHTTPRequest.h"
-
 @implementation BKSetCurrentFilterRequest
 - (void)dealloc
 {
@@ -44,7 +41,8 @@
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext filterName:(NSString *)inFilterName
 {
-	if (self = [super initWithAPIContext:inAPIContext]) {
+    self = [super initWithAPIContext:inAPIContext];
+	if (self) {
 		filterName = [inFilterName copy];
 		
 		// TODO: Check if API keeps the name
@@ -58,12 +56,6 @@
 - (BOOL)usesPOSTRequest
 {
     return YES;
-}
-
-// TODO: Removes this
-- (NSString *)HTTPRequestMethod
-{
-	return LFHTTPRequestPOSTMethod;
 }
 
 @synthesize filterName;

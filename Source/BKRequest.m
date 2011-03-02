@@ -50,7 +50,8 @@
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext
 {
-	if (self = [super init]) {
+    self = [super init];
+	if (self) {
 		APIContext = [inAPIContext retain];
 	}
 	

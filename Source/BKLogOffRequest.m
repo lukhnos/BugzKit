@@ -31,7 +31,8 @@
 @implementation BKLogOffRequest : BKRequest
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext
 {
-	if (self = [super initWithAPIContext:inAPIContext]) {
+    self = [super initWithAPIContext:inAPIContext];
+	if (self) {
 		requestParameterDict = [[NSDictionary dictionaryWithObjectsAndKeys:@"logoff", @"cmd", inAPIContext.authToken, @"token", nil] retain];
 	}
 	

@@ -35,7 +35,8 @@
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber eventID:(NSUInteger)inEventID
 {
-	if (self = [super initWithAPIContext:inAPIContext]) {
+    self = [super initWithAPIContext:inAPIContext];
+	if (self) {
 		NSMutableDictionary *d = [NSMutableDictionary dictionary];
 		
 		[d setObject:inAPIContext.authToken forKey:@"token"];

@@ -58,8 +58,9 @@
 	if ([inBCC length]) {
 		[params setObject:inBCC forKey:@"sBCC"];
 	}
-			 
-	if (self = [super initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:params attachmentURLs:inURLs attachmentsFromBugEventID:inEventID]) {
+			
+    self = [super initWithAPIContext:inAPIContext editAction:inAction caseNumber:inCaseNumber parameters:params attachmentURLs:inURLs attachmentsFromBugEventID:inEventID];
+	if (self) {
 	}
 	
 	return self;

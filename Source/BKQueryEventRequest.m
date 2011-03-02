@@ -35,7 +35,8 @@
 
 - (id)initWithAPIContext:(BKAPIContext *)inAPIContext caseNumber:(NSUInteger)inCaseNumber
 {
-	if (self = [super initWithAPIContext:inAPIContext query:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] columns:[NSArray arrayWithObject:@"events"]]) {
+    self = [super initWithAPIContext:inAPIContext query:[NSString stringWithFormat:@"%ju", (uintmax_t)inCaseNumber] columns:[NSArray arrayWithObject:@"events"]];
+	if (self) {
 	}
 	
 	return self;
