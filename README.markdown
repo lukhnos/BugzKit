@@ -28,6 +28,12 @@ In this sample app (note: a command-line tool), we want to do a few things:
 *   Fetch three lists -- projects, people, milestones
 *   Logout
 
+If we draw a dependency graph, it will look like this:
+
+<div style="text-align:center">
+<a href="http://www.flickr.com/photos/lukhnos/5491178323/"><img src="http://farm6.static.flickr.com/5213/5491178323_1b9f1d74e7_z.jpg"></a>
+</div>
+
 Apparently, each task depends on the successful execution of the previous task.
 
 BugzKit solves the dependency problem by separating "request objects" from "request operations".
@@ -53,12 +59,6 @@ Once we have a basic request operation class, we can start do the real work. For
 3.  Specify how we want to handle successful completion or failure for each operation
 4.  Add dependency (see Apple's `NSOperation` API documentation on how this works)
 5.  Add the operation to an operation queue
-
-If we draw a dependency graph, it will look like this:
-
-<div style="text-align:center">
-<a href="http://www.flickr.com/photos/lukhnos/5491178323/"><img src="http://farm6.static.flickr.com/5213/5491178323_1b9f1d74e7_z.jpg"></a>
-</div>
 
 In our sample, we also have a `convergeBlockOperation` which is a plain-vanilla `NSBlockOperation`. The operation gets executed after all its dependencies are done. If none of its dependencies failed, then the operation schedules a logout request operation.
 
