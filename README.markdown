@@ -12,14 +12,14 @@ Design Concepts
 Basically, the library is designed to separate request objects (objects that encapsulate API request details) and request operations (the actual worker objects that make the HTTP requests and handle the response). This allows the library to be used in a multithreaded app, backed by NSOperation objects and operation queues.
 
 
-Walking Through the BasicRequestsDemo
--------------------------------------
+Walking Through the BasicRequests Demo
+--------------------------------------
 
-Perhaps the best way to understand how this framework can be used is to walk through the `Examples/BasicRequestsDemo` sample.
+Perhaps the best way to understand how this framework can be used is to walk through the `Examples/BasicRequests` sample.
 
-To build the example, first checkout this project, then go to `Examples/BasicRequestsDemo`, and make a copy of `AccountInfo.template.h` and name it `AccountInfo.h`, and fill in your FogBugz account details.
+To build the example, first checkout this project, then go to `Examples/BasicRequests`, and make a copy of `AccountInfo.template.h` and name it `AccountInfo.h`, and fill in your FogBugz account details.
 
-The Xcode project file `BasicRequestsDemo.xcodeproj` is made using Xcode 4, but I've also tested with the latest Xcode 3.2.1. Please note that the sample app is built with 64-bit Debug config. I haven't tested it on any 32-bit config and there might be things you want to take care of (I've commented those things in the source code).
+The Xcode project file `BasicRequests.xcodeproj` is made using Xcode 4, but I've also tested with the latest Xcode 3.2.1. Please note that the sample app is built with 64-bit Debug config. I haven't tested it on any 32-bit config and there might be things you want to take care of (I've commented those things in the source code).
 
 In this sample app (note: a command-line tool), we want to do a few things:
 
