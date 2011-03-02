@@ -1,0 +1,317 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6A77314C131DDD1B0081015A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A77314B131DDD1B0081015A /* Foundation.framework */; };
+		6A773158131DDD880081015A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773157131DDD880081015A /* main.m */; };
+		6A77315C131DDDFC0081015A /* RequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77315B131DDDFC0081015A /* RequestOperation.m */; };
+		6A773184131DE2190081015A /* BKAPIContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773161131DE2190081015A /* BKAPIContext.m */; };
+		6A773185131DE2190081015A /* BKAreaListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773163131DE2190081015A /* BKAreaListRequest.m */; };
+		6A773186131DE2190081015A /* BKCheckVersionRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773165131DE2190081015A /* BKCheckVersionRequest.m */; };
+		6A773187131DE2190081015A /* BKEditCaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773167131DE2190081015A /* BKEditCaseRequest.m */; };
+		6A773188131DE2190081015A /* BKError.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773169131DE2190081015A /* BKError.m */; };
+		6A773189131DE2190081015A /* BKListRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77316B131DE2190081015A /* BKListRequest.m */; };
+		6A77318A131DE2190081015A /* BKListWorkingScheduleRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77316D131DE2190081015A /* BKListWorkingScheduleRequest.m */; };
+		6A77318B131DE2190081015A /* BKLogOffRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77316F131DE2190081015A /* BKLogOffRequest.m */; };
+		6A77318C131DE2190081015A /* BKLogOnRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773171131DE2190081015A /* BKLogOnRequest.m */; };
+		6A77318D131DE2190081015A /* BKMailRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773173131DE2190081015A /* BKMailRequest.m */; };
+		6A77318E131DE2190081015A /* BKMarkAsViewedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773175131DE2190081015A /* BKMarkAsViewedRequest.m */; };
+		6A77318F131DE2190081015A /* BKQueryCaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773178131DE2190081015A /* BKQueryCaseRequest.m */; };
+		6A773190131DE2190081015A /* BKQueryEventRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77317A131DE2190081015A /* BKQueryEventRequest.m */; };
+		6A773191131DE2190081015A /* BKRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77317C131DE2190081015A /* BKRequest.m */; };
+		6A773192131DE2190081015A /* BKRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77317E131DE2190081015A /* BKRequestOperation.m */; };
+		6A773193131DE2190081015A /* BKSetCurrentFilterRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773180131DE2190081015A /* BKSetCurrentFilterRequest.m */; };
+		6A773194131DE2190081015A /* BKXMLMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773182131DE2190081015A /* BKXMLMapper.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		6A773147131DDD1B0081015A /* BasicRequests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicRequests; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A77314B131DDD1B0081015A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		6A773156131DDD880081015A /* BasicRequests-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "BasicRequests-Prefix.pch"; sourceTree = "<group>"; };
+		6A773157131DDD880081015A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		6A77315A131DDDFC0081015A /* RequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RequestOperation.h; sourceTree = "<group>"; };
+		6A77315B131DDDFC0081015A /* RequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RequestOperation.m; sourceTree = "<group>"; };
+		6A77315F131DE2190081015A /* BKAPIContext+ProtectedMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "BKAPIContext+ProtectedMethods.h"; sourceTree = "<group>"; };
+		6A773160131DE2190081015A /* BKAPIContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKAPIContext.h; sourceTree = "<group>"; };
+		6A773161131DE2190081015A /* BKAPIContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKAPIContext.m; sourceTree = "<group>"; };
+		6A773162131DE2190081015A /* BKAreaListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKAreaListRequest.h; sourceTree = "<group>"; };
+		6A773163131DE2190081015A /* BKAreaListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKAreaListRequest.m; sourceTree = "<group>"; };
+		6A773164131DE2190081015A /* BKCheckVersionRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKCheckVersionRequest.h; sourceTree = "<group>"; };
+		6A773165131DE2190081015A /* BKCheckVersionRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKCheckVersionRequest.m; sourceTree = "<group>"; };
+		6A773166131DE2190081015A /* BKEditCaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKEditCaseRequest.h; sourceTree = "<group>"; };
+		6A773167131DE2190081015A /* BKEditCaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKEditCaseRequest.m; sourceTree = "<group>"; };
+		6A773168131DE2190081015A /* BKError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKError.h; sourceTree = "<group>"; };
+		6A773169131DE2190081015A /* BKError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKError.m; sourceTree = "<group>"; };
+		6A77316A131DE2190081015A /* BKListRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKListRequest.h; sourceTree = "<group>"; };
+		6A77316B131DE2190081015A /* BKListRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKListRequest.m; sourceTree = "<group>"; };
+		6A77316C131DE2190081015A /* BKListWorkingScheduleRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKListWorkingScheduleRequest.h; sourceTree = "<group>"; };
+		6A77316D131DE2190081015A /* BKListWorkingScheduleRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKListWorkingScheduleRequest.m; sourceTree = "<group>"; };
+		6A77316E131DE2190081015A /* BKLogOffRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKLogOffRequest.h; sourceTree = "<group>"; };
+		6A77316F131DE2190081015A /* BKLogOffRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKLogOffRequest.m; sourceTree = "<group>"; };
+		6A773170131DE2190081015A /* BKLogOnRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKLogOnRequest.h; sourceTree = "<group>"; };
+		6A773171131DE2190081015A /* BKLogOnRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKLogOnRequest.m; sourceTree = "<group>"; };
+		6A773172131DE2190081015A /* BKMailRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKMailRequest.h; sourceTree = "<group>"; };
+		6A773173131DE2190081015A /* BKMailRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKMailRequest.m; sourceTree = "<group>"; };
+		6A773174131DE2190081015A /* BKMarkAsViewedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKMarkAsViewedRequest.h; sourceTree = "<group>"; };
+		6A773175131DE2190081015A /* BKMarkAsViewedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKMarkAsViewedRequest.m; sourceTree = "<group>"; };
+		6A773176131DE2190081015A /* BKPrivateUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKPrivateUtilities.h; sourceTree = "<group>"; };
+		6A773177131DE2190081015A /* BKQueryCaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKQueryCaseRequest.h; sourceTree = "<group>"; };
+		6A773178131DE2190081015A /* BKQueryCaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKQueryCaseRequest.m; sourceTree = "<group>"; };
+		6A773179131DE2190081015A /* BKQueryEventRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKQueryEventRequest.h; sourceTree = "<group>"; };
+		6A77317A131DE2190081015A /* BKQueryEventRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKQueryEventRequest.m; sourceTree = "<group>"; };
+		6A77317B131DE2190081015A /* BKRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKRequest.h; sourceTree = "<group>"; };
+		6A77317C131DE2190081015A /* BKRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKRequest.m; sourceTree = "<group>"; };
+		6A77317D131DE2190081015A /* BKRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKRequestOperation.h; sourceTree = "<group>"; };
+		6A77317E131DE2190081015A /* BKRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKRequestOperation.m; sourceTree = "<group>"; };
+		6A77317F131DE2190081015A /* BKSetCurrentFilterRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKSetCurrentFilterRequest.h; sourceTree = "<group>"; };
+		6A773180131DE2190081015A /* BKSetCurrentFilterRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKSetCurrentFilterRequest.m; sourceTree = "<group>"; };
+		6A773181131DE2190081015A /* BKXMLMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BKXMLMapper.h; sourceTree = "<group>"; };
+		6A773182131DE2190081015A /* BKXMLMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKXMLMapper.m; sourceTree = "<group>"; };
+		6A773183131DE2190081015A /* BugzKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugzKit.h; sourceTree = "<group>"; };
+		6A7731A5131DEE8E0081015A /* AccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountInfo.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6A773144131DDD1B0081015A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A77314C131DDD1B0081015A /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6A77313A131DDD140081015A = {
+			isa = PBXGroup;
+			children = (
+				6A7731A5131DEE8E0081015A /* AccountInfo.h */,
+				6A77315E131DE2190081015A /* BugzKit */,
+				6A773156131DDD880081015A /* BasicRequests-Prefix.pch */,
+				6A77315A131DDDFC0081015A /* RequestOperation.h */,
+				6A77315B131DDDFC0081015A /* RequestOperation.m */,
+				6A773157131DDD880081015A /* main.m */,
+				6A77314A131DDD1B0081015A /* Frameworks */,
+				6A773148131DDD1B0081015A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6A773148131DDD1B0081015A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6A773147131DDD1B0081015A /* BasicRequests */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6A77314A131DDD1B0081015A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6A77314B131DDD1B0081015A /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6A77315E131DE2190081015A /* BugzKit */ = {
+			isa = PBXGroup;
+			children = (
+				6A77315F131DE2190081015A /* BKAPIContext+ProtectedMethods.h */,
+				6A773160131DE2190081015A /* BKAPIContext.h */,
+				6A773161131DE2190081015A /* BKAPIContext.m */,
+				6A773162131DE2190081015A /* BKAreaListRequest.h */,
+				6A773163131DE2190081015A /* BKAreaListRequest.m */,
+				6A773164131DE2190081015A /* BKCheckVersionRequest.h */,
+				6A773165131DE2190081015A /* BKCheckVersionRequest.m */,
+				6A773166131DE2190081015A /* BKEditCaseRequest.h */,
+				6A773167131DE2190081015A /* BKEditCaseRequest.m */,
+				6A773168131DE2190081015A /* BKError.h */,
+				6A773169131DE2190081015A /* BKError.m */,
+				6A77316A131DE2190081015A /* BKListRequest.h */,
+				6A77316B131DE2190081015A /* BKListRequest.m */,
+				6A77316C131DE2190081015A /* BKListWorkingScheduleRequest.h */,
+				6A77316D131DE2190081015A /* BKListWorkingScheduleRequest.m */,
+				6A77316E131DE2190081015A /* BKLogOffRequest.h */,
+				6A77316F131DE2190081015A /* BKLogOffRequest.m */,
+				6A773170131DE2190081015A /* BKLogOnRequest.h */,
+				6A773171131DE2190081015A /* BKLogOnRequest.m */,
+				6A773172131DE2190081015A /* BKMailRequest.h */,
+				6A773173131DE2190081015A /* BKMailRequest.m */,
+				6A773174131DE2190081015A /* BKMarkAsViewedRequest.h */,
+				6A773175131DE2190081015A /* BKMarkAsViewedRequest.m */,
+				6A773176131DE2190081015A /* BKPrivateUtilities.h */,
+				6A773177131DE2190081015A /* BKQueryCaseRequest.h */,
+				6A773178131DE2190081015A /* BKQueryCaseRequest.m */,
+				6A773179131DE2190081015A /* BKQueryEventRequest.h */,
+				6A77317A131DE2190081015A /* BKQueryEventRequest.m */,
+				6A77317B131DE2190081015A /* BKRequest.h */,
+				6A77317C131DE2190081015A /* BKRequest.m */,
+				6A77317D131DE2190081015A /* BKRequestOperation.h */,
+				6A77317E131DE2190081015A /* BKRequestOperation.m */,
+				6A77317F131DE2190081015A /* BKSetCurrentFilterRequest.h */,
+				6A773180131DE2190081015A /* BKSetCurrentFilterRequest.m */,
+				6A773181131DE2190081015A /* BKXMLMapper.h */,
+				6A773182131DE2190081015A /* BKXMLMapper.m */,
+				6A773183131DE2190081015A /* BugzKit.h */,
+			);
+			name = BugzKit;
+			path = ../../Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A773146131DDD1B0081015A /* BasicRequests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A773153131DDD1B0081015A /* Build configuration list for PBXNativeTarget "BasicRequests" */;
+			buildPhases = (
+				6A773143131DDD1B0081015A /* Sources */,
+				6A773144131DDD1B0081015A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BasicRequests;
+			productName = BasicRequests;
+			productReference = 6A773147131DDD1B0081015A /* BasicRequests */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6A77313C131DDD140081015A /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 6A77313F131DDD140081015A /* Build configuration list for PBXProject "BasicRequests" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 6A77313A131DDD140081015A;
+			productRefGroup = 6A773148131DDD1B0081015A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A773146131DDD1B0081015A /* BasicRequests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6A773143131DDD1B0081015A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A773158131DDD880081015A /* main.m in Sources */,
+				6A77315C131DDDFC0081015A /* RequestOperation.m in Sources */,
+				6A773184131DE2190081015A /* BKAPIContext.m in Sources */,
+				6A773185131DE2190081015A /* BKAreaListRequest.m in Sources */,
+				6A773186131DE2190081015A /* BKCheckVersionRequest.m in Sources */,
+				6A773187131DE2190081015A /* BKEditCaseRequest.m in Sources */,
+				6A773188131DE2190081015A /* BKError.m in Sources */,
+				6A773189131DE2190081015A /* BKListRequest.m in Sources */,
+				6A77318A131DE2190081015A /* BKListWorkingScheduleRequest.m in Sources */,
+				6A77318B131DE2190081015A /* BKLogOffRequest.m in Sources */,
+				6A77318C131DE2190081015A /* BKLogOnRequest.m in Sources */,
+				6A77318D131DE2190081015A /* BKMailRequest.m in Sources */,
+				6A77318E131DE2190081015A /* BKMarkAsViewedRequest.m in Sources */,
+				6A77318F131DE2190081015A /* BKQueryCaseRequest.m in Sources */,
+				6A773190131DE2190081015A /* BKQueryEventRequest.m in Sources */,
+				6A773191131DE2190081015A /* BKRequest.m in Sources */,
+				6A773192131DE2190081015A /* BKRequestOperation.m in Sources */,
+				6A773193131DE2190081015A /* BKSetCurrentFilterRequest.m in Sources */,
+				6A773194131DE2190081015A /* BKXMLMapper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6A773141131DDD140081015A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		6A773142131DDD140081015A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		6A773154131DDD1B0081015A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BasicRequests-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		6A773155131DDD1B0081015A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "BasicRequests-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6A77313F131DDD140081015A /* Build configuration list for PBXProject "BasicRequests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A773141131DDD140081015A /* Debug */,
+				6A773142131DDD140081015A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6A773153131DDD1B0081015A /* Build configuration list for PBXNativeTarget "BasicRequests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A773154131DDD1B0081015A /* Debug */,
+				6A773155131DDD1B0081015A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6A77313C131DDD140081015A /* Project object */;
+}
