@@ -1,5 +1,5 @@
 //
-// main.m
+// BasicRequestDemo.h
 //
 // Copyright (c) 2011 Lukhnos D. Liu (http://lukhnos.org)
 //
@@ -25,16 +25,17 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BasicRequestDemo.h"
+#import <Foundation/Foundation.h>
 
-int main (int argc, const char * argv[])
+@interface BasicRequestsDemo : NSObject
 {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
-    BasicRequestsDemo *demo = [[BasicRequestsDemo alloc] init];
-    [demo run];
-    [demo release];
+    NSOperationQueue *opQueue;
     
-    [pool drain];
-    return 0;
+    BOOL runloopRunning;
+    NSMessagePort *messagePort;    
 }
+- (void)prepareRunloop;
+- (void)enterRunloop;
+- (void)quitRunloop;
+- (void)run;
+@end

@@ -27,6 +27,7 @@
 		6A773192131DE2190081015A /* BKRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A77317E131DE2190081015A /* BKRequestOperation.m */; };
 		6A773193131DE2190081015A /* BKSetCurrentFilterRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773180131DE2190081015A /* BKSetCurrentFilterRequest.m */; };
 		6A773194131DE2190081015A /* BKXMLMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A773182131DE2190081015A /* BKXMLMapper.m */; };
+		6A7731A8131DF0A30081015A /* BasicRequestDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A7731A7131DF0A30081015A /* BasicRequestDemo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +75,8 @@
 		6A773182131DE2190081015A /* BKXMLMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BKXMLMapper.m; sourceTree = "<group>"; };
 		6A773183131DE2190081015A /* BugzKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugzKit.h; sourceTree = "<group>"; };
 		6A7731A5131DEE8E0081015A /* AccountInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountInfo.h; sourceTree = "<group>"; };
+		6A7731A6131DF0A30081015A /* BasicRequestDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasicRequestDemo.h; sourceTree = "<group>"; };
+		6A7731A7131DF0A30081015A /* BasicRequestDemo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasicRequestDemo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,11 +95,13 @@
 			isa = PBXGroup;
 			children = (
 				6A7731A5131DEE8E0081015A /* AccountInfo.h */,
-				6A77315E131DE2190081015A /* BugzKit */,
+				6A7731A6131DF0A30081015A /* BasicRequestDemo.h */,
+				6A7731A7131DF0A30081015A /* BasicRequestDemo.m */,
 				6A773156131DDD880081015A /* BasicRequests-Prefix.pch */,
 				6A77315A131DDDFC0081015A /* RequestOperation.h */,
 				6A77315B131DDDFC0081015A /* RequestOperation.m */,
 				6A773157131DDD880081015A /* main.m */,
+				6A77315E131DE2190081015A /* BugzKit */,
 				6A77314A131DDD1B0081015A /* Frameworks */,
 				6A773148131DDD1B0081015A /* Products */,
 			);
@@ -228,6 +233,7 @@
 				6A773192131DE2190081015A /* BKRequestOperation.m in Sources */,
 				6A773193131DE2190081015A /* BKSetCurrentFilterRequest.m in Sources */,
 				6A773194131DE2190081015A /* BKXMLMapper.m in Sources */,
+				6A7731A8131DF0A30081015A /* BasicRequestDemo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
