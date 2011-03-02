@@ -56,9 +56,9 @@ The sample app also schedules a runloop in the main thread and only quits the ru
 Coverage of this API Library
 ----------------------------
 
-A lot of things in FogBugz are not covered in the API library, such as Wiki and time tracking. It should not be hard to support them.
+A lot of things in FogBugz are not covered in the API library, such as Wiki and time tracking. It should not be hard to extend the library for those purposes.
 
-`BKEditCaseRequest` and `BKMailRequest` handles file attachments for you. When you init those objects, there's an init method that takes an array of URLs as one of its arguments. Those URLs must be file URLs, and the request objects will create the necessary temp files for you under the hood, and you can use the `requestInputStream` property to get a read stream for the raw bytes data, which you send as the multipart HTTP request body.
+`BKEditCaseRequest` and `BKMailRequest` are capable of handling file attachments for you. When you initialize those objects, there's an init method that takes an array of URLs as one of its arguments. Those URLs must be file URLs, and the request objects will create the necessary temp files for you under the hood, and you can use the `requestInputStream` property to get a read stream for the raw bytes data, which you send as the multipart HTTP request body.
 
 The definitive FogBugz API guide is of course http://fogbugz.stackexchange.com/fogbugz-xml-api.
 
