@@ -25,7 +25,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BasicRequestDemo.h"
+#import "BasicRequestsDemo.h"
 
 int main (int argc, const char * argv[])
 {

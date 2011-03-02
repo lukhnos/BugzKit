@@ -1,5 +1,5 @@
 //
-// BasicRequestDemo.m
+// BasicRequestsDemo.m
 //
 // Copyright (c) 2011 Lukhnos D. Liu (http://lukhnos.org)
 //
@@ -25,7 +25,7 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#import "BasicRequestDemo.h"
+#import "BasicRequestsDemo.h"
 #import "RequestOperation.h"
 
 #import "AccountInfo.h"
