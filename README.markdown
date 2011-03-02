@@ -9,7 +9,7 @@ Since Lithoglyph has discontinued developing the application, I think we should 
 Design Concepts
 ---------------
 
-Basically, the library is designed to separate request objects (objects that encapsulate API request details) and request operations (the actual worker objects that make the HTTP requests and handle the response). This allows the library to be used in a multithreaded app, backed by NSOperation objects and operation queues.
+Basically, the library is designed to separate request objects (objects that encapsulate API request details) from request operations (the actual worker objects that make the HTTP requests and handle the response). This allows the library to be used in a multithreaded app, backed by NSOperation objects and operation queues.
 
 
 Walking Through the BasicRequests Demo
@@ -30,7 +30,7 @@ In this sample app (note: a command-line tool), we want to do a few things:
 
 Apparently, each task depends on the successful execution of the previous task.
 
-BugzKit solves the dependency problem by separating "request objects" and "request operations".
+BugzKit solves the dependency problem by separating "request objects" from "request operations".
 
 A "request object" (like `BKLogOnRequest`, `BKListRequest`) encapsulates the information required to make a request (URL, auth token, parameters, HTTP method, etc.) and also handles the received information.
 
@@ -40,7 +40,7 @@ BugzKit only provides you `BKRequestOperation`, a skeleton. You need to fill in 
 
 Take a look at `RequestOperation.m`, and you'll understand why I leave so many implementation details to you. 
 
-After the request operation has received the HTTP payload, it has to convert the raw byte stream into meaningful data. FogBugz uses XML, and BugzKit supplies a `BKXMLMapper` helper class to first parse the XML then map the elements to an NSDictionary, much like what many XML-to-JSON libraries do. Using NSDictionary and NSArray objects to manipulate structured data is way then dealing with XML.
+After the request operation has received the HTTP payload, it has to convert the raw byte stream into meaningful data. FogBugz uses XML, and BugzKit supplies a `BKXMLMapper` helper class to first parse the XML then map the elements to an NSDictionary, much like what many XML-to-JSON libraries do. Using NSDictionary and NSArray objects to manipulate structured data is easier than dealing with XML.
 
 A very important note here: `BKXMLMapper` has an option to let you use `NSXMLParser` (default) or libxml2. Unfortunately neither library is thread-safe and garbage collection-compatible. `BKXMLMapper` takes care of the thread-safe issue by using putting using the `@synchronized` block. If you want to make a number of large requests at the same time, the XML parsing phase can become a bottleneck. And that they leak memory in GC is one of the reason LadyBugz couldn't use GC. FogBugz API actually only uses a small subset of XML, and it should be possible to pick an efficient, thread-safe, GC-compatible XML parser to work with BugzKit.
 
